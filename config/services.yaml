@@ -21,6 +21,7 @@ parameters:
   casMail: "%env(resolve:CAS_MAIL)%"
   casLastname: "%env(resolve:CAS_LASTNAME)%"
   casFirstname: "%env(resolve:CAS_FIRSTNAME)%"
+  ldapBase: "%env(resolve:LDAP_BASE)%"
 
 services:
     _defaults:

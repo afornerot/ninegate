@@ -14,6 +14,7 @@ use App\Repository\Ldap\LdapCapabilityRepository;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class LdapSyncListener
 {
@@ -22,6 +23,7 @@ class LdapSyncListener
         private LdapGroupRepository $ldapGroupRepo,
         private LdapUserRepository $ldapUserRepo,
         private LdapCapabilityRepository $ldapCapabilityRepo,
+        private ParameterBagInterface $parameterBag,
     ) {
     }
 
@@ -140,7 +142,7 @@ class LdapSyncListener
 
         foreach ($user->getUserGroups() as $ug) {
             $group = $ug->getGroup();
-            $ouName = strtolower('ou=' . $group->getName() . ',dc=ninegate,dc=local');
+            $ouName = strtolower('ou=' . $group->getName() . ',' . $this->parameterBag->get('ldapBase'));
 
             if (in_array($ug->getRole(), [UserGroup::ROLE_MASTER, UserGroup::ROLE_USER])) {
                 $cap = new LdapCapability();

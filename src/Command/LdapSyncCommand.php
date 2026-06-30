@@ -11,6 +11,7 @@ use App\Repository\Ldap\LdapUserRepository;
 use App\Repository\Ldap\LdapCapabilityRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,6 +31,7 @@ class LdapSyncCommand extends Command
         private LdapUserRepository $ldapUserRepo,
         private LdapCapabilityRepository $ldapCapabilityRepo,
         private \Doctrine\DBAL\Connection $connection,
+        private ParameterBagInterface $parameterBag,
     ) {
         parent::__construct();
     }
@@ -113,11 +115,13 @@ class LdapSyncCommand extends Command
 
     private function syncCapabilities(SymfonyStyle $io): void
     {
+        $ldapBase = $this->parameterBag->get('ldapBase');
+
         $this->connection->executeStatement('DELETE FROM capabilities');
 
-        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'search', 'dc=ninegate,dc=local' FROM user u JOIN user_group ug ON ug.user_id = u.id WHERE ug.role IN ('MASTER', 'USER')");
-        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'add', LOWER(CONCAT('ou=', g.name, ',dc=ninegate,dc=local')) FROM user u JOIN user_group ug ON ug.user_id = u.id JOIN `group` g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
-        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'modify', LOWER(CONCAT('ou=', g.name, ',dc=ninegate,dc=local')) FROM user u JOIN user_group ug ON ug.user_id = u.id JOIN `group` g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
+        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'search', '$ldapBase' FROM user u JOIN user_group ug ON ug.user_id = u.id WHERE ug.role IN ('MASTER', 'USER')");
+        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'add', LOWER(CONCAT('ou=', g.name, ',$ldapBase')) FROM user u JOIN user_group ug ON ug.user_id = u.id JOIN `group` g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
+        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'modify', LOWER(CONCAT('ou=', g.name, ',$ldapBase')) FROM user u JOIN user_group ug ON ug.user_id = u.id JOIN `group` g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
 
         $io->text('    ✓ capabilities peuplées');
     }
