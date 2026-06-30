@@ -10,9 +10,6 @@ services:
       MYSQL_PASSWORD: changeme
     volumes:
       - ./volume/mariadb:/var/lib/mysql
-    networks:
-      - ninegate_default
-
   ninegate:
     image: ghcr.io/afornerot/ninegate
     container_name: ninegate
@@ -36,9 +33,6 @@ services:
       - ./.env.local:/app/.env.local
       - ./volume/dex:/app/volume/dex
       - ./volume/glauth:/app/volume/glauth
-    networks:
-      - ninegate_default
-
   adminer:
     image: adminer
     container_name: ninegate-adminer
@@ -47,9 +41,6 @@ services:
       - mariadb
     ports:
       - 6019:8080
-    networks:
-      - ninegate_default
-
   mailhog:
     image: mailhog/mailhog
     container_name: ninegate-mailhog
@@ -57,9 +48,6 @@ services:
     ports:
       - "8025:8025"
       - "1025:1025"
-    networks:
-      - ninegate_default
-
   glauth:
     image: ghcr.io/glauth/glauth-plugins:v2.4.0
     container_name: ninegate-glauth
@@ -71,8 +59,4 @@ services:
       - "389:3893"
     volumes:
       - ./volume/glauth:/app/config
-    networks:
-      - ninegate_default
 
-networks:
-  ninegate_default:
