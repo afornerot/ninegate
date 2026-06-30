@@ -30,7 +30,7 @@
                     </p>
                     {% endif %}
                     {% if showDescription and item.description %}
-                        <p class="card-text small">{{ item.description|striptags|slice(0, 120)|nl2br }}{% if item.description|striptags|length > 120 %}...{% endif %}</p>
+                        <p class="card-text small">{{ item.description|striptags|replace({"\r\n": " ", "\n": " ", "\r": " "})|trim|slice(0, 120) }}{% if item.description|striptags|replace({"\r\n": " ", "\n": " ", "\r": " "})|trim|length > 120 %}...{% endif %}</p>
                     {% endif %}
                 </div>
             </div>

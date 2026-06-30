@@ -90,7 +90,7 @@ class PageRepository extends ServiceEntityRepository
             if (!$userGroup) {
                 continue;
             }
-            if ($group->getType() === Group::TYPE_WORK_GROUP) {
+            if (Group::TYPE_WORK_GROUP === $group->getType()) {
                 if (in_array($userGroup->getRole(), [UserGroup::ROLE_USER, UserGroup::ROLE_MASTER])) {
                     return true;
                 }
