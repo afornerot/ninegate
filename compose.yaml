@@ -76,4 +76,3 @@ services:
 
 networks:
   ninegate_default:
-    external: true
