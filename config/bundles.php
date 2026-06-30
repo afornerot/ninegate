@@ -14,7 +14,7 @@ return [
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
     Oneup\UploaderBundle\OneupUploaderBundle::class => ['all' => true],
-    Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
+    Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['all' => true],
     Bnine\MdEditorBundle\BnineMdEditorBundle::class => ['all' => true],
     Bnine\FilesBundle\BnineFilesBundle::class => ['all' => true],
 ];
