@@ -1,0 +1,20 @@
+name: Slate
+description: Theme gris élégant
+primary: "#6c757d"
+secondary: "#495057"
+success: "#198754"
+danger: "#dc3545"
+warning: "#ffc107"
+info: "#0dcaf0"
+light: "#f8f9fa"
+dark: "#343a40"
+body-bg: "#e9ecef"
+body-color: "#212529"
+body-color-dark: "#ffffff"
+border-color: "#dee2e6"
+card-bg: "#ffffff"
+btn-bg: "#6c757d"
+btn-border-color: "#6c757d"
+fontHeader: Acme
+fontBody: Lato
+app-bs-header: "#6c757d"

@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{% if is_granted('blogarticle_create', blog) %}
+    <div class="d-flex gap-2 mb-3">
+        <a href="{{ path(routearticle_submit, {blogId: blog.id}) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvel Article
+        </a>
+    </div>
+{% endif %}
+
+<div class="blog-masonry">
+    {% for article in articles %}
+        <div class="blog-masonry-item">
+            <div class="card">
+                {% if article.image %}
+                    <a href="{{ path(isAdmin ? 'app_admin_blogarticle_view' : 'app_blogarticle_view', {slug: article.slug}) }}">
+                        <img src="{{ path('bninefiles_files_thumbnail', {domain: 'blog', id: blog.id, path: article.image}) }}" class="card-img-top" alt="{{ article.title }}">
+                    </a>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title mb-1">
+                        <a href="{{ path(isAdmin ? 'app_admin_blogarticle_view' : 'app_blogarticle_view', {slug: article.slug}) }}" class="text-decoration-none">
+                            {{ article.title }}
+                        </a>
+                    </h6>
+                    <p class="card-text text-muted small mb-1">
+                        <i class="fas fa-user"></i> {{ article.user ? article.user.displayName : 'Inconnu' }}
+                        &middot;
+                        <i class="fas fa-clock"></i> {{ article.createdAt|date('d/m/Y H:i') }}
+                    </p>
+                    {% if article.content %}
+                        <p class="card-text small">{{ article.content|slice(0, 120)|nl2br }}{% if article.content|length > 120 %}...{% endif %}</p>
+                    {% endif %}
+                    <a href="{{ path(isAdmin ? 'app_admin_blogarticle_view' : 'app_blogarticle_view', {slug: article.slug}) }}" class="btn btn-sm btn-primary">
+                        Lire la suite
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted">Aucun article dans ce blog.</p>
+    {% endfor %}
+</div>
+{% endblock %}

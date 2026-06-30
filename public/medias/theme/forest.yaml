@@ -1,0 +1,20 @@
+name: Forest
+description: Theme vert forêt naturel
+primary: "#2d6a4f"
+secondary: "#40916c"
+success: "#52b788"
+danger: "#e63946"
+warning: "#f4a261"
+info: "#457b9d"
+light: "#d8f3dc"
+dark: "#1b4332"
+body-bg: "#081c15"
+body-color: "#ffffff"
+body-color-dark: "#ffffff"
+border-color: "#40916c"
+card-bg: "#2d6a4f"
+btn-bg: "#52b788"
+btn-border-color: "#52b788"
+fontHeader: Baloo
+fontBody: Lato
+app-bs-header: "#f8f9fa"

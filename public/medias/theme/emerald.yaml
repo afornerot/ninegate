@@ -1,0 +1,20 @@
+name: Emerald
+description: Theme émeraude luxuriant
+primary: "#009432"
+secondary: "#0652DD"
+success: "#009432"
+danger: "#cb2d3e"
+warning: "#f39c12"
+info: "#1e90ff"
+light: "#c8d6e5"
+dark: "#222f3e"
+body-bg: "#1dd1a1"
+body-color: "#222f3e"
+body-color-dark: "#222f3e"
+border-color: "#009432"
+card-bg: "#10ac84"
+btn-bg: "#009432"
+btn-border-color: "#009432"
+fontHeader: Anton
+fontBody: Lato
+app-bs-header: "#f8f9fa"

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block navbar_extra %}
+    {% if is_granted('page_edit', page) %}
+        <a class="nav-link px-2" href="{{ path(isAdmin ? 'app_admin_pagewidget_list' : 'app_user_pagewidget_list', { 'pageId': page.id }) }}" title="Gérer les widgets">
+            <i class="fa-solid fa-cubes fa-2x"></i>
+        </a>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+{{ page.pageTemplate.template|raw }}
+
+<div id="page-widgets-data" style="display:none;">
+    {% for widget in widgets|sort((a, b) => a.widgetOrder <=> b.widgetOrder) %}
+        <div class="page-widget" data-location="{{ widget.location|default('R1C1') }}" data-id="{{ widget.id }}">
+            {{ render(path(isAdmin ? 'app_admin_pagewidget_render' : 'app_user_pagewidget_render', {pageId: page.id, id: widget.id})) }}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block localscript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var widgetsData = document.getElementById('page-widgets-data');
+    if (!widgetsData) return;
+    
+    var widgets = widgetsData.querySelectorAll('.page-widget');
+    widgets.forEach(function(widget) {
+        var location = widget.getAttribute('data-location') || 'R1C1';
+        var target = document.getElementById(location);
+        if (target) {
+            target.appendChild(widget);
+        } else {
+            var defaultTarget = document.getElementById('R1C1');
+            if (defaultTarget) {
+                defaultTarget.appendChild(widget);
+            }
+        }
+    });
+    
+    widgetsData.remove();
+});
+</script>
+{% endblock %}

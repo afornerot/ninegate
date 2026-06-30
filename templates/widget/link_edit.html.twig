@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+<div class="d-flex gap-2 mb-3">
+    <button type="button" class="btn btn-success link-save-btn"
+            data-save-url="{{ path(routeSave, {pageWidgetId: pageWidget.id}) }}"
+            data-page="{{ page.id }}">
+        <i class="fas fa-save"></i> Sauvegarder
+    </button>
+    <a href="{{ path(routecancel, {slug: page.slug}) }}" class="btn btn-secondary">Retour</a>
+    <button type="button" class="btn btn-outline-primary ms-auto" id="addLinkBtn-{{ pageWidget.id }}">
+        <i class="fas fa-plus"></i> Ajouter un lien
+    </button>
+</div>
+
+<div id="link-list-{{ pageWidget.id }}">
+    {% for link in links %}
+        <div class="card mb-2 link-card">
+            <div class="card-body p-2">
+                <div class="row g-2 align-items-start">
+                    {# Colonne 1 : Icône #}
+                    <div class="col-md-1 text-center">
+                        <img class="link-icon-preview"
+                             src="{% if link.iconId is defined and link.iconId %}{% for icon in icons %}{% if icon.id == link.iconId %}/{{ icon.route }}{% endif %}{% endfor %}{% endif %}"
+                             style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 4px; {% if not link.iconId is defined or not link.iconId %}display: none;{% endif %}">
+                        <input type="hidden" class="link-icon-id" value="{{ link.iconId|default('') }}">
+                        <div class="d-flex gap-1 justify-content-center mt-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary link-icon-btn" title="Choisir une icône">
+                                <i class="fas fa-icons"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger link-icon-clear" title="Retirer" style="{% if not link.iconId is defined or not link.iconId %}display: none;{% endif %}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {# Colonne 2 : Titre / URL / Résumé / Couleurs / Flag #}
+                    <div class="col-md-4">
+                        <input type="text" class="form-control form-control-sm link-title mb-2" placeholder="Titre *" value="{{ link.title|default('') }}">
+                        <input type="url" class="form-control form-control-sm link-url mb-2" placeholder="URL *" value="{{ link.url|default('') }}">
+                        <input type="text" class="form-control form-control-sm link-summary mb-2" placeholder="Résumé" value="{{ link.summary|default('') }}">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small">Fond</label>
+                                <input type="text" class="form-control form-control-sm color-input link-bgcolor" value="{{ link.bgcolor|default('') }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small">Texte</label>
+                                <input type="text" class="form-control form-control-sm color-input link-color" value="{{ link.color|default('') }}">
+                            </div>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input type="checkbox" class="form-check-input link-new-tab" {% if link.newTab|default(true) %}checked{% endif %}>
+                            <label class="form-check-label small">Ouvrir dans un nouvel onglet</label>
+                        </div>
+                    </div>
+                    {# Colonne 3 : Description #}
+                    <div class="col-md-7">
+                        <textarea class="form-control form-control-sm link-description" rows="5" placeholder="Description">{{ link.description|default('') }}</textarea>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-sm btn-outline-danger link-delete" title="Supprimer">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div id="link-no-links-{{ pageWidget.id }}" class="text-muted text-center p-3" {% if links|length > 0 %}style="display:none"{% endif %}>
+    Aucun lien. Ajoutez-en un avec le bouton "Ajouter un lien" en haut.
+</div>
+
+{# Icon picker modal #}
+<div class="modal fade" id="iconPickerModalLink" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Choisir une icône</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="iconSearchInputLink" placeholder="Rechercher par tags...">
+                </div>
+                <div class="d-flex flex-wrap gap-2" id="iconGridLink">
+                    {% for icon in icons %}
+                        <div class="icon-picker-link-item" data-id="{{ icon.id }}" data-route="{{ icon.route }}" data-tags="{{ icon.tags|default('') }}" title="{{ icon.tags|default(icon.route) }}">
+                            <img src="/{{ icon.route }}" alt="{{ icon.tags|default('') }}" style="height: 40px; width: 40px; object-fit: contain;">
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

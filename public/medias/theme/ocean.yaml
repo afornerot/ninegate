@@ -1,0 +1,20 @@
+name: Ocean
+description: Theme bleu océan rafraîchissant
+primary: "#0077b6"
+secondary: "#00b4d8"
+success: "#06d6a0"
+danger: "#ef476f"
+warning: "#ffd166"
+info: "#118ab2"
+light: "#caf0f8"
+dark: "#03045e"
+body-bg: "#023e8a"
+body-color: "#ffffff"
+body-color-dark: "#ffffff"
+border-color: "#0077b6"
+card-bg: "#0096c7"
+btn-bg: "#00b4d8"
+btn-border-color: "#00b4d8"
+fontHeader: Baloo
+fontBody: Lato
+app-bs-header: "#f8f9fa"

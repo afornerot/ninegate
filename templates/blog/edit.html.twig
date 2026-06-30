@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if routedelete is defined and blog and blog.id %}
+        <a href="{{ path(routedelete, {id: blog.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Supprimer ce blog et tous ses articles ?')">Supprimer</a>
+    {% endif %}
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="mb-0">Blog</h5>
+    </div>
+    <div class="card-body">
+        {{ form_row(form.title) }}
+        {% if form.groups is defined %}
+            {{ form_row(form.groups) }}
+        {% endif %}
+        {% if form.roles is defined %}
+            {{ form_row(form.roles) }}
+        {% endif %}
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

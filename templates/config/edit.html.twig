@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+<form method="post">
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if routedelete is defined and config and config.id %}
+        <a href="{{ path(routedelete, {id: config.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Voulez-vous remettre à défaut cette configuration ?')">Remise à défaut</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-6 m-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5>Configuration</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Titre:</strong> {{ config.title }}</p>
+                <p><strong>Type:</strong> {{ config.type }}</p>
+                <p><strong>Groupe:</strong> {{ config.configGroup }}</p>
+                <p><strong>Valeur par défaut:</strong> {{ config.defaultValue }}</p>
+                {{ form_row(form.rawValue) }}
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+{% endblock %}

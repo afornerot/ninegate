@@ -1,0 +1,69 @@
+{% if items|length > 0 %}
+<div class="rss-widget">
+    {% if feeds|length > 1 %}
+    <div class="rss-feed-nav mb-2 d-flex gap-1 flex-wrap" data-rss-id="{{ pageWidget.id }}">
+        <a href="#" class="badge rss-feed-filter active" data-feed="all" style="background: var(--bs-primary); cursor: pointer;">Tous</a>
+        {% for feed in feeds %}
+        <a href="#" class="badge rss-feed-filter" data-feed="{{ feed }}" style="background: var(--bs-secondary); cursor: pointer;">{{ feed }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="blog-masonry" id="rss-items-{{ pageWidget.id }}">
+        {% for item in items %}
+        <div class="blog-masonry-item" data-rss-source="{{ item.source|default('') }}">
+            <div class="card">
+                {% if item.image %}
+                    <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ item.image }}" class="card-img-top" alt="{{ item.title }}">
+                    </a>
+                {% endif %}
+                <div class="card-body">
+                    <div class="card-title mb-1">
+                        <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                            <h6 class="mb-0">{{ item.title }}</h6>
+                        </a>
+                    </div>
+                    {% if item.pubDate %}
+                    <p class="card-text text-muted small mb-1">
+                        <i class="fas fa-clock"></i> {{ item.pubDate|date('d/m/Y H:i') }}
+                    </p>
+                    {% endif %}
+                    {% if showDescription and item.description %}
+                        <p class="card-text small">{{ item.description|striptags|slice(0, 120)|nl2br }}{% if item.description|striptags|length > 120 %}...{% endif %}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var $nav = $('.rss-feed-nav[data-rss-id="{{ pageWidget.id }}"]');
+    var $items = $('#rss-items-{{ pageWidget.id }}');
+    $nav.on('click', '.rss-feed-filter', function(e) {
+        e.preventDefault();
+        $nav.find('.rss-feed-filter').removeClass('active').css('background', 'var(--bs-secondary)');
+        $(this).addClass('active').css('background', 'var(--bs-primary)');
+        var feed = $(this).data('feed');
+        $items.find('.blog-masonry-item').each(function() {
+            if (feed === 'all' || $(this).data('rss-source') === feed) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+});
+</script>
+{% else %}
+<div class="text-muted small p-2">
+    {% if feedUrls is defined and feedUrls %}
+        <i class="fas fa-exclamation-circle"></i> Flux RSS introuvable(s) ou invalide(s).
+    {% else %}
+        <i class="fas fa-rss"></i> Configurez les URLs des flux RSS dans les paramètres du widget.
+    {% endif %}
+</div>
+{% endif %}

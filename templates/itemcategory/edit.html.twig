@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="card mb-3">
+    <div class="card-body">
+        {{ form_row(form.title) }}
+        {{ form_row(form.sortOrder) }}
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+    <button type="submit" class="btn btn-success">Valider</button>
+    <a href="{{ path('app_admin_itemcategory_list') }}" class="btn btn-secondary">Annuler</a>
+</div>
+{{ form_end(form) }}
+{% endblock %}

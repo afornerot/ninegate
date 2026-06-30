@@ -1,0 +1,45 @@
+{% if canManage %}
+<div class="note-widget-view">
+    <div class="widget-actions">
+        <button class="btn btn-sm btn-outline-secondary note-edit-btn" title="Modifier" data-page-widget-id="{{ pageWidget.id }}">
+            <i class="fas fa-edit"></i>
+        </button>
+    </div>
+    <div class="note-widget-display" id="note-display-{{ pageWidget.id }}">
+        {% if pageWidget.content and pageWidget.content.markdown is defined and pageWidget.content.markdown %}
+            {{ pageWidget.content.markdown|markdown }}
+        {% else %}
+            <p class="text-muted fst-italic mb-0">Cliquez pour ajouter une note...</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="noteModal-{{ pageWidget.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ pageWidget.title|default(pageWidget.widget.title) }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="note-mde-loading text-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                </div>
+                <textarea class="easymde-textarea d-none" id="note-mde-{{ pageWidget.id }}">{{ pageWidget.content.markdown|default('') }}</textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success note-save-btn" data-page-widget-id="{{ pageWidget.id }}" data-save-url="{{ path(routeSave, {pageWidgetId: pageWidget.id}) }}">
+                    <i class="fas fa-check"></i> Sauvegarder
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+    {% if pageWidget.content and pageWidget.content.markdown is defined and pageWidget.content.markdown %}
+        {{ pageWidget.content.markdown|markdown }}
+    {% endif %}
+{% endif %}

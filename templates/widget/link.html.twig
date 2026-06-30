@@ -1,0 +1,44 @@
+{# Widget actions #}
+{% if canManage %}
+<div class="widget-actions">
+    <button type="button" class="btn btn-sm btn-outline-secondary bureau-size-toggle"
+            data-bureau-id="{{ pageWidget.id }}"
+            data-current="medium"
+            data-show-fav="0"
+            title="Changer la taille d'affichage">
+        <i class="fas fa-th-large"></i>
+    </button>
+    <a href="{{ path(isAdmin ? 'app_admin_pagewidget_link_edit' : 'app_user_pagewidget_link_edit', {pageWidgetId: pageWidget.id}) }}" class="btn btn-sm btn-outline-secondary" title="Éditer les liens">
+        <i class="fas fa-edit"></i>
+    </a>
+</div>
+{% endif %}
+
+{# Links display #}
+<div class="itemlink-items itemlink-medium" id="link-widget-{{ pageWidget.id }}">
+    {% for link in links %}
+        <div class="itemlink-item" data-title="{{ link.title|default('')|lower }}" data-summary="{{ link.summary|default('')|lower }}"
+             style="{% if link.bgcolor is defined and link.bgcolor %}background-color: {{ link.bgcolor }};{% endif %}{% if link.color is defined and link.color %} color: {{ link.color }};{% endif %}"
+             title="{{ link.title|default('') }}{% if link.description is defined and link.description %}\n{{ link.description }}{% endif %}">
+            {% if link.iconId is defined and link.iconId %}
+                {% for icon in icons %}
+                    {% if icon.id == link.iconId %}
+                        <img src="/{{ icon.route }}" class="itemlink-item-icon" alt="">
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <div class="itemlink-item-content">
+                <strong>{{ link.title|default('') }}</strong>
+                {% if link.summary is defined and link.summary %}
+                    <small class="text-muted itemlink-summary">{{ link.summary }}</small>
+                {% endif %}
+                {% if link.description is defined and link.description %}
+                    <small class="text-muted itemlink-item-desc">{{ link.description|slice(0, 150) }}{% if link.description|length > 150 %}...{% endif %}</small>
+                {% endif %}
+            </div>
+            {% if link.url is defined and link.url %}
+                <a href="{{ link.url }}" target="{{ link.newTab|default(true) ? '_blank' : '_self' }}" class="stretched-link" title="{{ link.title|default('') }}"></a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

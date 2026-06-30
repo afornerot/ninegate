@@ -1,0 +1,43 @@
+{% block icon_entity_widget %}
+    <div class="icon-entity-wrapper" data-input-id="{{ id }}">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <img class="icon-entity-preview" src="" alt="" style="height: 40px; width: 40px; object-fit: contain; border-radius: 4px; background: var(--bs-light); padding: 4px; display: none;">
+            <span class="icon-entity-name text-muted small">Aucune icône sélectionnée</span>
+            <button type="button" class="btn btn-sm btn-outline-primary icon-entity-btn" data-bs-toggle="modal" data-bs-target="#iconPickerModal">
+                <i class="fas fa-icons"></i> Choisir
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger icon-entity-clear" title="Retirer l'icône" style="display: none;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <input type="hidden" {{ block('widget_attributes') }} value="{{ value }}" required>
+        <div class="icon-entity-error text-danger small" style="display: none;">Veuillez choisir une icône</div>
+    </div>
+
+    {# Render the icon picker modal once (only if not already rendered by another widget) #}
+    {% if not app.request.attributes.get('_icon_modal_rendered') %}
+        {% set _ = app.request.attributes.set('_icon_modal_rendered', true) %}
+        <div class="modal fade" id="iconPickerModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Choisir une icône</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="iconSearchInput" placeholder="Rechercher par tags...">
+                        </div>
+                        <div class="d-flex flex-wrap gap-2" id="iconGrid">
+                            {% for icon in icons %}
+                                <div class="icon-picker-item" data-id="{{ icon.id }}" data-route="{{ icon.route }}" data-tags="{{ icon.tags|default('') }}" title="{{ icon.tags|default(icon.route) }}">
+                                    <img src="/{{ icon.route }}" alt="{{ icon.tags|default('') }}" style="height: 40px; width: 40px; object-fit: contain;">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

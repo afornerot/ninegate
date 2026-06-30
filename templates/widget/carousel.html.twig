@@ -1,0 +1,163 @@
+{% if canManage %}
+<div class="widget-actions">
+    <button class="btn btn-sm btn-outline-secondary carousel-upload-btn" title="Uploader des images">
+        <i class="fas fa-upload"></i>
+    </button>
+    <button class="btn btn-sm btn-outline-secondary carousel-edit-btn" title="Éditer les slides"
+            data-bs-toggle="modal" data-bs-target="#carouselEditModal-{{ pageWidget.id }}">
+        <i class="fas fa-edit"></i>
+    </button>
+</div>
+{% endif %}
+
+<div class="carousel-widget" id="carousel-widget-{{ pageWidget.id }}"
+     data-page-widget-id="{{ pageWidget.id }}"
+     data-save-url="{{ path(routeSave, {pageWidgetId: pageWidget.id}) }}"
+     data-list-files-url="{{ path('bninefiles_files', {domain: domain, id: id, editable: editable, compact: 1}) }}"
+     data-slides-list-id="carousel-slides-list-{{ pageWidget.id }}">
+    {% if slides|length > 0 %}
+        <div id="carousel-{{ pageWidget.id }}" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-indicators">
+                {% for slide in slides %}
+                    <button type="button" data-bs-target="#carousel-{{ pageWidget.id }}" data-bs-slide-to="{{ loop.index0 }}"
+                            {% if loop.first %}class="active" aria-current="true"{% endif %}
+                            aria-label="Slide {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for slide in slides %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <img src="{{ path('bninefiles_files_image', {domain: domain, id: id, path: slide.image}) }}"
+                                 class="d-block w-100" alt="{{ slide.title|default(slide.image) }}">
+                            {% if slide.link %}
+                                <a href="{{ slide.link }}" target="{{ slide.linkTarget|default('_blank') }}"
+                                   class="carousel-slide-link"></a>
+                            {% endif %}
+                            {% if slide.title or slide.description %}
+                                <div class="carousel-caption">
+                                    {% if slide.title %}
+                                        <h5>{{ slide.title }}</h5>
+                                    {% endif %}
+                                    {% if slide.description %}
+                                        <p>{{ slide.description }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carousel-{{ pageWidget.id }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Précédent</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carousel-{{ pageWidget.id }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Suivant</span>
+            </button>
+        </div>
+    {% else %}
+        <div class="carousel-empty text-center p-4 text-muted">
+            <i class="fas fa-images fa-3x mb-2"></i>
+            <p class="mb-0">Aucune image. Uploadez des images pour créer un carousel.</p>
+        </div>
+    {% endif %}
+</div>
+
+{# Upload modal #}
+<div id="mymodalupload-{{ domain }}-{{ id }}" class="modal" tabindex="-1"
+     data-domain="{{ domain }}" data-id="{{ id }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Uploader des images</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="framemodal-{{ pageWidget.id }}" frameborder="0" width="100%" height="600px"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Edit slides modal #}
+{% if canManage %}
+<div class="modal fade" id="carouselEditModal-{{ pageWidget.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Éditer les slides</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div id="carousel-slides-list-{{ pageWidget.id }}">
+                    {% for slide in slides %}
+                        <div class="card mb-2 carousel-slide-card" data-index="{{ loop.index0 }}">
+                            <div class="card-body p-2">
+                                <div class="d-flex align-items-start gap-2">
+                                    <img src="{{ path('bninefiles_files_thumbnail', {domain: domain, id: id, path: slide.image}) }}"
+                                         class="rounded" style="width: 80px; height: 60px; object-fit: cover;" alt="">
+                                    <div class="flex-grow-1">
+                                        <input type="text" class="form-control form-control-sm mb-1 slide-title"
+                                               placeholder="Titre" value="{{ slide.title|default('') }}">
+                                        <input type="text" class="form-control form-control-sm mb-1 slide-description"
+                                               placeholder="Description" value="{{ slide.description|default('') }}">
+                                        <input type="url" class="form-control form-control-sm mb-1 slide-link"
+                                               placeholder="Lien (https://...)" value="{{ slide.link|default('') }}">
+                                        <div class="form-check form-check-inline mt-1">
+                                            <input type="checkbox" class="form-check-input slide-link-target" id="linkTarget-{{ pageWidget.id }}-{{ loop.index0 }}"
+                                                   {% if slide.linkTarget|default('_blank') == '_blank' %}checked{% endif %}>
+                                            <label class="form-check-label small" for="linkTarget-{{ pageWidget.id }}-{{ loop.index0 }}">Nouvel onglet</label>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger carousel-slide-delete" title="Supprimer ce slide">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div id="carousel-no-slides-{{ pageWidget.id }}" class="text-muted text-center p-3" {% if slides|length > 0 %}style="display:none"{% endif %}>
+                    Aucune image. Uploadez des images d'abord.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success carousel-save-btn"
+                        data-save-url="{{ path(routeSave, {pageWidgetId: pageWidget.id}) }}"
+                        data-slides-list-id="carousel-slides-list-{{ pageWidget.id }}"
+                        data-modal-id="carouselEditModal-{{ pageWidget.id }}">
+                    <i class="fas fa-check"></i> Sauvegarder
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if canManage %}
+<script>
+$(document).ready(function() {
+    var modalId = 'mymodalupload-{{ domain }}-{{ id }}';
+    var uploadUrl = '{{ path("bninefiles_files_uploadmodal", {domain: domain, id: id, imageOnly: 1}) }}';
+
+    $('.carousel-upload-btn').on('click', function() {
+        $('#' + modalId).find('iframe').attr('src', uploadUrl);
+        var modal = bootstrap.Modal.getOrCreateInstance($('#' + modalId)[0]);
+        modal.show();
+    });
+
+    window.imageUploadDone = function(filename) {
+        var modal = bootstrap.Modal.getInstance($('#' + modalId)[0]);
+        if (modal) modal.hide();
+        if (filename) {
+            var listUrl = '{{ path("bninefiles_files", {domain: domain, id: id, editable: 1, compact: 1}) }}';
+            $.get(listUrl, function(html) {
+                var $container = $('#carousel-widget-{{ pageWidget.id }}');
+                $container.attr('data-list-files-url', listUrl);
+            });
+        }
+    };
+});
+</script>
+{% endif %}

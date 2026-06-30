@@ -1,0 +1,20 @@
+name: Dracula
+description: Theme sombre style Dracula
+primary: "#bd93f8"
+secondary: "#6272a4"
+success: "#50fa7b"
+danger: "#ff5555"
+warning: "#f1fa8c"
+info: "#8be9fd"
+light: "#f8f8f2"
+dark: "#282a36"
+body-bg: "#21222c"
+body-color: "#f8f8f2"
+body-color-dark: "#f8f8f2"
+border-color: "#6272a4"
+card-bg: "#282a36"
+btn-bg: "#bd93f8"
+btn-border-color: "#bd93f8"
+fontHeader: Righteous
+fontBody: Roboto
+app-bs-header: "#bd93f8"

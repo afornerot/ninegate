@@ -1,0 +1,26 @@
+<div class="blog-widget-masonry">
+    {% for article in articles %}
+        <div class="blog-widget-item card mb-3">
+            {% if article.image %}
+                <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}">
+                    <img src="{{ path('bninefiles_files_thumbnail', {domain: 'blog', id: article.blog.id, path: article.image}) }}" class="card-img-top" alt="{{ article.title }}">
+                </a>
+            {% endif %}
+            <div class="card-body py-2 px-3">
+                <div class="card-title mb-1">
+                    <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}" class="text-decoration-none">
+                        <h6 class="mb-0">{{ article.title }}</h6>
+                    </a>
+                </div>
+                <p class="card-text text-muted small mb-1">
+                    <i class="fas fa-newspaper"></i> {{ article.blog.title }}
+                    &middot;
+                    <i class="fas fa-clock"></i> {{ article.createdAt|date('d/m/Y') }}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted small mb-0">Aucun article.</p>
+    {% endfor %}
+</div>
+

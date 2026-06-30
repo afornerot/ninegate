@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if routedelete is defined and mode != 'submit' %}
+        <a href="{{ path(routedelete, {id: user.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Voulez-vous supprimer cet utilisateur ?')">Supprimer</a>
+    {% endif %}
+</div>
+
+<div class="text-center d-flex flex-column align-items-center">
+    {{ form_row(form.avatar) }}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.username) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.firstname) }}
+                {{ form_row(form.lastname) }}
+                {{ form_row(form.pseudo) }}
+                {% if mode != 'profil' %}
+                    {{ form_row(form.roles) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% if form.password is defined %}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Mot de passe</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.password.first) }}
+                {{ form_row(form.password.second) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Mon Espace</h1>
+
+<div class="row mt-4 mb-4">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <img src="{{ asset(user.avatar) }}" alt="Avatar" class="rounded-circle me-4" style="width: 80px; height: 80px; object-fit: cover;">
+                    <div>
+                        <h3 class="mb-1">{{ user.displayName }}</h3>
+                        <p class="text-muted mb-0">{{ user.email }}</p>
+                        <p class="mb-0"><small>Groupes: {{ user.groups|length }} | Rôles: {{ user.roles|join(', ') }}</small></p>
+                    </div>
+                    <a href="{{ path('app_user_profil') }}" class="btn btn-primary ms-auto">Modifier mon profil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-user"></i> Mon Profil
+                </h5>
+                <p class="card-text">Modifier mes informations</p>
+                <a href="{{ path('app_user_profil') }}" class="btn btn-primary">
+                    Mon Profil
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-users"></i> Mes Groupes
+                </h5>
+                <p class="card-text">Gérer mes groupes</p>
+                <a href="{{ path('app_user_group_list') }}" class="btn btn-primary">
+                    Mes Groupes
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-image"></i> Mes Icônes
+                </h5>
+                <p class="card-text">Gérer mes icônes personnalisées</p>
+                <a href="{{ path('app_user_icon_list') }}" class="btn btn-primary">
+                    Mes Icônes
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-file"></i> Mes Pages
+                </h5>
+                <p class="card-text">Gérer mes pages</p>
+                <a href="{{ path('app_user_page_list') }}" class="btn btn-primary">
+                    Mes Pages
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-thumbtack"></i> Mes Favoris
+                </h5>
+                <p class="card-text">Gérer mes favoris</p>
+                <a href="{{ path('app_user_bookmark_list') }}" class="btn btn-primary">
+                    Mes Favoris
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-newspaper"></i> Mes Blogs
+                </h5>
+                <p class="card-text">Gérer mes blogs</p>
+                <a href="{{ path('app_user_blog_list') }}" class="btn btn-primary">
+                    Mes Blogs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+parameters:
+  appEnv: "%env(resolve:APP_ENV)%"
+  appSecret: "%env(resolve:APP_SECRET)%"
+  appName: "%env(resolve:APP_NAME)%"
+  appNoreply: "%env(resolve:APP_NOREPLY)%"
+  appAdmin: "%env(resolve:APP_ADMIN)%"
+  appModeAuth: "%env(resolve:APP_MODEAUTH)%"
+  appMasterIdentity: "%env(resolve:APP_MASTERIDENTITY)%"
+  databaseUrl: "%env(resolve:DATABASE_URL)%"
+  defaultUri: "%env(resolve:DEFAULT_URI)%"
+  oidcIssuer: "%env(resolve:OIDC_ISSUER)%"
+  oidcClientId: "%env(resolve:OIDC_CLIENTID)%"
+  oidcClientSecret: "%env(resolve:OIDC_CLIENTSECRET)%"
+  oidcRedirectUri: "%env(resolve:OIDC_REDIRECTURI)%"
+  oidcMailAttribute: "%env(resolve:OIDC_MAILATTRIBUTE)%"
+  oidcUsernameAttribute: "%env(resolve:OIDC_USERNAMEATTRIBUTE)%"
+  casHost: "%env(resolve:CAS_HOST)%"
+  casPort: "%env(resolve:CAS_PORT)%"
+  casPath: "%env(resolve:CAS_PATH)%"
+  casUsername: "%env(resolve:CAS_USERNAME)%"
+  casMail: "%env(resolve:CAS_MAIL)%"
+  casLastname: "%env(resolve:CAS_LASTNAME)%"
+  casFirstname: "%env(resolve:CAS_FIRSTNAME)%"
+
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+
+    App\Service\ConfigParameterBag:
+        class: App\Service\ConfigParameterBag
+        arguments: ['@App\Repository\ConfigRepository']
+
+    App\Service\PageParameterBag:
+        class: App\Service\PageParameterBag
+        arguments: ['@App\Repository\PageRepository', '@security.token_storage']
+
+    App\:
+        resource: '../src/'
+

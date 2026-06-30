@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block localstyle %}
+    <style>
+        body { background-color: transparent; }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <a class="btn btn-secondary" onClick="closeModal();">Annuler</a>
+    <form action="{{ path('bninefiles_files_uploadfile', {
+        domain: domain,
+        id: id,
+        path: path
+    }) }}"
+    class="dropzone" id="myDropzone" style="margin-top:10px"></form>
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        Dropzone.options.myDropzone = {
+            paramName: "{{endpoint}}",
+            maxFilesize: 20,
+            parallelUploads: 5,
+            uploadMultiple: false,
+            acceptedFiles: ".jpg,.jpeg,.png,.gif,.webp,.svg",
+            dictDefaultMessage: "Déposez vos images ici pour les téléverser",
+            successmultiple: function (files, response) {
+                console.log("uploaded", files);
+            },
+            queuecomplete: function () {
+                window.parent.$("#blogarticleUploadModal").modal('hide');
+                // Update the hidden input with just the filename
+                var firstFile = this.files[0];
+                if (firstFile) {
+                    window.parent.$("#blogarticle_image").val(firstFile.name);
+                }
+            }
+        };
+
+        function closeModal() {
+            window.parent.$("#blogarticleUploadModal").modal('hide');
+        }
+    </script>
+{% endblock %}

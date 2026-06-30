@@ -1,0 +1,18 @@
+<div class="page-widget-card{% if canManage %} page-widget-manageable{% endif %}{% if pageWidget.withBorder %} page-widget-bordered{% endif %}{% if pageWidget.height %} page-widget-fixed-height{% endif %}"
+    {% if pageWidget.height %} style="--page-widget-height: {{ pageWidget.height }}px;"{% endif %}>
+    {% if pageWidget.withTitle %}
+    <div class="page-widget-title"
+        {% if pageWidget.titleBgColor or pageWidget.titleFontColor %} style="{% if pageWidget.titleBgColor %} background-color: {{ pageWidget.titleBgColor }};{% endif %}{% if pageWidget.titleFontColor %} color: {{ pageWidget.titleFontColor }} !important;{% endif %}"{% endif %}>
+        <h6 class="mb-0" {% if pageWidget.titleFontColor %} style="color: {{ pageWidget.titleFontColor }} !important;"{% endif %}>
+            {% if pageWidget.icon %}
+                <img src="/{{ pageWidget.icon.route }}" alt="{{ pageWidget.title|default(widget.title) }}" style="height: 20px; width: 20px; object-fit: contain; vertical-align: middle; margin-right: 6px;">
+            {% endif %}
+            {{ pageWidget.title|default(widget.title) }}
+        </h6>
+    </div>
+    {% endif %}
+    <div class="page-widget-body"
+        {% if pageWidget.bodyBgColor or pageWidget.bodyFontColor %} style="{% if pageWidget.bodyBgColor %} background-color: {{ pageWidget.bodyBgColor }};{% endif %}{% if pageWidget.bodyFontColor %} color: {{ pageWidget.bodyFontColor }};{% endif %}"{% endif %}>
+        {{ render(path(widgetRoute, {pageWidgetId: pageWidget.id})) }}
+    </div>
+</div>

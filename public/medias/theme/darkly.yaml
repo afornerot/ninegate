@@ -1,0 +1,20 @@
+name: Darkly (Default)
+description: Thème sombre par défaut Bootswatch
+primary: "#375a7f"
+secondary: "#444444"
+success: "#00bc8c"
+danger: "#e74c3c"
+warning: "#f39c12"
+info: "#3498db"
+light: "#adb5bd"
+dark: "#303030"
+body-bg: "#222222"
+body-color: "#ffffff"
+body-color-dark: "#ffffff"
+border-color: "#444444"
+card-bg: "#303030"
+btn-bg: "#375a7f"
+btn-border-color: "#375a7f"
+fontHeader: Anton
+fontBody: Roboto
+app-bs-header: "#f8f9fa"

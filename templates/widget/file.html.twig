@@ -1,0 +1,9 @@
+{% if canManage %}
+<div class="widget-actions">
+    <button class="btn btn-sm btn-outline-secondary file-upload-btn" title="Uploader" onclick="$(this).closest('.page-widget').find('.btn-info:has(.fa-upload)').first().trigger('click')">
+        <i class="fas fa-upload"></i>
+    </button>
+</div>
+{% endif %}
+
+{{ render(path('bninefiles_files', {domain: domain, id: id, editable: editable, compact: 1})) }}

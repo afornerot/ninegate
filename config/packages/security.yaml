@@ -1,0 +1,38 @@
+security:
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
+
+  providers:
+    sql_provider:
+      entity:
+        class: App\Entity\User
+        property: username
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    main:
+      pattern: ^/
+      provider: sql_provider
+      custom_authenticators:
+        - App\Security\DynamicAuthenticator
+      form_login:
+        login_path: app_login
+        check_path: app_login
+        enable_csrf: false
+        csrf_token_id: authenticate
+        csrf_parameter: _csrf_token
+        default_target_path: /
+        use_forward: false
+      logout:
+        path: app_logout
+
+  access_control:
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/$, roles: PUBLIC_ACCESS }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/master, roles: [ROLE_MASTER, ROLE_ADMIN] }
+    - { path: ^/user, roles: [ROLE_USER, ROLE_MASTER, ROLE_ADMIN] }
+

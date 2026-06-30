@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+<div class="row">
+{% set groupOrder = ['Site', 'Font', 'ColorBg', 'ColorTheme'] %}
+{% set groupWidths = {Site: 12, Font: 12, ColorBg: 6, ColorTheme: 6} %}
+
+{% for group in groupOrder %}
+    {% set groupConfigs = configs|filter(c => c.configGroup == group)|sort((a, b) => a.order <=> b.order) %}
+    {% if groupConfigs|length > 0 %}
+    <div class="{{ groupWidths[group] == 12 ? 'col-12' : 'col-md-6' }} mb-4">
+    <div class="card h-100">
+        <div class="card-header">
+            <h5 class="mb-0">{{ group }}</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered mb-0" id="table-{{ group }}">
+                    <thead>
+                        <tr>
+                            <th class="text-nowrap" width="100px">Actions</th>
+                            <th class="text-nowrap">Code</th>
+                            <th class="text-nowrap">Titre</th>
+                            <th>Valeur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for config in groupConfigs %}
+                        <tr>
+                            <td class="text-nowrap">
+                                <a href="{{ path(routeupdate, {id: config.id}) }}" class="btn btn-sm btn-secondary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                            <td>{{ config.code }}</td>
+                            <td>{{ config.title }}</td>
+                            <td {% if config.type == 'color' %}style="background-color: {{ config.value }}"{% elseif config.type == 'font' %}style="font-family: '{{ config.value }}', sans-serif"{% elseif config.type == 'logo' %}{% endif %}>{% if config.type == 'logo' %}<img src="{{ asset(config.value) }}" class="logo">{% else %}{{ config.value }}{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block localscript %}
+<script>
+$(document).ready(function() {
+{% set groupOrder = ['Site', 'ColorBg', 'ColorTheme', 'Font'] %}
+    {% for group in groupOrder %}
+    $('#table-{{ group }}').DataTable({
+        ordering: false
+    });
+    {% endfor %}
+});
+</script>
+{% endblock %}

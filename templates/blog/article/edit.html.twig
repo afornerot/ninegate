@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% form_theme form '@BnineFilesBundle/file/image_upload.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    <button type="submit" class="btn btn-success">
+        <i class="fas fa-save"></i> Sauvegarder
+    </button>
+    <a href="{{ path('app_blog_view', {slug: blog.slug}) }}" class="btn btn-secondary">Annuler</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        {{ form_row(form.title) }}
+
+        <div class="mb-3">
+            <label class="form-label">Image à la une</label>
+            {{ form_widget(form.image) }}
+        </div>
+
+        {{ form_row(form.content) }}
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+<div class="row">
+    {% for key, theme in themes %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ theme.name }}</h5>
+                <small>{{ theme.description }}</small>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <div class="color-swatch" style="background: {{ theme.primary }}" title="Primary"></div>
+                    <div class="color-swatch" style="background: {{ theme.secondary }}" title="Secondary"></div>
+                    <div class="color-swatch" style="background: {{ theme.success }}" title="Success"></div>
+                    <div class="color-swatch" style="background: {{ theme.danger }}" title="Danger"></div>
+                    <div class="color-swatch" style="background: {{ theme.warning }}" title="Warning"></div>
+                    <div class="color-swatch" style="background: {{ theme.info }}" title="Info"></div>
+                    <div class="color-swatch" style="background: {{ theme.dark }}" title="Dark"></div>
+                    <div class="color-swatch" style="background: {{ theme.light }}" title="Light"></div>
+                </div>
+                <a href="{{ path(routeapply, {themeName: key}) }}" class="btn btn-primary w-100">Appliquer</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.color-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+</style>
+{% endblock %}

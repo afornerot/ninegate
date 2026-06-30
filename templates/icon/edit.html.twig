@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if routedelete is defined and icon and icon.id and is_granted('icon_delete', icon) %}
+        <a href="{{ path(routedelete, {id: icon.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Voulez-vous supprimer cette icône ?')">Supprimer</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-6 m-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.route) }}
+                {{ form_row(form.tags) }}
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+{% endblock %}

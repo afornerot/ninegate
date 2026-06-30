@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ app_config.get('appName') }}{% block title %}{% endblock %}</title>
+        <meta name="description" content="{{ app_config.get('appDescription') }}">
+        
+        <link rel="icon" href="{{ asset(app_config.get('appLogo')) }}">
+
+        <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/bootswatch/bootswatch.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/fontawesome/css/all.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/datatables/datatables.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/select2/select2.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/select2/select2-bootstrap-5-theme.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/dropzone/dropzone.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/dropzone/dropzone-bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ asset('lib/imgareaselect/css/imgareaselect-default.css') }}">
+
+        <script src="{{ asset('lib/jquery/jquery.min.js') }}"></script>
+        <script src="{{ asset('lib/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('lib/datatables/datatables.min.js') }}"></script>
+        <script src="{{ asset('lib/datatables/datatables.init.js') }}"></script>
+        <script src="{{ asset('lib/select2/select2.min.js') }}"></script>
+        <script src="{{ asset('lib/select2/select2.init.js') }}"></script>
+        <script src="{{ asset('lib/dropzone/dropzone.min.js') }}"></script>
+        <script src="{{ asset('lib/imgareaselect/js/jquery.imgareaselect.dev.js') }}"></script>
+        <script src="{{ asset('lib/jqueryui/jquery-ui.min.js') }}"></script>
+        <script src="{{ asset('lib/chart/chart.js') }}"></script>
+        <link rel="stylesheet" href="{{ asset('bundles/bninemdeditor/easymde.min.css') }}">
+        <script src="{{ asset('bundles/bninemdeditor/easymde.min.js') }}"></script>
+
+        
+
+        <style>
+            :root {
+                --bs-primary: {{ app_config.get('app-bs-primary') }};
+                --bs-primary-rgb: {{ app_config.get('app-bs-primary')|hex_to_rgb }};
+                --bs-secondary: {{ app_config.get('app-bs-secondary') }};
+                --bs-secondary-rgb: {{ app_config.get('app-bs-secondary')|hex_to_rgb }};
+                --bs-success: {{ app_config.get('app-bs-success') }};
+                --bs-success-rgb: {{ app_config.get('app-bs-success')|hex_to_rgb }};
+                --bs-danger: {{ app_config.get('app-bs-danger') }};
+                --bs-danger-rgb: {{ app_config.get('app-bs-danger')|hex_to_rgb }};
+                --bs-warning: {{ app_config.get('app-bs-warning') }};
+                --bs-warning-rgb: {{ app_config.get('app-bs-warning')|hex_to_rgb }};
+                --bs-info: {{ app_config.get('app-bs-info') }};
+                --bs-info-rgb: {{ app_config.get('app-bs-info')|hex_to_rgb }};
+                --bs-light: {{ app_config.get('app-bs-light') }};
+                --bs-light-rgb: {{ app_config.get('app-bs-light')|hex_to_rgb }};
+                --bs-dark: {{ app_config.get('app-bs-dark') }};
+                --bs-dark-rgb: {{ app_config.get('app-bs-dark')|hex_to_rgb }};
+                --bs-body-bg: {{ app_config.get('app-bs-body-bg') }};
+                --bs-body-bg-rgb: {{ app_config.get('app-bs-body-bg')|hex_to_rgb }};
+                --bs-body-color: {{ app_config.get('app-bs-body-color') }};
+                --bs-body-color-rgb: {{ app_config.get('app-bs-body-color')|hex_to_rgb }};
+                --bs-body-color-dark: {{ app_config.get('app-bs-body-color-dark') }};
+                --bs-border-color: {{ app_config.get('app-bs-border-color') }};
+                --bs-border-color-rgb: {{ app_config.get('app-bs-border-color')|hex_to_rgb }};
+                --bs-card-bg: {{ app_config.get('app-bs-card-bg') }};
+                --bs-card-bg-rgb: {{ app_config.get('app-bs-card-bg')|hex_to_rgb }};
+                --bs-btn-bg: {{ app_config.get('app-bs-btn-bg') }};
+                --bs-btn-border-color: {{ app_config.get('app-bs-btn-border-color') }};
+                --app-font-header: '{{ app_config.get('appFontHeader') }}';
+                --app-font-body: '{{ app_config.get('appFontBody') }}';
+                --app-bs-header: {{ app_config.get('app-bs-header')|default('#ffffff') }};
+            }
+
+            .table {
+                --bs-table-color-state: {{ app_config.get('app-bs-body-color') }};
+                --bs-table-color-state-rgb: {{ app_config.get('app-bs-body-color')|hex_to_rgb }};
+            }
+
+            .card {
+                --bs-card-bg: {{ app_config.get('app-bs-card-bg') }};
+            }
+        </style>
+
+        <link rel="stylesheet" href="{{ asset('lib/app/app.css') }}?v=20260630">
+        <script src="{{ asset('lib/app/app.js') }}?v=20260630"></script>
+
+        {% block javascripts %}{% endblock %}
+    </head>
+
+    <style>
+        verysmall { font-size: 10px; }
+    </style>
+
+    <style media="print">
+        nav, sidebar, .no-print { display: none !important; }
+        content { width: 100% !important; margin: 0 !important; }
+        .dt-container > div:first-child, .dt-container > div:last-child { display: none !important; }
+    </style>
+
+    {% block localstyle %}{% endblock %}
+
+    <body>
+        {% if usemenu is defined and usemenu %}
+        <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+            <div class="container-fluid">                
+                <a class="navbar-brand" href="{{ path('app_home') }}">
+                    <img src="{{asset(app_config.get('appLogo'))}}"  alt="{{app_config.get('appName')}}"> {{app_config.get('appName')}}
+                </a>
+                
+                <div class="collapse navbar-collapse" id="navbarColor02">
+                    <ul class="navbar-nav me-auto">
+                        {% if app_pages is defined %}
+                            {% if app_pages.get('group_orga_role') %}
+                                {% for page in app_pages.get('group_orga_role') %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_page_view', {slug: page.slug}) }}">{{ page.title }}</a>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                             
+                            {% if app_pages.get('personal') %}
+                                {% set personalPages = app_pages.get('personal') %}
+                                {% if personalPages|length > 5 %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Mes Pages</a>
+                                    <div class="dropdown-menu">
+                                        {% for page in personalPages %}
+                                            <a class="dropdown-item" href="{{ path('app_page_view', {slug: page.slug}) }}">{{ page.title }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                                {% else %}
+                                    {% for page in personalPages %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_page_view', {slug: page.slug}) }}">{{ page.title }}</a>
+                                    </li>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                            {% if app_pages.get('work_group') %}
+                                {% set workGroupPages = app_pages.get('work_group') %}
+                                {% if workGroupPages|length > 3 %}
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Mes Groupes de Travail</a>
+                                    <div class="dropdown-menu">
+                                        {% for page in workGroupPages %}
+                                            <a class="dropdown-item" href="{{ path('app_page_view', {slug: page.slug}) }}">{{ page.title }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                                {% else %}
+                                    {% for page in workGroupPages %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ path('app_page_view', {slug: page.slug}) }}">{{ page.title }}</a>
+                                    </li>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+                </div>
+            
+                <div class="navbar-nav ms-auto ps-3 d-flex flex-row position-absolute" style="right: 15px; top:15px">
+                    {% if app.user %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <a class="nav-link px-2" href="{{path('app_admin')}}"><i class="fa-solid fa-cog fa-2x"></i></a>
+                        {% endif %}
+                        <a class="nav-link px-2" href="{{path('app_user_group_list')}}"><i class="fa-solid fa-users fa-2x"></i></a>
+                        {% block navbar_extra %}{% endblock %}
+                        <a class="nav-link px-2" href="{{path('app_user')}}"><img src="{{asset(app.user.avatar)}}" alt="Profil" class="rounded-circle" style="height: 2.2rem; width: 2.2rem; object-fit: cover;"></a>
+                        <a class="nav-link px-2" href="{{path('app_logout')}}"><i class="fa-solid fa-right-from-bracket fa-2x"></i></a>
+                    {% else %}
+                        <a class="nav-link px-2" href="{{path('app_login')}}"><i class="fa-solid fa-right-to-bracket fa-2x"></i></a>
+                    {% endif %}
+                
+                    <a class="navbar-toggler nav-link px-2" href="#" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation"><i class="fa-solid fa-bars fa-2x"></i></a>
+                </div>
+            </div>
+        </nav>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+
+        <main>
+            {% if usesidebar is defined and usesidebar %}
+                {% set currentRoute = app.request.get('_route')|default('') %}
+                <sidebar>
+                {% if currentRoute|slice(0,9) == 'app_admin' %}
+                    <div>
+                        <a href="{{ path('app_admin') }}"><span>GENERALE</span></a>
+                        <a href="{{ path('app_admin_user') }}" title="Utilisateurs">
+                            <i class="fas fa-user fa-fw"></i>
+                            <span>Utilisateurs</span>
+                        </a>
+                        <a href="{{ path('app_admin_group_list') }}" title="Groupes">
+                            <i class="fas fa-users fa-fw"></i>
+                            <span>Groupes</span>
+                        </a>
+                        <a href="{{ path('app_admin_config') }}" title="Configuration">
+                            <i class="fas fa-cog fa-fw"></i>
+                            <span>Configuration</span>
+                        </a>
+                        <a href="{{ path('app_admin_theme') }}" title="Thèmes">
+                            <i class="fas fa-palette fa-fw"></i>
+                            <span>Thèmes</span>
+                        </a>
+                        <a href="{{ path('app_admin_icon_list') }}" title="Icônes">
+                            <i class="fas fa-image fa-fw"></i>
+                            <span>Icônes</span>
+                        </a>
+                        <a href="{{ path('app_admin_page_list') }}" title="Pages">
+                            <i class="fas fa-file fa-fw"></i>
+                            <span>Pages</span>
+                        </a>
+                        <a href="{{ path('app_admin_itemcategory_list') }}" title="Items">
+                            <i class="fas fa-th-list fa-fw"></i>
+                            <span>Items</span>
+                        </a>
+                        <a href="{{ path('app_admin_blog_list') }}" title="Blogs">
+                            <i class="fas fa-newspaper fa-fw"></i>
+                            <span>Blogs</span>
+                        </a>
+                    </div>
+                {% elseif currentRoute|slice(0,8) == 'app_user' %}
+                    <div>
+                        <a href="{{ path('app_user') }}"><span>GENERALE</span></a>
+                        <a href="{{ path('app_user_profil') }}" title="Profil">
+                            <i class="fas fa-user fa-fw"></i>
+                            <span>Mon Profil</span>
+                        </a>
+                        <a href="{{ path('app_user_group_list') }}" title="Mes Groupes">
+                            <i class="fas fa-users fa-fw"></i>
+                            <span>Mes Groupes</span>
+                        </a>
+                        <a href="{{ path('app_user_icon_list') }}" title="Mes Icônes">
+                            <i class="fas fa-image fa-fw"></i>
+                            <span>Mes Icônes</span>
+                        </a>
+                        <a href="{{ path('app_user_page_list') }}" title="Mes Pages">
+                            <i class="fas fa-file fa-fw"></i>
+                            <span>Mes Pages</span>
+                        </a>
+                        <a href="{{ path('app_user_bookmark_list') }}" title="Mes Favoris">
+                            <i class="fas fa-thumbtack fa-fw"></i>
+                            <span>Mes Favoris</span>
+                        </a>
+                        <a href="{{ path('app_user_blog_list') }}" title="Mes Blogs">
+                            <i class="fas fa-newspaper fa-fw"></i>
+                            <span>Mes Blogs</span>
+                        </a>
+                    </div>
+                {% endif %}
+                </sidebar>
+            {% endif %}
+
+            <content style="margin: 0px auto; {{ (maxwidth is defined ? 'max-width:'~maxwidth~'px;' : '') }}">
+                {% block body %}{% endblock %}
+            </content>
+        </main>
+
+        {% for flash in app.session.flashbag.get('success') %}
+            <div class="alert alert-success alert-dismissible fade show position-fixed end-0 m-3" role="alert" style="top: 80px; z-index: 9999;">
+                {{ flash }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {% for flash in app.session.flashbag.get('error') %}
+            <div class="alert alert-danger alert-dismissible fade show position-fixed end-0 m-3" role="alert" style="top: 80px; z-index: 9999;">
+                {{ flash }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {% for flash in app.session.flashbag.get('danger') %}
+            <div class="alert alert-danger alert-dismissible fade show position-fixed end-0 m-3" role="alert" style="top: 80px; z-index: 9999;">
+                {{ flash }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+            <div id="ajaxErrorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body" id="ajaxErrorMessage">Une erreur est survenue.</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mymodal" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">INFORMATION</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="framemodal" frameborder="0" width="100%" height="600px"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mymodallarge" class="modal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">INFORMATION</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="framemodal" frameborder="0" width="100%" height="800px"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </body>
+
+    {% block localscript %}{% endblock %}
+</html>

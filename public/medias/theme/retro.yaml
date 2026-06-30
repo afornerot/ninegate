@@ -1,0 +1,20 @@
+name: Retro
+description: Theme rétro consola vintage
+primary: "#ff6b6b"
+secondary: "#c44569"
+success: "#f8b739"
+danger: "#eb4d4b"
+warning: "#f9ca24"
+info: "#686de0"
+light: "#dff9fb"
+dark: "#130f40"
+body-bg: "#2d3436"
+body-color: "#dff9fb"
+body-color-dark: "#dff9fb"
+border-color: "#c44569"
+card-bg: "#353b48"
+btn-bg: "#ff6b6b"
+btn-border-color: "#ff6b6b"
+fontHeader: LuckiestGuy
+fontBody: Righteous
+app-bs-header: "#ff6b6b"

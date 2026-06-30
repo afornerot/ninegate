@@ -1,0 +1,53 @@
+{# Size toggle + manage button #}
+<div class="widget-actions">
+    <button type="button" class="btn btn-sm btn-outline-secondary bureau-size-toggle"
+            data-bureau-id="{{ pageWidget.id }}"
+            data-current="{{ config.display|default('medium') }}"
+            data-show-fav="0"
+            title="Changer la taille d'affichage">
+        {% if config.display|default('medium') == 'small' %}
+            <i class="fas fa-th"></i>
+        {% elseif config.display|default('medium') == 'large' %}
+            <i class="fas fa-th-large"></i>
+        {% elseif config.display|default('medium') == 'list' %}
+            <i class="fas fa-list"></i>
+        {% else %}
+            <i class="fas fa-th-large"></i>
+        {% endif %}
+    </button>
+    {% if canManage %}
+    <a href="{{ path('app_user_bookmark_list') }}" class="btn btn-sm btn-outline-secondary" title="Gérer mes favoris">
+        <i class="fas fa-cog"></i>
+    </a>
+    {% endif %}
+</div>
+
+{# Favoris list #}
+<div class="itemlink-items itemlink-medium">
+    {% for item in items %}
+        <div class="itemlink-item" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+             title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
+             style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
+            {% if item.icon %}
+                <img src="/{{ item.icon.route }}" class="itemlink-item-icon" alt="">
+            {% endif %}
+            <div class="itemlink-item-content">
+                <strong>{{ item.title }}</strong>
+                {% if item.summary %}
+                    <small class="text-muted itemlink-summary">{{ item.summary }}</small>
+                {% endif %}
+                {% if item.description %}
+                    <small class="text-muted itemlink-item-desc">{{ item.description|slice(0, 150) }}{% if item.description|length > 150 %}...{% endif %}</small>
+                {% endif %}
+            </div>
+            {% if item.url %}
+                <a href="{{ item.url }}" target="{{ item.newTab ? '_blank' : '_self' }}" class="stretched-link" title="{{ item.title }}"></a>
+            {% endif %}
+            {% if item._isItem %}
+                <button class="itemlink-fav-btn active" data-item-id="{{ item.id }}" title="Retirer des favoris">
+                    <i class="fas fa-heart"></i>
+                </button>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

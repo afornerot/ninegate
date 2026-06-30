@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block localstyle %}
+    <style>
+        body {
+            background-color: transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <a class="btn btn-secondary" onClick="closeModal();">Annuler</a>
+    <form action="{{ oneup_uploader_endpoint(endpoint) }}" class="dropzone" id="myDropzone" style="margin-top:10px">
+    </form>
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        Dropzone.options.myDropzone = {
+            maxFiles: 1,
+            acceptedMimeTypes: 'image/*',
+            success: function(file, response){
+                // Construction de l'url de retour                
+                url="{{ path('app_user_upload_crop02',{reportThumb: reportThumb, path:'xxx', file:'yyy'})|escape('js') }}";
+                url=url.replace("xxx",response["path"]);
+                url=url.replace("yyy",response["file"]);
+
+                // Navigation sur l'url de retour
+                $(location).attr('href',url);
+            },
+
+
+            dictDefaultMessage: "Déposez vos fichiers ici pour les téléverser",
+            dictFallbackMessage: "Votre navigateur ne supporte pas le téléversement de fichiers par glisser-déposer.",
+            dictFallbackText: "Veuillez utiliser le formulaire ci-dessous pour téléverser vos fichiers.",
+            dictFileTooBig: "Le fichier est trop volumineux .",
+            dictInvalidFileType: "Vous ne pouvez pas téléverser des fichiers de ce type.",
+            dictCancelUpload: "Annuler le téléversement",
+            dictCancelUploadConfirmation: "Êtes-vous sûr de vouloir annuler ce téléversement ?",
+            dictRemoveFile: "Supprimer le fichier",
+            dictMaxFilesExceeded: "Vous ne pouvez pas téléverser plus de fichiers."
+        }
+
+        function closeModal() {
+            window.parent.$("#mymodal").modal('hide');
+        }
+    </script>
+{% endblock %}

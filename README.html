@@ -1,0 +1,590 @@
+<html>
+	<head>
+		<title></title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+
+		<link rel="stylesheet" href="data:text/plain;%20charset=utf-8;base64,CkBwYWdlIHsKICAgIG1hcmdpbjogMjBtbSAxNW1tIDIwbW0gMTVtbTsgLyogdG9wIHJpZ2h0IGJvdHRvbSBsZWZ0ICovCn0KCmJvZHkgewoJZm9udC1mYW1pbHk6ICJSb2JvdG8iICFpbXBvcnRhbnQ7Cgljb2xvcjogIzMzMzsJCiAgICBtYXgtd2lkdGg6IDEyMDBweDsKICAgIG1hcmdpbjogYXV0bzsKICAgIGNvdW50ZXItcmVzZXQ6IGgxY291bnRlcjsKICAgIHBhZGRpbmc6MTBweDsKICAgIGZvbnQtc2l6ZToyNXB4Owp9CgojbG9nbyB7CiAgICBtYXgtd2lkdGg6NjAwcHg7Cn0KCi50aXRsZSwgLnN1YnRpdGxlIHsKCWNvbG9yOiAjMzI5YWNhOwogICAgdGV4dC1hbGlnbjogcmlnaHQ7CiAgICBsaW5lLWhlaWdodDogMWVtOwogICAgZm9udC13ZWlnaHQ6IGJvbGQ7Cn0KCi50aXRsZSB7CiAgICBmb250LWZhbWlseTogIkJlYmFzIE5ldWUiICFpbXBvcnRhbnQ7CiAgICB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOwogICAgZm9udC1zaXplOiA4MHB4OwogICAgbWFyZ2luLXRvcDozMHB4Owp9Cgouc3VidGl0bGUgewogICAgZm9udC1zaXplOiA0MHB4Owp9CgoudGl0bGVkZXRhaWwgewogICAgbWFyZ2luLXRvcDogMjBweDsKICAgIHRleHQtYWxpZ246IHJpZ2h0Owp9CgpoMSB7Cgl0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOwogICAgcGFnZS1icmVhay1iZWZvcmU6IGFsd2F5czsKICAgIGZvbnQtZmFtaWx5OiAiQmViYXMgTmV1ZSIgIWltcG9ydGFudDsKICAgIGNvdW50ZXItcmVzZXQ6IGgyY291bnRlcjsKICAgIG1hcmdpbjogMHB4IC0xNXB4IDIwcHggLTE1cHg7CiAgICBmb250LXNpemU6NTBweDsKICAgIGJhY2tncm91bmQtY29sb3I6ICMzMjlhY2E7CiAgICBjb2xvcjogI2ZmZmZmZjsKICAgIHBhZGRpbmc6MTVweDsKfQpoMTpiZWZvcmUgewoJY291bnRlci1pbmNyZW1lbnQ6IGgxY291bnRlcjsKCWNvbnRlbnQ6IGNvdW50ZXIoaDFjb3VudGVyKSIgPSAiOwp9CgpoMiB7CiAgICB0ZXh0LXRyYW5zZm9ybTogdXBwZXJjYXNlOwogICAgZm9udC1mYW1pbHk6ICJCZWJhcyBOZXVlIiAhaW1wb3J0YW50OwogICAgY291bnRlci1yZXNldDogaDNjb3VudGVyOwogICAgbWFyZ2luLWJvdHRvbTo1cHg7CiAgICBmb250LXNpemU6NDVweDsKICAgIGJvcmRlci1ib3R0b206IDVweCBzb2xpZDsKfQpoMjpiZWZvcmUgewogICAgY291bnRlci1pbmNyZW1lbnQ6IGgyY291bnRlcjsKICAgIGNvbnRlbnQ6IGNvdW50ZXIoaDFjb3VudGVyKSAiLiIgY291bnRlcihoMmNvdW50ZXIpICIgPSAiOwp9CgpoMyB7CiAgICB0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsKICAgIGZvbnQtZmFtaWx5OiAiQmViYXMgTmV1ZSIgIWltcG9ydGFudDsKICAgIGNvdW50ZXItcmVzZXQ6IGg0Y291bnRlcjsKICAgIG1hcmdpbi1ib3R0b206NXB4OwogICAgZm9udC1zaXplOjQwcHg7Cn0KaDM6YmVmb3JlIHsKICAgIGNvdW50ZXItaW5jcmVtZW50OiBoM2NvdW50ZXI7CiAgICBjb250ZW50OiBjb3VudGVyKGgxY291bnRlcikgIi4iIGNvdW50ZXIoaDJjb3VudGVyKSAiLiIgY291bnRlcihoM2NvdW50ZXIpICAiID0gIjsKfQoKaDQgewogICAgZm9udC1mYW1pbHk6ICJCZWJhcyBOZXVlIiAhaW1wb3J0YW50OwogICAgbWFyZ2luLWJvdHRvbTo1cHg7ICAgIAogICAgZm9udC1zaXplOiAzNXB4Owp9Cmg0OmJlZm9yZSB7CiAgICBjb3VudGVyLWluY3JlbWVudDogaDRjb3VudGVyOwogICAgY29udGVudDogY291bnRlcihoMWNvdW50ZXIpICIuIiBjb3VudGVyKGgyY291bnRlcikgIi4iIGNvdW50ZXIoaDNjb3VudGVyKSAiLiIgY291bnRlcihoNGNvdW50ZXIpICIgPSAiOwp9CgpoNSB7CiAgICBtYXJnaW4tYm90dG9tOjVweDsgICAgCiAgICBmb250LXNpemU6IDI1cHg7Cn0KCgpwIHsKICAgIG1hcmdpbjogMHB4IDBweCAyMHB4IDBweDsKfQoKc3Ryb25nIHsKICAgIGNvbG9yOiAjMzI5YWNhOwp9CgphLCBhOmhvdmVyLCBhOnZpc2l0ZWQgLCBoMiwgaDMsIGg0LCBoNSwgaDYgewoJY29sb3I6ICMzMjlhY2E7CiAgICBmb250LXdlaWdodDogYm9sZAp9CgpwICsgdWwgewogICAgbWFyZ2luLXRvcDogLTIwcHggIWltcG9ydGFudDsKfQoKdWwgewogICAgcGFkZGluZy1sZWZ0OjIwcHg7Cn0KCmltZyB7CiAgICBtYXgtd2lkdGg6MTAwJTsKICAgIG1hcmdpbjphdXRvOwogICAgZGlzcGxheTogYmxvY2s7Cn0KaW1nW2FsdD0iNzUiXSB7IHdpZHRoOiA3NSUgfQppbWdbYWx0PSI2MCJdIHsgd2lkdGg6IDYwJSB9CgouY2VudGVyIHsKICAgIHRleHQtYWxpZ246IGNlbnRlcjsKfQoKZm9vdGVyIGltZyB7Cgl3aWR0aDogMzJweDsKfQoKYmxvY2txdW90ZSB7CiAgICBtYXJnaW46IDBweDsKICAgIHBhZGRpbmc6IDIwcHggMHB4IDFweCAxNXB4OwogICAgYm9yZGVyLWxlZnQ6IDEwcHggc29saWQgZ3JheTsKfQoKLmluZm8sCi5zdWNjZXNzLAoud2FybmluZywKLmRhbmdlciB7CglwYWRkaW5nOiAxcmVtOwoJbWFyZ2luLWJvdHRvbTogMXJlbTsKfQoKLmluZm8gewoJYmFja2dyb3VuZC1jb2xvcjogcmdiYSg0MSwgMTI4LCAxODUsIC4xKTsKCWJvcmRlci1sZWZ0OiBzb2xpZCA0cHggcmdiYSg0MSwgMTI4LCAxODUsMS4wKTsKCWNvbG9yOiByZ2JhKDQxLCAxMjgsIDE4NSwxLjApOwp9Cgouc3VjY2VzcyB7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDM5LCAxNzQsIDk2LCAuMSk7Cglib3JkZXItbGVmdDogc29saWQgNHB4IHJnYmEoMzksIDE3NCwgOTYsMS4wKTsKCWNvbG9yOnJnYmEoMzksIDE3NCwgOTYsMS4wKTsKfQoKLndhcm5pbmcgewoJcGFkZGluZzogMXJlbTsKCWJhY2tncm91bmQtY29sb3I6IHJnYmEoMjQzLCAxNTYsIDE4LCAuMSk7Cglib3JkZXItbGVmdDogc29saWQgNHB4ICNmMzljMTI7Cgljb2xvcjogI2YzOWMxMjsKfQoKLmRhbmdlciB7CgliYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDIzMSwgNzYsIDYwLCAuMSk7Cglib3JkZXItbGVmdDogc29saWQgNHB4IHJnYmEoMjMxLCA3NiwgNjAsMS4wKTsKCWNvbG9yOiByZ2JhKDIzMSwgNzYsIDYwLDEuMCk7Cn0KCi5wYWdlLWJyZWFrIHsKCXBhZ2UtYnJlYWstYWZ0ZXI6IGFsd2F5czsKfQoKLmNlbnRlciB7CiAgICB0ZXh0LWFsaWduOiBjZW50ZXI7Cn0KCnRhYmxlIHsKICAgIHdpZHRoOiAxMDAlOwogICAgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsKICAgIGJvcmRlcjogMXB4IHNvbGlkICNkZGQ7CiAgICBtYXJnaW4tYm90dG9tOiAyMHB4Owp9Cgp0aCwgdGQgewogICAgcGFkZGluZzogMTBweDsKICAgIHRleHQtYWxpZ246IGxlZnQ7CiAgICBib3JkZXI6IDFweCBzb2xpZCAjZGRkOwp9Cgp0aCB7CiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZjRmNGY0OwogICAgZm9udC13ZWlnaHQ6IGJvbGQ7Cn0KCmNvZGUgewogICAgem9vbTo3NSU7Cn0KCi56b29tOTUgewogICAgem9vbTo5NSU7Cn0KCi56b29tODUgewogICAgem9vbTo4NSU7Cn0KCi56b29tNzUgewogICAgem9vbTo3NSU7Cn0KCi56b29tNjUgewogICAgem9vbTo2NSU7Cn0KCi56b29tNTAgewogICAgem9vbTo1MCU7Cn0KCnByZS5obGpzIGNvZGUgPiBkaXYgewogICAgcGFkZGluZzowcHg7Cn0KCi50b3RvIHsKICAgIGZvbnQtc2l6ZToxNTAlOwp9" />
+  	</head>
+  	
+	<body>
+    	<h1 id="etude-messages">Etude Messages</h1>
+<h2 id="poc">POC</h2>
+<p>POC disponible sur = <a href="https://msepoc.cadol.es">https://msepoc.cadol.es</a></p>
+<p>Pour faciliter la recette du POC, différents profils utilisateurs ont été pré-configurés. <strong>Mot de passe unique</strong> : <code>changeme</code></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Identifiant</th>
+<th style="text-align:left">Rôle</th>
+<th style="text-align:left">Crous</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>admin</code></td>
+<td style="text-align:left"><strong>ROLE_ADMIN</strong></td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Administrateur global.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gcnous</code></td>
+<td style="text-align:left"><strong>ROLE_GCNOUS</strong></td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Gestionnaire National.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ccnous</code></td>
+<td style="text-align:left"><strong>ROLE_CCNOUS</strong></td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">Consultant National.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gcrousTOU</code></td>
+<td style="text-align:left"><strong>ROLE_GCROUS</strong></td>
+<td style="text-align:left">TOU</td>
+<td style="text-align:left">Gestionnaire Toulouse.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cgrousTOU</code></td>
+<td style="text-align:left"><strong>ROLE_CCROUS</strong></td>
+<td style="text-align:left">TOU</td>
+<td style="text-align:left">Consultant Toulouse.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gcrousBFC</code></td>
+<td style="text-align:left"><strong>ROLE_GCROUS</strong></td>
+<td style="text-align:left">BFC</td>
+<td style="text-align:left">Gestionnaire Bourgogne Franche-Comté.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cgrousBFC</code></td>
+<td style="text-align:left"><strong>ROLE_CCROUS</strong></td>
+<td style="text-align:left">BFC</td>
+<td style="text-align:left">Consultant Bourgogne Franche-Comté.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gcrousLIM</code></td>
+<td style="text-align:left"><strong>ROLE_GCROUS</strong></td>
+<td style="text-align:left">LIM</td>
+<td style="text-align:left">Gestionnaire Limoges.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cgrousLIM</code></td>
+<td style="text-align:left"><strong>ROLE_CCROUS</strong></td>
+<td style="text-align:left">LIM</td>
+<td style="text-align:left">Consultant Limoges.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="modle-conceptuel-de-donnes-mcd">Modèle Conceptuel de Données (MCD)</h2>
+<p>L'application gère une arborescence de thèmes (sujets) hiérarchisés, potentiellement liés à une entité administrative (Crous) et à des utilisateurs gestionnaires. Les utilisateurs externes (Étudiants, Visiteurs) peuvent créer des demandes (Issues) associées à ces thèmes.</p>
+<pre class="mermaid">erDiagram
+    User }|..|| Crous : appartient
+    Student }|..|| Crous : appartient
+    Theme }|..|o Crous : &#34;lié à (si null = National)&#34;
+    Theme ||..|o Theme : &#34;parent (Arborescence)&#34;
+    Theme }|..|{ User : &#34;gestionnaires assignés&#34;
+    Theme ||--o{ ThemeResponse : &#34;possède des réponses types&#34;
+    Theme ||--o{ Issue : &#34;reçoit des demandes&#34;
+    Issue }|..|| Crous : &#34;appartient&#34;
+    Issue }|..|o Student : &#34;créé par&#34;
+    Issue }|..|o Visitor : &#34;créé par&#34;
+    Issue ||--o{ IssueMessage : &#34;contient des messages&#34;
+    Issue }|..|{ User : &#34;assigné à des gestionnaires&#34;
+    IssueMessage ||--o{ IssueAttachment : &#34;contient des pièces jointes&#34;
+
+    User {
+        int id
+        string username
+        string apikey
+        array roles
+        string password
+        string avatar
+        string email
+    }
+
+    Crous {
+        int id
+        string code
+        string title
+        bool allowIssueAttachments
+    }
+
+    Student {
+        int id
+        string username
+        string password
+        string apiToken
+        array roles
+        string email
+        string avatar
+        string resetToken
+        datetime resetTokenExpiresAt
+    }
+
+    Visitor {
+        int id
+        string email
+    }
+
+    Theme {
+        int id
+        string title
+        text help
+        bool active
+        bool security
+        array profils
+        int position
+    }
+
+    ThemeResponse {
+        int id
+        string title
+        text description
+    }
+
+    Issue {
+        int id
+        enum status
+        datetime dateSubmit
+        bool allowIssueAttachments
+        string token
+    }
+
+    IssueMessage {
+        int id
+        datetime dateSubmit
+        text message
+        string authorName
+        enum authorType
+    }
+
+    IssueAttachment {
+        int id
+        string originalFilename
+        string filename
+        string mimeType
+        int size
+        string path
+        datetime uploadedAt
+    }
+</pre><h2 id="description-fonctionnelle">Description Fonctionnelle</h2>
+<p>L'application assure la gestion du référentiel des motifs de contact (Thèmes) du système de messagerie (MSE). Elle permet de structurer les demandes des utilisateurs via une classification hiérarchique et contextuelle.</p>
+<h3 id="1-gestion-des-thmes-et-rponses-types">1. Gestion des Thèmes et Réponses Types</h3>
+<h4 id="11-arborescence-des-thmes">1.1 Arborescence des Thèmes</h4>
+<p>Les thèmes sont organisés selon une structure en arbre pouvant aller jusqu'à 4 niveaux de profondeur.</p>
+<ul>
+<li><strong>Navigation &amp; Filtrage</strong> : Visualisation par niveau et filtre sur les éléments actifs/inactifs.</li>
+<li><strong>Réorganisation Dynamique</strong> : Interface &quot;Glisser-Déposer&quot; (Drag &amp; Drop) permettant de modifier facilement l'ordre et la hiérarchie des thèmes (<code>ThemeController::move</code>).</li>
+<li><strong>Configuration</strong> : Chaque thème dispose d'attributs de visibilité (Actif/Inactif), de contextes de sécurité (Profils autorisés : Étudiant, Visiteur) et d'aide contextuelle.</li>
+</ul>
+<h4 id="12-primtres-et-responsabilits-national--crous">1.2 Périmètres et Responsabilités (National / Crous)</h4>
+<p>Le système distingue deux niveaux de gouvernance :</p>
+<ul>
+<li><strong>National</strong> : Gestion des thèmes transverses communs à l'ensemble du réseau.</li>
+<li><strong>Local (Crous)</strong> : Chaque Crous peut gérer ses propres déclinaisons ou spécificités locales.</li>
+<li><strong>Cloisonnement</strong> : Un système de permissions (Voters) garantit qu'un gestionnaire local ne peut modifier que les thèmes rattachés à son Crous, tandis que le niveau National supervise l'ensemble.</li>
+</ul>
+<h4 id="13-base-de-connaissance-rponses-types">1.3 Base de Connaissance (Réponses Types)</h4>
+<p>Pour faciliter le traitement des demandes, des Réponses Types peuvent être associées à chaque thème (<code>ThemeResponseController</code>). Elles fournissent aux gestionnaires des modèles de réponse standardisés, assurant ainsi une cohérence dans la communication.</p>
+<h4 id="14-attribution-et-scurit">1.4 Attribution et Sécurité</h4>
+<ul>
+<li><strong>Profilage</strong> : Restriction de la visibilité d'un thème selon le profil de l'utilisateur connecté (ex: réservé aux étudiants).</li>
+<li><strong>Assignation</strong> : Possibilité d'attribuer spécifiquement un thème à une liste de gestionnaires/consultants du Crous concerné, restreignant ainsi son traitement aux personnes compétentes (uniquement pour les thèmes liés à un Crous local). Si aucun gestionnaire n'est assigné, tous les gestionnaires/consultants de ce Crous pourront voir les messages liés à ce thème.</li>
+</ul>
+<h4 id="15-autorisation-de-pices-jointes">1.5 Autorisation de Pièces Jointes</h4>
+<p>Il est possible pour un étudiant/visiteur d'associer une pièce jointe lors de la création de son message si l'une des conditions suivantes est remplie :</p>
+<ul>
+<li>Le thème lié au message est flagué comme étant de type &quot;sécurité&quot; (<code>security = true</code>)</li>
+<li>Le Crous associé au message autorise les pièces jointes (<code>allowIssueAttachments = true</code>)</li>
+</ul>
+<h4 id="16-rgles-de-gestion-et-validation">1.6 Règles de Gestion et Validation</h4>
+<p>L'intégrité des données est assurée par des validateurs spécifiques appliqués à l'entité <code>Theme</code> :</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Règle</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>MaxDepth</strong></td>
+<td style="text-align:left">La profondeur de l'arborescence ne peut excéder <strong>4 niveaux</strong>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>NoCrousRoot</strong></td>
+<td style="text-align:left">Un thème racine (Niveau 1) ne peut pas être rattaché à un Crous (il doit être National).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>NoCircularReference</strong></td>
+<td style="text-align:left">Un thème ne peut pas être son propre parent (direct ou indirect).</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>CrousConsistency</strong></td>
+<td style="text-align:left">Cohérence hiérarchique : un sous-thème local ne peut être créé que sous un parent National ou du même Crous.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Profils</strong></td>
+<td style="text-align:left">Au moins un profil cible (Étudiant, Visiteur) doit être sélectionné.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="17-matrice-des-permissions-acl---thmes">1.7 Matrice des Permissions (ACL) - Thèmes</h4>
+<p>Les actions autorisées sont déterminées par le rôle de l'utilisateur et le contexte du thème (Voter).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Rôle</th>
+<th style="text-align:center">Voir Arborescence</th>
+<th style="text-align:center">Créer Racine (Niv 1)</th>
+<th style="text-align:center">Créer Sous-thème (Niv 2-4)</th>
+<th style="text-align:center">Modifier / Supprimer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Admin PVE</strong></td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>Tout</td>
+<td style="text-align:center">✅</td>
+<td style="text-align:center">✅</td>
+<td style="text-align:center">✅</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Gestionnaire CNOUS</strong></td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>Tout</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">✅</td>
+<td style="text-align:center">✅</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>(Sauf niveau 1)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Consultant CNOUS</strong></td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>Tout</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">❌</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Gestionnaire CROUS</strong></td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>(National + Son Crous)</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>(Si parent Nat. ou son Crous)</td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>(Uniquement ses thèmes)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Consultant CROUS</strong></td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>(National + Son Crous)</td>
+<td style="text-align:center">✅</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:left"><br>(National + Son Crous)</td>
+<td style="text-align:center">❌</td>
+<td style="text-align:center">❌</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-gestion-des-messages-interface-gestionnaireconsultant">2. Gestion des Messages (Interface Gestionnaire/Consultant)</h3>
+<p>L'interface interne permet aux gestionnaires et consultants de visualiser et traiter les demandes (Issues) adressées au Crous.</p>
+<h4 id="21-liste-des-demandes">2.1 Liste des Demandes</h4>
+<ul>
+<li><strong>Console de visualisation</strong> (<code>IssueController::indexInternal</code>) : Liste de toutes les demandes avec filtrage par :
+<ul>
+<li>Statut (À répondre, Répondu, Émis)</li>
+<li>Date du dernier message (début/fin)</li>
+<li>Thème (hiérarchique, avec tous les sous-thèmes)</li>
+<li>ID Étudiant</li>
+<li>Email</li>
+</ul>
+</li>
+<li><strong>Filtrage par périmètre</strong> :
+<ul>
+<li>Admin/CNOUS : voit l'ensemble des demandes, peut filtrer par CROUS</li>
+<li>Gestionnaire/Consultant Crous : voit les demandes de son Crous (National + local), pas de filtre CROUS (auto-filtré)</li>
+<li>Les thèmes affichés sont filtrés selon les droits (National ou son CROUS, et affectation utilisateur le cas échéant)</li>
+</ul>
+</li>
+</ul>
+<h4 id="22-colonnes-affiches">2.2 Colonnes affichées</h4>
+<table>
+<thead>
+<tr>
+<th>Colonne</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ID</td>
+<td>Lien vers la vue détaillée</td>
+</tr>
+<tr>
+<td>Statut</td>
+<td>À répondre / Répondu / Émis</td>
+</tr>
+<tr>
+<td>CROUS</td>
+<td>Code CROUS</td>
+</tr>
+<tr>
+<td>Niveaux Thème</td>
+<td>Chemin hiérarchique du thème (ex: Transport &gt; Train &gt; TGV)</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>Email de l'étudiant ou du visiteur</td>
+</tr>
+<tr>
+<td>ID Étudiant</td>
+<td>ID de l'étudiant (si applicable)</td>
+</tr>
+<tr>
+<td>Dernier message</td>
+<td>Date de création du dernier message</td>
+</tr>
+<tr>
+<td>Nb messages</td>
+<td>Nombre de messages dans la conversation</td>
+</tr>
+</tbody>
+</table>
+<h4 id="23-traitement-des-demandes">2.3 Traitement des Demandes</h4>
+<ul>
+<li><strong>Consultation détaillée</strong> (<code>IssueController::viewInternal</code>) : Visualisation complète d'une demande avec :
+<ul>
+<li>Historique des messages chronologiques</li>
+<li>Informations sur le demandeur (Étudiant ou Visiteur)</li>
+<li>Thème associé et chemin hiérarchique</li>
+<li>Pièces jointes</li>
+</ul>
+</li>
+<li><strong>Réponses types</strong> : Accès rapide aux réponses pré-enregistrées pour le thème concerné</li>
+<li><strong>Réponse au demandeur</strong> : Formulaire de réponse avec :
+<ul>
+<li>Zone de texte pour le message</li>
+<li>Upload de pièces jointes (3 maximum)</li>
+<li>Bouton rapide pour insérer un lien vers la page &quot;Mot de passe oublié&quot;</li>
+<li>Option pour autoriser ou interdire au demandeur de répondre avec des pièces jointes</li>
+<li>Choix du statut après réponse :
+<ul>
+<li><strong>Envoyer et passer en Émis</strong> : Le demandeur pourra répondre à la suite de cette réponse</li>
+<li><strong>Envoyer et marquer comme Répondu</strong> : Le demandeur ne pourra plus répondre (conversation close)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Transfert de demande</strong> (<code>IssueController::transferIssue</code>) : Possibilité de transférer une demande vers un autre Crous avec changement de thème</li>
+<li><strong>Notification par email</strong> : À chaque envoi de réponse par le gestionnaire/consultant, un email est automatiquement envoyé au demandeur (étudiant ou visiteur) contenant :
+<ul>
+<li>Le numéro de demande et le token</li>
+<li>Le CROUS et le thème</li>
+<li>Le statut actuel</li>
+<li>L'historique complet des échanges (messages textuels uniquement, sans les pièces jointes)</li>
+<li>Un lien pour consulter et répondre à la demande</li>
+</ul>
+</li>
+</ul>
+<h4 id="24-cration-de-demandes-admingestionnaireconsultant">2.4 Création de Demandes (Admin/Gestionnaire/Consultant)</h4>
+<ul>
+<li><strong>Création externe</strong> (<code>IssueController::newIssueInternal</code>) : Possibilité pour les profils suivants de créer une demande au nom d'un étudiant via la console des usagers :
+<ul>
+<li>Admin</li>
+<li>Gestionnaire CNOUS</li>
+<li>Consultant CNOUS</li>
+<li>Gestionnaire CROUS</li>
+<li>Consultant CROUS</li>
+<li>Statut initial : Émis</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-gestion-des-messages-interface-tudiantvisiteur">3. Gestion des Messages (Interface Étudiant/Visiteur)</h3>
+<p>L'interface externe permet aux utilisateurs (Étudiants identifiés ou Visiteurs anonymes) de créer et suivre leurs demandes.</p>
+<h4 id="31-cration-dune-demande">3.1 Création d'une Demande</h4>
+<ul>
+<li><strong>Formulaire de contact</strong> (<code>IssueController::newIssue</code>) :
+<ul>
+<li>Sélection du Crous (pré-sélectionné pour les étudiants connectés)</li>
+<li>Navigation dans l'arborescence des thèmes (API : <code>/api/themes/level1</code>, <code>/api/themes/children</code>)</li>
+<li>Le thème doit être au moins de niveau 3</li>
+<li>Message initial obligatoire</li>
+<li>Upload de pièces jointes (3 maximum, selon configuration du CROUS ou thème de sécurité)</li>
+</ul>
+</li>
+<li><strong>Confirmation</strong> : Après soumission, un email de confirmation est envoyé contenant :
+<ul>
+<li>Le numéro de demande et le token</li>
+<li>Le CROUS et le thème (chemin hiérarchique)</li>
+<li>La date de soumission</li>
+<li>Le statut initial</li>
+<li>Le message initial</li>
+<li>Le nombre de pièces jointes (si présentes)</li>
+<li>Un lien pour consulter et suivre la demande</li>
+</ul>
+</li>
+</ul>
+<h4 id="32-suivi-des-demandes-tudiant">3.2 Suivi des Demandes (Étudiant)</h4>
+<ul>
+<li><strong>Liste des demandes</strong> (<code>IssueController::studentIssueIndex</code>) : Visualisation de l'historique des demandes soumises par l'étudiant connecté</li>
+<li><strong>Consultation</strong> (<code>IssueController::studentIssueView</code>) :
+<ul>
+<li>Historique des messages</li>
+<li>Statut actuel de la demande</li>
+<li>Pièces jointes</li>
+</ul>
+</li>
+<li><strong>Réponse</strong> : Possibilité de répondre uniquement quand le statut est &quot;Émis&quot; (en attente de réponse client)</li>
+</ul>
+<h4 id="33-suivi-des-demandes-visiteur">3.3 Suivi des Demandes (Visiteur)</h4>
+<ul>
+<li><strong>Accès par token</strong> : Le visiteur accède à sa demande via le lien contenu dans l'email de confirmation ou de réponse. L'URL doit contenir le token unique de la demande.</li>
+<li><strong>Vérification d'identité</strong> : Pour accéder à la demande, le visiteur doit saisir son adresse email. Celle-ci doit correspondre à l'email du visiteur associé à la demande (authentification sans mot de passe).</li>
+<li><strong>Consultation</strong> (<code>IssueController::visitorIssueDetail</code>) : Même fonctionnalités que pour les étudiants (historique des messages, statut, pièces jointes)</li>
+<li><strong>Réponse</strong> : Possible uniquement quand le statut est &quot;Émis&quot;</li>
+</ul>
+<h2 id="api-platform-perspectives-dvolution">API Platform (Perspectives d'évolution)</h2>
+<h3 id="quest-ce-que-api-platform-">Qu'est-ce que API Platform ?</h3>
+<p><strong>API Platform</strong> est un framework PHP open-source built on top de Symfony, conçu pour créer rapidement des APIs REST et GraphQL de qualité professionnelle. Il permet de transformer des entités Doctrine en ressources API exposées automatiquement avec :</p>
+<ul>
+<li><strong>Documentation automatique</strong> : Génère une documentation OpenAPI/Swagger interactive</li>
+<li><strong>Validation des données</strong> : Utilise les contraintes de validation Symfony</li>
+<li><strong>Filtrage et pagination</strong> : Système de filtres intégrés (recherche, tri, pagination)</li>
+<li><strong>Authentification</strong> : Support natif de JWT, OAuth, etc.</li>
+<li><strong>Formatage JSON-LD/HAL</strong> : Standards du web sémantique</li>
+</ul>
+<h3 id="application-au-projet-mse">Application au projet MSE</h3>
+<p>L'implémentation d'API Platform dans ce projet pourrait représenter une étape majeure dans l'évolution de l'architecture de l'application, en particulier pour répondre aux besoins croissants de découplage entre le front-end et le back-end.</p>
+<h4 id="dcouplage-frontback">Découplage front/back</h4>
+<p>Actualmente, l'application MSE utilise une approche monolithique où le front-end (templates Twig) est étroitement intégré au back-end (contrôleurs Symfony). Bien que cette approche soit simple et efficace pour un projet de taille modeste, elle présente plusieurs limitations :</p>
+<ul>
+<li><strong>Difficulté à maintenir</strong> : Toute modification de l'interface utilisateur nécessite une intervention sur le code serveur</li>
+<li><strong>Impossibilité de partager les ressources</strong> : L'application mobile CROUS ou d'autres services ne peuvent pas réutiliser facilement les fonctionnalités existantes</li>
+<li><strong>Technologies figées</strong> : Le choix de Twig impose de facto l'utilisation de PHP pour le front-end</li>
+</ul>
+<p>En exposant une API REST via API Platform, cela nous permettrait de :</p>
+<ul>
+<li><strong>Séparer les préoccupations</strong> : Le front-end pourrait être développé indépendamment (React, Vue.js, mobile natif, etc.) en consommant uniquement l'API</li>
+<li><strong>Réutiliser les ressources</strong> : L'API pourrait être consommée par l'application mobile CROUS, des services internes (CRM, outils de ticketing), ou même des partenaires externes</li>
+<li><strong>Évolutivité</strong> : L'architecture microservices devient possible à terme, avec des équipes pouvant travailler de manière indépendante sur différentes briques</li>
+</ul>
+<h4 id="mise-en-place-progressive">Mise en place progressive</h4>
+<p>L'introduction d'API Platform ne nécessite pas de refondre l'existant. Une approche progressive est recommandée :</p>
+<ol>
+<li><strong>Exposition des ressources existantes</strong> : Les entités <code>Issue</code> et <code>IssueMessage</code> pourraient être exposées via API Platform avec un minimum de configuration</li>
+<li><strong>Ajout de la sécurité</strong> : Intégration avec le système d'authentification existant (JWT ou token OAuth)</li>
+<li><strong>Création de nouveaux endpoints</strong> : Pour les fonctionnalités non encore présentes dans l'API</li>
+<li><strong>Migration progressive du front</strong> : Les nouveaux écrans pourraient être développés en consommant l'API, tandis que les écrans existants continueraient à utiliser les contrôleurs Twig</li>
+</ol>
+<h4 id="entits--exposer">Entités à exposer</h4>
+<p>Les principales entités à exposer seraient :</p>
+<table>
+<thead>
+<tr>
+<th>Entité</th>
+<th>Description</th>
+<th>Opérations CRUD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Issue</td>
+<td>Demande/Signalement</td>
+<td>Créer, Lire, Mettre à jour</td>
+</tr>
+<tr>
+<td>IssueMessage</td>
+<td>Messages d'une demande</td>
+<td>Créer, Lire</td>
+</tr>
+<tr>
+<td>Theme</td>
+<td>Thèmes hiérarchiques</td>
+<td>Lire</td>
+</tr>
+<tr>
+<td>ThemeResponse</td>
+<td>Réponses types</td>
+<td>Lire</td>
+</tr>
+<tr>
+<td>Crous</td>
+<td>Établissements CROUS</td>
+<td>Lire</td>
+</tr>
+</tbody>
+</table>
+<h4 id="avantages-concrets">Avantages concrets</h4>
+<ul>
+<li><strong>Pour les étudiants</strong> : Une application mobile performante avec une expérience utilisateur moderne</li>
+<li><strong>Pour les gestionnaires</strong> : Possibilité de développer des outils de gestion dédiés (tableaux de bord avancés, statistiques)</li>
+<li><strong>Pour les équipes techniques</strong> : Maintenance simplifiée, tests unitaires plus ciblés, déploiement indépendant</li>
+<li><strong>Pour le CROUS</strong> : Flexibilité pour intégrer le système de messages avec d'autres outils (CRM, ERP, etc.)</li>
+</ul>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script><script>mermaid.initialize({startOnLoad: true});</script>
+  </body>
+</html>

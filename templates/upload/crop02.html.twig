@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block localstyle %}
+    <style>
+        body {
+            background-color: transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+        {{ form_widget(form.submit) }} <a class="btn btn-secondary" onClick="closeModal();">Annuler</a>
+
+        <div id='preview' style='overflow:hidden; width:90px; height:90px; position: absolute; top: 0px; right: 10px;'>
+        	<img src="{{ asset(image) }}" style='position: relative;' alt='Thumbnail Preview' />
+	    </div>
+
+        <div style="margin-top:50px;">
+            <img id="largeimg" src="{{ asset(image) }}">
+        </div>
+    {{ form_end(form) }}
+
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        function preview(img, selection) {
+            var scaleX = 90 / selection.width;
+            var scaleY = 90 / selection.height;
+
+            $('#preview img').css({
+                width: Math.round(scaleX * $('#largeimg').width()) + 'px',
+                height: Math.round(scaleY * $('#largeimg').height()) + 'px',
+                marginLeft: '-' + Math.round(scaleX * selection.x1) + 'px',
+                marginTop: '-' + Math.round(scaleY * selection.y1) + 'px'
+            });
+            $('#form_x1').val(selection.x1);
+            $('#form_y1').val(selection.y1);
+            $('#form_x2').val(selection.x2);
+            $('#form_y2').val(selection.y2);
+            $('#form_w').val(selection.width);
+            $('#form_h').val(selection.height);
+        }
+
+        function reportThumb() {
+            window.parent.$("#{{reportThumb}}").val("{{thumb}}");
+            url="{{ asset(thumb) }}";
+            window.parent.$("#{{reportThumb}}_img").attr("src",url);
+            closeModal();
+        }
+
+        function closeModal() {
+            window.parent.$("#mymodal").modal('hide');
+        }
+
+        $(window).on("load",function () {
+            {% if toReport %}
+                reportThumb();
+            {% endif %}
+            $('#largeimg').imgAreaSelect({ aspectRatio: '1:1', onSelectChange: preview });
+            
+            
+            var selection = new Object();
+            if($('#largeimg').height()<$('#largeimg').width()) {
+                selection.width = $('#largeimg').height();
+                selection.height = $('#largeimg').height();
+            }
+            else {
+                selection.width = $('#largeimg').width();
+                selection.height = $('#largeimg').width();
+            }
+
+            selection.x1=0;
+            selection.x2=0;
+            selection.y1=0;
+            selection.y2=0;
+
+            preview($('#largeimg'),selection);
+        
+        });    
+    </script>
+{% endblock %}

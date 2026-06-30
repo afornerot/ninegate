@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'form/icon_entity_widget.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    <button type="submit" class="btn btn-success">Valider</button>
+    <a href="{{ path('app_user_bookmark_list') }}" class="btn btn-secondary">Annuler</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Favori</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.title) }}
+                {{ form_row(form.summary) }}
+                {{ form_row(form.description) }}
+                {{ form_row(form.url) }}
+                {{ form_row(form.newTab) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Apparence</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.icon) }}
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        {{ form_row(form.bgcolor, {'attr': {'class': 'form-control color-input'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.color, {'attr': {'class': 'form-control color-input'}}) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var iconInput = document.querySelector('.icon-entity-input');
+            if (iconInput && !iconInput.value) {
+                e.preventDefault();
+                var error = document.querySelector('.icon-entity-error');
+                if (error) error.style.display = 'block';
+                alert('Veuillez choisir une icône.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

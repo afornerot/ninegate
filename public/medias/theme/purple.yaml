@@ -1,0 +1,20 @@
+name: Purple Night
+description: Theme violet nuit élégant
+primary: "#7b2cbf"
+secondary: "#9d4edd"
+success: "#06d6a0"
+danger: "#e63946"
+warning: "#ffb703"
+info: "#4895ef"
+light: "#e0aaff"
+dark: "#240046"
+body-bg: "#3c0965"
+body-color: "#ffffff"
+body-color-dark: "#ffffff"
+border-color: "#7b2cbf"
+card-bg: "#5a189a"
+btn-bg: "#9d4edd"
+btn-border-color: "#9d4edd"
+fontHeader: SigmarOne
+fontBody: LexendDeca
+app-bs-header: "#c77dff"

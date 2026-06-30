@@ -1,0 +1,79 @@
+services:
+  mariadb:
+    image: mariadb
+    container_name: ninegate-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: ninegate
+      MYSQL_USER: user
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - ./volume/mariadb:/var/lib/mysql
+    networks:
+      - ninegate_default
+
+  ninegate:
+    image: ghcr.io/afornerot/ninegate
+    container_name: ninegate
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ./misc/docker/Dockerfile
+    depends_on:
+      - mariadb
+    ports:
+      - "8019:80"
+    volumes:
+      - ./src:/app/src:delegated
+      - ./templates:/app/templates:delegated
+      - ./config:/app/config:delegated
+      - ./public/uploads:/app/public/uploads:delegated
+      - ./uploads:/app/uploads:delegated
+      - ./misc:/app/misc:delegated
+      - ./public/lib:/app/public/lib:delegated
+      - ./public/medias:/app/public/medias:delegated
+      - ./.env.local:/app/.env.local
+      - ./volume/dex:/app/volume/dex
+      - ./volume/glauth:/app/volume/glauth
+    networks:
+      - ninegate_default
+
+  adminer:
+    image: adminer
+    container_name: ninegate-adminer
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    ports:
+      - 6019:8080
+    networks:
+      - ninegate_default
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: ninegate-mailhog
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - ninegate_default
+
+  glauth:
+    image: ghcr.io/glauth/glauth-plugins:v2.4.0
+    container_name: ninegate-glauth
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+      - ninegate
+    ports:
+      - "389:3893"
+    volumes:
+      - ./volume/glauth:/app/config
+    networks:
+      - ninegate_default
+
+networks:
+  ninegate_default:
+    external: true

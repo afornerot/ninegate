@@ -1,0 +1,20 @@
+name: Mint
+description: Theme frais à la menthe
+primary: "#00b894"
+secondary: "#00cec9"
+success: "#00b894"
+danger: "#ff7675"
+warning: "#ffeaa7"
+info: "#74b9ff"
+light: "#dfe6e9"
+dark: "#2d3436"
+body-bg: "#ffffff"
+body-color: "#2d3436"
+body-color-dark: "#ffffff"
+border-color: "#dfe6e9"
+card-bg: "#f5f6fa"
+btn-bg: "#00b894"
+btn-border-color: "#00b894"
+fontHeader: Baloo
+fontBody: Lato
+app-bs-header: "#00b894"

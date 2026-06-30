@@ -1,0 +1,59 @@
+<div class="clock-widget">
+    <div class="clock-main" data-timezone="{{ mainTimezone }}">
+        <div class="clock-time" id="clock-main-{{ pageWidget.id }}"></div>
+        <div class="clock-date text-muted small" id="clock-date-main-{{ pageWidget.id }}"></div>
+    </div>
+    {% if extraTimezones|length > 0 %}
+    <div class="clock-extra mt-2">
+        {% for tz in extraTimezones %}
+        <div class="clock-extra-item d-flex justify-content-between align-items-center py-1 {% if not loop.last %}border-bottom{% endif %}" data-timezone="{{ tz }}">
+            <span class="text-muted small">{{ timezones[tz] ?? tz }}</span>
+            <span class="clock-extra-time small fw-bold" id="clock-extra-{{ pageWidget.id }}-{{ loop.index0 }}"></span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+(function() {
+    var pwId = {{ pageWidget.id }};
+
+    function formatTime(timezone) {
+        return new Intl.DateTimeFormat('fr-FR', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            timeZone: timezone, hour12: false
+        });
+    }
+
+    function formatDate(timezone) {
+        return new Intl.DateTimeFormat('fr-FR', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+            timeZone: timezone
+        });
+    }
+
+    function updateClocks() {
+        var mainEl = document.getElementById('clock-main-' + pwId);
+        var mainDateEl = document.getElementById('clock-date-main-' + pwId);
+        if (mainEl) {
+            var mainTz = document.querySelector('.clock-main').dataset.timezone;
+            mainEl.textContent = formatTime(mainTz).format(new Date());
+            if (mainDateEl) {
+                mainDateEl.textContent = formatDate(mainTz).format(new Date());
+            }
+        }
+
+        document.querySelectorAll('.clock-extra-item[data-timezone]').forEach(function(el, i) {
+            var tz = el.dataset.timezone;
+            var target = document.getElementById('clock-extra-' + pwId + '-' + i);
+            if (target) {
+                target.textContent = formatTime(tz).format(new Date());
+            }
+        });
+    }
+
+    updateClocks();
+    setInterval(updateClocks, 1000);
+})();
+</script>

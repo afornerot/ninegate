@@ -1,0 +1,153 @@
+{% if canManage %}
+<div id="weather-config-{{ pageWidget.id }}" class="mb-2 position-relative">
+    <div class="input-group input-group-sm">
+        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+        <input type="text" class="form-control weather-city-search" placeholder="Changer de ville..." value="{{ city }}">
+    </div>
+    <div class="weather-city-results"></div>
+</div>
+{% endif %}
+
+<div id="weather-container-{{ pageWidget.id }}">
+{% if weather %}
+<div class="weather-widget">
+    <div class="weather-current">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <div>
+                <div class="weather-city fw-bold">{{ city }}</div>
+                <div class="text-muted small">{{ weather.timezone_abbreviation }}</div>
+            </div>
+            <div class="text-end">
+                {% set currentCode = weather.current.weather_code %}
+                {% set codeInfo = weatherCodes[currentCode] ?? {'icon': 'fa-cloud', 'color': '#94a3b8', 'label': 'Inconnu'} %}
+                <i class="fas {{ codeInfo.icon }} weather-icon" style="font-size: 2rem; color: {{ codeInfo.color }};"></i>
+            </div>
+        </div>
+        <div class="d-flex align-items-end gap-3">
+            <div class="weather-temp">{{ weather.current.temperature_2m }}°</div>
+            <div class="text-muted small pb-1">
+                Ressentie {{ weather.current.apparent_temperature }}°<br>
+                <i class="fas fa-wind"></i> {{ weather.current.wind_speed_10m }} km/h
+                <i class="fas fa-droplet ms-2"></i> {{ weather.current.relative_humidity_2m }}%
+            </div>
+        </div>
+    </div>
+    <div class="weather-forecast mt-3">
+        {% for i in 0..6 %}
+            {% if weather.daily is defined and weather.daily.time[i] is defined %}
+                {% set date = weather.daily.time[i]|date('Y-m-d') %}
+                {% set today = 'now'|date('Y-m-d') %}
+                {% if date == today %}
+                    {% set dayLabel = 'Auj.' %}
+                {% else %}
+                    {% set dayNum = weather.daily.time[i]|date('w') %}
+                    {% set dayLabel = dayNames[dayNum] ?? '' %}
+                {% endif %}
+                {% set fcCode = weather.daily.weather_code[i] %}
+                {% set fcInfo = weatherCodes[fcCode] ?? {'icon': 'fa-cloud', 'color': '#94a3b8'} %}
+                <div class="weather-forecast-day">
+                    <div class="text-muted small">{{ dayLabel }}</div>
+                    <i class="fas {{ fcInfo.icon }}" style="color: {{ fcInfo.color }};"></i>
+                    <div class="small">
+                        <span class="fw-bold">{{ weather.daily.temperature_2m_max[i] }}°</span>
+                        <span class="text-muted">{{ weather.daily.temperature_2m_min[i] }}°</span>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% elseif not weather and city %}
+<div class="text-muted small p-2">Données météo indisponibles.</div>
+{% endif %}
+</div>
+
+<script>
+(function() {
+    var pwId = {{ pageWidget.id }};
+    var storageKey = 'weather_widget_' + pwId;
+    var container = document.getElementById('weather-container-' + pwId);
+    var weatherCodes = {{ weatherCodes|json_encode|raw }};
+    var dayNames = {{ dayNames|json_encode|raw }};
+
+    function getDayLabel(dateStr) {
+        var d = new Date(dateStr + 'T00:00:00');
+        var today = new Date(); today.setHours(0,0,0,0);
+        if (Math.round((d - today) / 86400000) === 0) return 'Auj.';
+        return dayNames[d.getDay()] || '';
+    }
+
+    function renderWeather(data, cityName) {
+        var c = data.current;
+        var codeInfo = weatherCodes[c.weather_code] || {icon: 'fa-cloud', color: '#94a3b8', label: 'Inconnu'};
+        var html = '<div class="weather-widget"><div class="weather-current">';
+        html += '<div class="d-flex align-items-center justify-content-between mb-2">';
+        html += '<div><div class="weather-city fw-bold">' + cityName + '</div>';
+        html += '<div class="text-muted small">' + (data.timezone_abbreviation || '') + '</div></div>';
+        html += '<div class="text-end"><i class="fas ' + codeInfo.icon + '" style="font-size: 2rem; color: ' + codeInfo.color + ';"></i></div></div>';
+        html += '<div class="d-flex align-items-end gap-3">';
+        html += '<div class="weather-temp">' + c.temperature_2m + '°</div>';
+        html += '<div class="text-muted small pb-1">Ressentie ' + c.apparent_temperature + '°<br>';
+        html += '<i class="fas fa-wind"></i> ' + c.wind_speed_10m + ' km/h ';
+        html += '<i class="fas fa-droplet ms-2"></i> ' + c.relative_humidity_2m + '%</div></div></div>';
+        html += '<div class="weather-forecast mt-3">';
+        for (var i = 0; i < 7; i++) {
+            if (!data.daily || !data.daily.time[i]) continue;
+            var fcInfo = weatherCodes[data.daily.weather_code[i]] || {icon: 'fa-cloud', color: '#94a3b8'};
+            html += '<div class="weather-forecast-day"><div class="text-muted small">' + getDayLabel(data.daily.time[i]) + '</div>';
+            html += '<i class="fas ' + fcInfo.icon + '" style="color: ' + fcInfo.color + ';"></i>';
+            html += '<div class="small"><span class="fw-bold">' + data.daily.temperature_2m_max[i] + '°</span> ';
+            html += '<span class="text-muted">' + data.daily.temperature_2m_min[i] + '°</span></div></div>';
+        }
+        html += '</div></div>';
+        container.innerHTML = html;
+    }
+
+    function fetchWeather(lat, lon, cityName) {
+        var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon;
+        url += '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,is_day';
+        url += '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max';
+        url += '&timezone=auto&forecast_days=7';
+        fetch(url).then(function(r) { return r.json(); }).then(function(data) { renderWeather(data, cityName); });
+    }
+
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem(storageKey)); } catch(e) {}
+    if (stored && stored.latitude && stored.longitude) {
+        var $config = $('#weather-config-{{ pageWidget.id }}');
+        if ($config.length) {
+            $config.find('.weather-city-search').val(stored.city);
+        }
+        fetchWeather(stored.latitude, stored.longitude, stored.city);
+    }
+
+    {% if canManage %}
+    var $config = $('#weather-config-{{ pageWidget.id }}');
+    var $results = $config.find('.weather-city-results');
+    var searchTimeout;
+    $config.find('.weather-city-search').on('input', function() {
+        var query = $(this).val();
+        clearTimeout(searchTimeout);
+        if (query.length < 2) { $results.empty().hide(); return; }
+        searchTimeout = setTimeout(function() {
+            $.get('{{ path("app_widget_weather_geocode") }}', {name: query}, function(data) {
+                $results.empty();
+                if (!data.length) { $results.hide(); return; }
+                data.forEach(function(r) {
+                    var label = r.name + (r.admin1 ? ', ' + r.admin1 : '') + (r.country ? ' (' + r.country + ')' : '');
+                    $results.append($('<div class="weather-city-result"></div>').text(label).data({lat: r.latitude, lon: r.longitude, city: r.name}));
+                });
+                $results.show();
+            });
+        }, 300);
+    });
+    $results.on('click', '.weather-city-result', function() {
+        var d = $(this).data();
+        localStorage.setItem(storageKey, JSON.stringify({city: d.city, latitude: d.lat, longitude: d.lon}));
+        $config.find('.weather-city-search').val(d.city);
+        $results.empty().hide();
+        fetchWeather(d.lat, d.lon, d.city);
+    });
+    {% endif %}
+})();
+</script>

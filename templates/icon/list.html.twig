@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+<a href="{{ path(routesubmit) }}" class="btn btn-primary mb-3">Nouvelle Icône</a>
+
+<div class="d-flex flex-wrap gap-3">
+{% for icon in icons %}
+    <a href="{{ path(routeupdate, {id: icon.id}) }}" class="text-decoration-none" title="{{ icon.tags }}">
+        <img src="{{ asset(icon.route) }}" style="height: 48px;">
+    </a>
+{% endfor %}
+</div>
+{% endblock %}

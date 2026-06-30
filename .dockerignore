@@ -1,0 +1,41 @@
+# Dépendances locales (elles seront réinstallées dans l’image)
+vendor/
+node_modules/
+
+# Fichiers de config locaux ou secrets
+.env.local
+.env.*.local
+
+# Cache et logs Symfony
+var/cache/
+var/log/
+
+# Build front-end
+public/build/
+public/bundles/
+
+# Tests, docs, etc.
+phpunit.xml
+phpunit.xml.dist
+tests/
+docs/
+
+# IDE & OS
+*.log
+*.md
+*.swp
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# uploads
+uploads/
+public/uploads/
+
+# Volume
+volume/

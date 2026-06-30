@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block localstyle %}
+    <style>
+        body {
+            background-color: transparent;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+{% endblock %}
+
+{% block localscript %}
+    <script>
+        function reportThumb() {
+            window.parent.$("#{{reportThumb}}").val("{{thumb}}");
+            url="{{ asset(thumb) }}";
+            window.parent.$("#{{reportThumb}}_img").attr("src",url);
+            closeModal();
+        }
+
+        function closeModal() {
+            window.parent.$("#mymodal").modal('hide');
+        }
+
+        $(window).on("load",function () {
+            reportThumb();
+        });    
+    </script>
+{% endblock %}

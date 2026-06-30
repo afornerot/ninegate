@@ -1,0 +1,12 @@
+oneup_uploader:
+    mappings:
+        avatar:
+            frontend: dropzone
+        logo:
+            frontend: dropzone    
+        icon:
+            frontend: dropzone
+        bninefile:
+            frontend: dropzone
+        blogarticle:
+            frontend: dropzone        

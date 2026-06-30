@@ -1,0 +1,20 @@
+name: Cadoles
+description: Thème Cadoles - Version sombre professionnelle
+primary: "#0B2634"
+secondary: "#1a3a4d"
+success: "#2ecc71"
+danger: "#e74c3c"
+warning: "#f39c12"
+info: "#3498db"
+light: "#b8c5cc"
+dark: "#0d1f2a"
+body-bg: "#0B2634"
+body-color: "#e8eaed"
+body-color-dark: "#e8eaed"
+border-color: "#1a3a4d"
+card-bg: "#0d1f2a"
+btn-bg: "#0B2634"
+btn-border-color: "#0B2634"
+fontHeader: Space Mono
+fontBody: Hack
+app-bs-header: "#F59B41"

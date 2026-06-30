@@ -1,0 +1,330 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_errors(form) }}
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if routedelete is defined and page and page.id %}
+        <a href="{{ path(routedelete, {id: page.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Voulez-vous supprimer cette page ?')">Supprimer</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.title) }}
+                {{ form_row(form.slug) }}
+                {{ form_row(form.pageOrder) }}
+            </div>
+        </div>
+    </div>
+
+    {% if isAdmin is defined and isAdmin %}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Permissions</h5>
+            </div>
+            <div class="card-body">
+                {% if form.pageType is defined %}
+                    {{ form_row(form.pageType) }}
+                    <div id="page-all-users-wrapper" style="display: none; margin-bottom: 10px;">
+                        {{ form_row(form.allUsers) }}
+                    </div>
+                    <div id="page-user-wrapper" style="display: none;">
+                        {{ form_row(form.user) }}
+                    </div>
+                    <div id="page-groups-roles-wrapper" style="display: none;">
+                        {{ form_row(form.groups) }}
+                        {{ form_row(form.roles) }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        {% if page.user %}Type: Page personnelle{% elseif page.groups|length > 0 or page.roles|length > 0 %}Type: Page de groupe/role{% endif %}
+                    </div>
+                    <div id="page-all-users-wrapper" style="margin-bottom: 10px;">
+                        {{ form_row(form.allUsers) }}
+                    </div>
+                    {% if page.user %}
+                    <div id="page-user-wrapper">
+                        {{ form_row(form.user) }}
+                    </div>
+                    <div id="page-groups-roles-wrapper" style="display: none;">
+                        {{ form_row(form.groups) }}
+                        {{ form_row(form.roles) }}
+                    </div>
+                    {% else %}
+                    <div id="page-user-wrapper" style="display: none;">
+                        {{ form_row(form.user) }}
+                    </div>
+                    <div id="page-groups-roles-wrapper">
+                        {{ form_row(form.groups) }}
+                        {{ form_row(form.roles) }}
+                    </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% elseif not isAdmin %}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Permissions</h5>
+            </div>
+            <div class="card-body">
+                {% if form.pageType is defined %}
+                    {{ form_row(form.pageType) }}
+                    <div id="page-groups-wrapper" style="display: none;">
+                        {{ form_row(form.groups) }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        {% if page.user %}Type: Page personnelle{% elseif page.groups|length > 0 %}Type: Page de groupe{% endif %}
+                    </div>
+                    <div id="page-all-users-wrapper" style="margin-bottom: 10px;">
+                        {{ form_row(form.allUsers) }}
+                    </div>
+                    {{ form_row(form.groups) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Template</h5>
+            </div>
+            <div class="card-body">
+                <div id="template-selector" class="template-selector">
+                    <div class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        <span class="ms-2 text-muted">Chargement des templates...</span>
+                    </div>
+                </div>
+                {{ form_widget(form.pageTemplate) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}
+
+{% block localstyle %}
+<style>
+    .template-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 14px;
+    }
+    .template-card {
+        border: 2px solid var(--bs-border-color);
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: var(--bs-body-bg);
+    }
+    .template-card:hover {
+        border-color: var(--bs-secondary);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    }
+    .template-card.selected {
+        border-color: var(--bs-success);
+        border-width: 3px;
+        background: rgba(var(--bs-success-rgb), 0.08);
+        box-shadow: 0 0 0 3px rgba(var(--bs-success-rgb), 0.25);
+    }
+    .template-card.selected .template-name {
+        color: var(--bs-success);
+    }
+    .template-card .template-name {
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 10px;
+        color: var(--bs-body-color);
+    }
+    .template-card .template-preview {
+        border: 2px solid var(--bs-border-color);
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+        padding: 8px;
+    }
+    .template-card .template-preview .row {
+        min-height: 60px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .template-card .template-preview [id^="R"] {
+        min-height: 60px;
+        background: var(--bs-tertiary-bg);
+        border: 2px dashed var(--bs-border-color);
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}
+
+{% block localscript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pageTypeInputs = document.querySelectorAll('input[type="radio"][name*="pageType"]');
+    
+    const userWrapper = document.getElementById('page-user-wrapper');
+    const groupsRolesWrapper = document.getElementById('page-groups-roles-wrapper');
+    const groupsWrapper = document.getElementById('page-groups-wrapper');
+    
+    const groupsSelect = groupsWrapper ? groupsWrapper.querySelector('select') : null;
+    const groupsRolesSelect = groupsRolesWrapper ? groupsRolesWrapper.querySelector('select') : null;
+
+    if (pageTypeInputs.length === 0) {
+        initTemplateSelector();
+        return;
+    }
+
+    function updateVisibility() {
+        let selectedType = null;
+        pageTypeInputs.forEach(function(input) {
+            if (input.checked) {
+                selectedType = input.value;
+            }
+        });
+
+        var allUsersWrapper = document.getElementById('page-all-users-wrapper');
+
+        if (userWrapper && groupsRolesWrapper) {
+            if (selectedType === 'personal') {
+                userWrapper.style.display = 'block';
+                groupsRolesWrapper.style.display = 'none';
+                if (allUsersWrapper) allUsersWrapper.style.display = 'none';
+                if (groupsRolesSelect) {
+                    Array.from(groupsRolesSelect.options).forEach(function(option) {
+                        option.selected = false;
+                    });
+                }
+            } else if (selectedType === 'group' || selectedType === 'group_role') {
+                userWrapper.style.display = 'none';
+                groupsRolesWrapper.style.display = 'block';
+                if (allUsersWrapper) allUsersWrapper.style.display = 'block';
+                const userSelect = userWrapper.querySelector('select');
+                if (userSelect) {
+                    Array.from(userSelect.options).forEach(function(option) {
+                        option.selected = false;
+                    });
+                }
+            }
+        } else if (groupsWrapper) {
+            if (selectedType === 'group') {
+                groupsWrapper.style.display = 'block';
+            } else {
+                groupsWrapper.style.display = 'none';
+                if (groupsSelect) {
+                    Array.from(groupsSelect.options).forEach(function(option) {
+                        option.selected = false;
+                    });
+                }
+            }
+        }
+    }
+
+    pageTypeInputs.forEach(function(input) {
+        input.addEventListener('change', updateVisibility);
+    });
+
+    if (pageTypeInputs.length > 0 && !document.querySelector('input[type="radio"][name*="pageType"]:checked')) {
+        const pageUser = {{ page.user|default('null') }};
+        const pageGroups = {{ page.groups|length|default(0) }};
+        const pageRoles = {{ page.roles|length|default(0) }};
+        
+        if (pageUser) {
+            pageTypeInputs.forEach(function(input) {
+                if (input.value === 'personal') {
+                    input.checked = true;
+                }
+            });
+            if (userWrapper) userWrapper.style.display = 'block';
+            if (groupsRolesWrapper) groupsRolesWrapper.style.display = 'none';
+            if (allUsersWrapper) allUsersWrapper.style.display = 'none';
+        } else if (pageGroups > 0 || pageRoles > 0) {
+            pageTypeInputs.forEach(function(input) {
+                if (input.value === 'group' || input.value === 'group_role') {
+                    input.checked = true;
+                }
+            });
+            if (userWrapper) userWrapper.style.display = 'none';
+            if (groupsRolesWrapper) groupsRolesWrapper.style.display = 'block';
+            if (allUsersWrapper) allUsersWrapper.style.display = 'block';
+        }
+    }
+
+    updateVisibility();
+    initTemplateSelector();
+
+    // Toggle groups/roles when "Tout le monde" is checked
+    var allUsersCheckbox = document.getElementById('page_allUsersWrapper') ? document.querySelector('#page_allUsersWrapper input[type="checkbox"]') : null;
+    if (allUsersCheckbox) {
+        allUsersCheckbox.addEventListener('change', function() {
+            var hidden = this.checked;
+            if (userWrapper) userWrapper.style.display = hidden ? 'none' : '';
+            if (groupsRolesWrapper) groupsRolesWrapper.style.display = hidden ? 'none' : '';
+            if (groupsWrapper) groupsWrapper.style.display = hidden ? 'none' : '';
+        });
+    }
+
+    function initTemplateSelector() {
+        var $templateSelect = $('#page_pageTemplate');
+        var currentTemplateId = $templateSelect.val();
+        var $selector = $('#template-selector');
+        var apiUrl = '{{ path("app_page_templates_api") }}';
+
+        $.get(apiUrl, function(templates) {
+            $selector.empty();
+            if (!templates.length) {
+                $selector.html('<div class="text-muted">Aucun template disponible</div>');
+                return;
+            }
+
+            templates.forEach(function(t) {
+                var $card = $('<div class="template-card"></div>');
+                $card.attr('data-id', t.id);
+                $card.html(
+                    '<div class="template-name">' + t.name + '</div>' +
+                    '<div class="template-preview">' + t.template + '</div>'
+                );
+
+                if (currentTemplateId && String(t.id) === String(currentTemplateId)) {
+                    $card.addClass('selected');
+                }
+
+                $card.on('click', function() {
+                    $selector.find('.template-card').removeClass('selected');
+                    $(this).addClass('selected');
+                    $templateSelect.val(t.id).trigger('change');
+                });
+
+                $selector.append($card);
+            });
+
+            if (!currentTemplateId && templates.length > 0) {
+                $selector.find('.template-card:first').trigger('click');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

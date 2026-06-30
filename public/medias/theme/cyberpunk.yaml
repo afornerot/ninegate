@@ -1,0 +1,20 @@
+name: Cyberpunk
+description: Theme néon cyberpunk incontourn
+primary: "#ff00ff"
+secondary: "#00ffff"
+success: "#39ff14"
+danger: "#ff073a"
+warning: "#ffe700"
+info: "#00d4ff"
+light: "#f0f0f0"
+dark: "#0d0d0d"
+body-bg: "#0a0a12"
+body-color: "#e0e0e0"
+body-color-dark: "#e0e0e0"
+border-color: "#ff00ff"
+card-bg: "#1a1a2e"
+btn-bg: "#ff00ff"
+btn-border-color: "#ff00ff"
+fontHeader: Anton
+fontBody: Roboto
+app-bs-header: "#ff00ff"

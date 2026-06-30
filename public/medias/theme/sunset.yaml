@@ -1,0 +1,20 @@
+name: Sunset
+description: Theme orange soleil chaud
+primary: "#e85d04"
+secondary: "#f48c06"
+success: "#06d6a0"
+danger: "#d00000"
+warning: "#faa307"
+info: "#00b4d8"
+light: "#ffe8d6"
+dark: "#370617"
+body-bg: "#6a040f"
+body-color: "#ffffff"
+body-color-dark: "#ffffff"
+border-color: "#e85d04"
+card-bg: "#9d0208"
+btn-bg: "#f48c06"
+btn-border-color: "#f48c06"
+fontHeader: Anton
+fontBody: Lato
+app-bs-header: "#ffba08"

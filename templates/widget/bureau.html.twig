@@ -1,0 +1,119 @@
+{# Size toggle - available to all users, positioned like widget-actions #}
+<div class="widget-actions">
+    <button type="button" class="btn btn-sm btn-outline-secondary bureau-size-toggle"
+            data-bureau-id="{{ pageWidget.id }}"
+            data-current="{{ config.display|default('medium') }}"
+            data-show-fav="{{ config.showFavorites|default(false) ? '1' : '0' }}"
+            title="Changer la taille d'affichage">
+        {% if config.display|default('medium') == 'small' %}
+            <i class="fas fa-th"></i>
+        {% elseif config.display|default('medium') == 'large' %}
+            <i class="fas fa-th-large"></i>
+        {% elseif config.display|default('medium') == 'list' %}
+            <i class="fas fa-list"></i>
+        {% else %}
+            <i class="fas fa-th-large"></i>
+        {% endif %}
+    </button>
+</div>
+
+{# Category navbar - single select #}
+{% if config.showCategoryNav and categories|length > 0 %}
+<div class="itemlink-category-nav mb-2 d-flex gap-1 flex-wrap" data-bureau-id="{{ pageWidget.id }}">
+    <a href="#" class="badge category-all active" style="background: var(--bs-primary); cursor: pointer;">Toutes</a>
+    {% if config.showFavorites and favoriteItems|length > 0 %}
+        <a href="#" class="badge category-filter" data-cat="fav" style="background: var(--bs-danger); cursor: pointer;"><i class="fas fa-heart"></i> Favoris</a>
+    {% endif %}
+    {% for cat in categories %}
+        <a href="#" class="badge category-filter" data-cat="{{ cat.id }}" style="background: var(--bs-secondary); cursor: pointer;">{{ cat.title }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+
+{# Search #}
+{% if config.showSearch %}
+<input type="text" class="form-control form-control-sm mb-2 bureau-search" placeholder="Rechercher...">
+{% endif %}
+
+{# Favorites section #}
+{% if config.showFavorites and favoriteItems|length > 0 %}
+    <div class="itemlink-category-section" data-cat-section="fav" data-bureau-id="{{ pageWidget.id }}">
+        {% if not config.categoryId %}
+            <h6 class="itemlink-category-title mt-2 mb-1" style="opacity: 0.7;"><i class="fas fa-heart text-danger"></i> Favoris</h6>
+        {% endif %}
+        <div class="itemlink-items itemlink-{{ config.display|default('medium') }}">
+            {% for item in favoriteItems %}
+                <div class="itemlink-item itemlink-fav" data-cat="fav" data-origin-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+                     title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
+                     style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
+                    {% if item.icon %}
+                        <img src="/{{ item.icon.route }}" class="itemlink-item-icon" alt="">
+                    {% endif %}
+                    <div class="itemlink-item-content">
+                        <strong>{{ item.title }}</strong>
+                        {% if item.summary %}
+                            <small class="text-muted itemlink-summary">{{ item.summary }}</small>
+                        {% endif %}
+                        {% if item.description %}
+                            <small class="text-muted itemlink-item-desc">{{ item.description|slice(0, 150) }}{% if item.description|length > 150 %}...{% endif %}</small>
+                        {% endif %}
+                    </div>
+                    {% if item.url %}
+                        <a href="{{ item.url }}" target="{{ item.newTab ? '_blank' : '_self' }}" class="stretched-link" title="{{ item.title }}"></a>
+                    {% endif %}
+                    <button class="itemlink-fav-btn active" data-item-id="{{ item.id }}" title="Retirer des favoris">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+{# Items grouped by category - exclude favorites if showFavorites enabled #}
+{% set displayItems = config.showFavorites ? items|filter(i => i.id not in favoriteIds) : items %}
+{% set currentCatId = null %}
+{% for item in displayItems %}
+    {% if item.category.id != currentCatId %}
+        {% set currentCatId = item.category.id %}
+        {% if not loop.first %}
+            </div></div>
+        {% endif %}
+        <div class="itemlink-category-section" data-cat-section="{{ item.category.id }}" data-bureau-id="{{ pageWidget.id }}">
+            {% if not config.categoryId %}
+                <h6 class="itemlink-category-title mt-2 mb-1" style="opacity: 0.7;">{{ item.category.title }}</h6>
+            {% endif %}
+            <div class="itemlink-items itemlink-{{ config.display|default('medium') }}">
+    {% endif %}
+
+    {% set isFav = item.id in favoriteIds %}
+    <div class="itemlink-item {% if isFav %}itemlink-fav{% endif %}" data-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+         title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
+         style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
+        {% if item.icon %}
+            <img src="/{{ item.icon.route }}" class="itemlink-item-icon" alt="">
+        {% endif %}
+        <div class="itemlink-item-content">
+            <strong>{{ item.title }}</strong>
+            {% if item.summary %}
+                <small class="text-muted itemlink-summary">{{ item.summary }}</small>
+            {% endif %}
+            {% if item.description %}
+                <small class="text-muted itemlink-item-desc">{{ item.description|slice(0, 150) }}{% if item.description|length > 150 %}...{% endif %}</small>
+            {% endif %}
+        </div>
+        {% if item.url %}
+            <a href="{{ item.url }}" target="{{ item.newTab ? '_blank' : '_self' }}" class="stretched-link" title="{{ item.title }}"></a>
+        {% endif %}
+        {% if user %}
+            <button class="itemlink-fav-btn {% if isFav %}active{% endif %}" data-item-id="{{ item.id }}" title="{% if isFav %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                <i class="fas fa-heart"></i>
+            </button>
+        {% endif %}
+    </div>
+
+    {% if loop.last %}
+        </div>
+        </div>
+    {% endif %}
+{% endfor %}

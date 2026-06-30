@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+<div class="d-flex gap-2 mb-3">
+    {% if is_granted('blogarticle_edit', article) %}
+        <a href="{{ path(isAdmin ? 'app_admin_blogarticle_update' : 'app_user_blogarticle_update', {blogId: blog.id, id: article.id}) }}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+    {% endif %}
+    {% if pageSlug is defined and pageSlug %}
+        <a href="{{ path(isAdmin ? 'app_admin_page_view' : 'app_user_page_view', {slug: pageSlug}) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la page
+        </a>
+    {% else %}
+        <a href="{{ path('app_blog_view', {slug: blog.slug}) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au blog
+        </a>
+    {% endif %}
+</div>
+
+<p class="text-muted">
+    <i class="fas fa-user"></i> {{ article.user ? article.user.displayName : 'Inconnu' }}
+    &middot;
+    <i class="fas fa-clock"></i> Créé le {{ article.createdAt|date('d/m/Y H:i') }}
+    {% if article.updatedAt != article.createdAt %}
+        &middot; Modifié le {{ article.updatedAt|date('d/m/Y H:i') }}
+    {% endif %}
+</p>
+
+{% if article.image %}
+    <img src="{{ path('bninefiles_files_image', {domain: 'blog', id: blog.id, path: article.image}) }}" alt="{{ article.title }}" class="img-fluid mb-4 rounded" style="max-height: 400px; object-fit: cover; width: 100%;">
+{% endif %}
+
+<div class="article-content">
+    {{ (article.content ?? '')|markdown }}
+</div>
+
+{% endblock %}

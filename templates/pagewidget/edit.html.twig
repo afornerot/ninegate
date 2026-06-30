@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'form/icon_entity_widget.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_errors(form) }}
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel, {pageId: pageId}) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if widget is defined and widget.widget and widget.widget.route == 'pagewidget_link' %}
+        <a href="{{ path('app_admin_pagewidget_link_edit', {pageWidgetId: widget.id}) }}" class="btn btn-info">
+            <i class="fas fa-link"></i> Éditer les liens
+        </a>
+    {% endif %}
+    {% if routedelete is defined and widget and widget.id %}
+        <a href="{{ path(routedelete, {pageId: pageId, id: widget.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Voulez-vous supprimer ce widget ?')">Supprimer</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Widget</h5>
+            </div>
+            <div class="card-body">
+                {% if widget is defined and widget.widget %}
+                <div class="mb-3">
+                    <label class="form-label">Type</label>
+                    <input type="text" class="form-control" value="{{ widget.widget.title }}" disabled>
+                </div>
+                {% endif %}
+                {% if form.title is defined %}
+                    {{ form_row(form.title) }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Options</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.withBorder) }}
+                    </div>
+                    {% if form.withTitle is defined %}
+                    <div class="col-md-6">
+                        {{ form_row(form.withTitle) }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        {{ form_row(form.height) }}
+                    </div>
+                    {% if form.icon is defined %}
+                    <div class="col-md-6">
+                        {{ form_row(form.icon) }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Couleurs</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form_row(form.titleBgColor, {'attr': {'class': 'form-control color-input'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.titleFontColor, {'attr': {'class': 'form-control color-input'}}) }}
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        {{ form_row(form.bodyBgColor, {'attr': {'class': 'form-control color-input'}}) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.bodyFontColor, {'attr': {'class': 'form-control color-input'}}) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if configForm is not null %}
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Configuration</h5>
+            </div>
+            <div class="card-body">
+                {% if widget is defined and widget.widget and widget.widget.route == 'pagewidget_weather' %}
+                <div class="mb-3 position-relative" id="weather-geocode-search">
+                    <label class="form-label">Rechercher une ville</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="weather-city-input" placeholder="Tapez le nom d'une ville...">
+                    </div>
+                    <div id="weather-geocode-results" class="weather-geocode-results"></div>
+                </div>
+                {% endif %}
+                {% for child in configForm %}
+                    {{ form_row(child) }}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}
+
+{% block localscript %}
+{% if widget is defined and widget.widget and widget.widget.route == 'pagewidget_weather' %}
+<script>
+$(document).ready(function() {
+    var $search = $('#weather-geocode-search');
+    var $results = $('#weather-geocode-results');
+    var $cityInput = $('#weather-city-input');
+    var searchTimeout;
+
+    $cityInput.on('input', function() {
+        var query = $(this).val();
+        clearTimeout(searchTimeout);
+        if (query.length < 2) { $results.empty().hide(); return; }
+        searchTimeout = setTimeout(function() {
+            $.get('{{ path("app_widget_weather_geocode") }}', {name: query}, function(data) {
+                $results.empty();
+                if (!data.length) { $results.hide(); return; }
+                data.forEach(function(r) {
+                    var label = r.name + (r.admin1 ? ', ' + r.admin1 : '') + (r.country ? ' (' + r.country + ')' : '');
+                    $results.append($('<div class="weather-geocode-result"></div>').text(label).data({lat: r.latitude, lon: r.longitude, city: r.name}));
+                });
+                $results.show();
+            });
+        }, 300);
+    });
+
+    $results.on('click', '.weather-geocode-result', function() {
+        var d = $(this).data();
+        $cityInput.val(d.city);
+        $results.empty().hide();
+        var $card = $search.closest('.card');
+        $card.find('[name$="[city]"]').val(d.city);
+        $card.find('[name$="[latitude]"]').val(d.lat);
+        $card.find('[name$="[longitude]"]').val(d.lon);
+    });
+});
+</script>
+<style>
+.weather-geocode-results { position: absolute; z-index: 100; background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: 0 0 0.375rem 0.375rem; max-height: 200px; overflow-y: auto; width: 100%; display: none; top: 100%; left: 0; right: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.weather-geocode-result { padding: 0.5rem 0.75rem; cursor: pointer; font-size: 0.875rem; color: var(--bs-body-color); }
+.weather-geocode-result:hover { background: var(--bs-primary); color: #fff; }
+</style>
+{% endif %}
+{% endblock %}

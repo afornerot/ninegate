@@ -1,0 +1,20 @@
+name: Pastel
+description: Theme doux pastel清新
+primary: "#a8d8ea"
+secondary: "#aa96da"
+success: "#fcbad3"
+danger: "#f28485"
+warning: "#fdfd96"
+info: "#a8e6cf"
+light: "#ffffff"
+dark: "#555555"
+body-bg: "#faf9f6"
+body-color: "#4a4a4a"
+body-color-dark: "#ffffff"
+border-color: "#e0e0e0"
+card-bg: "#ffffff"
+btn-bg: "#a8d8ea"
+btn-border-color: "#a8d8ea"
+fontHeader: FredokaOne
+fontBody: ABeeZee
+app-bs-header: "#6ba3b5"
