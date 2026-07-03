@@ -114,7 +114,7 @@ class LdapSyncListener
             $ldapGroup = new LdapGroup();
         }
 
-        $ldapGroup->setName($group->getName());
+        $ldapGroup->setName($group->getSlug());
         $ldapGroup->setGidnumber($group->getId() + 1000);
 
         $this->em->persist($ldapGroup);
@@ -142,7 +142,7 @@ class LdapSyncListener
 
         foreach ($user->getUserGroups() as $ug) {
             $group = $ug->getGroup();
-            $ouName = strtolower('ou=' . $group->getName() . ',' . $this->parameterBag->get('ldapBase'));
+            $ouName = strtolower('ou=' . $group->getSlug() . ',' . $this->parameterBag->get('ldapBase'));
 
             if (in_array($ug->getRole(), [UserGroup::ROLE_MASTER, UserGroup::ROLE_USER])) {
                 $cap = new LdapCapability();

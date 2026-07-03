@@ -1,15 +1,14 @@
 services:
-  mariadb:
-    image: mariadb
-    container_name: ninegate-mariadb
+  postgres:
+    image: postgres:17-alpine
+    container_name: ninegate-postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: changeme
-      MYSQL_DATABASE: ninegate
-      MYSQL_USER: user
-      MYSQL_PASSWORD: changeme
+      POSTGRES_DB: ninegate
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: changeme
     volumes:
-      - ./volume/mariadb:/var/lib/mysql
+      - ./volume/postgres:/var/lib/postgresql/data
   ninegate:
     image: ghcr.io/afornerot/ninegate
     container_name: ninegate
@@ -18,7 +17,7 @@ services:
       context: .
       dockerfile: ./misc/docker/Dockerfile
     depends_on:
-      - mariadb
+      - postgres
     ports:
       - "8019:80"
     volumes:
@@ -38,7 +37,7 @@ services:
     container_name: ninegate-adminer
     restart: unless-stopped
     depends_on:
-      - mariadb
+      - postgres
     ports:
       - 6019:8080
   mailhog:
@@ -53,7 +52,7 @@ services:
     container_name: ninegate-glauth
     restart: unless-stopped
     depends_on:
-      - mariadb
+      - postgres
       - ninegate
     ports:
       - "389:3893"

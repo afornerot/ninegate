@@ -85,6 +85,10 @@ class GroupVoter extends Voter
 
     private function canEdit(User $user, Group $group): bool
     {
+        if ($group->isSystem()) {
+            return false;
+        }
+
         if ($user->hasRole('ROLE_ADMIN') && $this->isAdminRoute()) {
             return true;
         }
@@ -99,6 +103,10 @@ class GroupVoter extends Voter
 
     private function canDelete(User $user, Group $group): bool
     {
+        if ($group->isSystem()) {
+            return false;
+        }
+
         if ($user->hasRole('ROLE_ADMIN') && $this->isAdminRoute()) {
             return true;
         }

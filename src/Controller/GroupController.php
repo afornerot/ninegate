@@ -7,6 +7,7 @@ use App\Entity\UserGroup;
 use App\Form\GroupType;
 use App\Repository\GroupRepository;
 use App\Repository\UserRepository;
+use App\Service\SlugService;
 use App\Voter\GroupVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,6 +25,7 @@ class GroupController extends AbstractController
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private GroupRepository $groupRepository,
+        private SlugService $slugService,
     ) {
     }
 
@@ -145,6 +147,7 @@ class GroupController extends AbstractController
         $form = $this->createForm(GroupType::class, $group, ['mode' => 'submit', 'isAdmin' => $isAdmin]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $group->setSlug($this->slugService->generateUniqueSlug($group->getName(), 'Group'));
             $this->em->persist($group);
             $this->em->flush();
             if (!$isAdmin) {
@@ -184,6 +187,12 @@ class GroupController extends AbstractController
             return $this->redirectToRoute($listRoute);
         }
 
+        if ($group->isSystem()) {
+            $this->addFlash('error', 'Ce groupe est un groupe système et ne peut pas être modifié.');
+
+            return $this->redirectToRoute($listRoute);
+        }
+
         if (!$isAdmin && !$this->isGranted(GroupVoter::EDIT, $group)) {
             return $this->redirectToRoute($listRoute);
         }
@@ -191,6 +200,7 @@ class GroupController extends AbstractController
         $form = $this->createForm(GroupType::class, $group, ['mode' => 'update', 'isAdmin' => $isAdmin]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $group->setSlug($this->slugService->generateUniqueSlug($group->getName(), 'Group', $group->getId()));
             $this->em->flush();
 
             return $this->redirectToRoute($listRoute);
@@ -217,6 +227,12 @@ class GroupController extends AbstractController
 
         $group = $this->groupRepository->find($id);
         if (!$group) {
+            return $this->redirectToRoute($listRoute);
+        }
+
+        if ($group->isSystem()) {
+            $this->addFlash('error', 'Ce groupe est un groupe système et ne peut pas être supprimé.');
+
             return $this->redirectToRoute($listRoute);
         }
 

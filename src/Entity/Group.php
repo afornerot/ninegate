@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GroupRepository::class)]
-#[ORM\Table(name: '`group`')]
+#[ORM\Table(name: 'app_group')]
 class Group
 {
     public const TYPE_ORGANISATION = 'Organisation';
@@ -28,8 +28,14 @@ class Group
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
 
+    #[ORM\Column(length: 128, unique: true)]
+    private ?string $slug = null;
+
     #[ORM\Column]
     private bool $isOpen = true;
+
+    #[ORM\Column]
+    private bool $isSystem = false;
 
     #[ORM\Column(length: 50)]
     private string $type = self::TYPE_WORK_GROUP;
@@ -39,6 +45,7 @@ class Group
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'groups')]
     #[ORM\JoinTable(name: 'group_user')]
+    #[ORM\JoinColumn(name: 'group_id')]
     private Collection $users;
 
     public function __construct()
@@ -89,6 +96,30 @@ class Group
     public function setLogo(?string $logo): static
     {
         $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->isSystem;
+    }
+
+    public function setIsSystem(bool $isSystem): static
+    {
+        $this->isSystem = $isSystem;
 
         return $this;
     }

@@ -62,7 +62,7 @@ class LdapSyncCommand extends Command
             if (!$ldapGroup) {
                 $ldapGroup = new LdapGroup();
             }
-            $ldapGroup->setName($group->getName());
+            $ldapGroup->setName($group->getSlug());
             $ldapGroup->setGidnumber($group->getId() + 1000);
             $this->em->persist($ldapGroup);
         }
@@ -119,9 +119,9 @@ class LdapSyncCommand extends Command
 
         $this->connection->executeStatement('DELETE FROM capabilities');
 
-        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'search', '$ldapBase' FROM user u JOIN user_group ug ON ug.user_id = u.id WHERE ug.role IN ('MASTER', 'USER')");
-        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'add', LOWER(CONCAT('ou=', g.name, ',$ldapBase')) FROM user u JOIN user_group ug ON ug.user_id = u.id JOIN `group` g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
-        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'modify', LOWER(CONCAT('ou=', g.name, ',$ldapBase')) FROM user u JOIN user_group ug ON ug.user_id = u.id JOIN `group` g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
+        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'search', '$ldapBase' FROM app_user u JOIN user_group ug ON ug.user_id = u.id WHERE ug.role IN ('MASTER', 'USER')");
+        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'add', LOWER(CONCAT('ou=', g.slug, ',$ldapBase')) FROM app_user u JOIN user_group ug ON ug.user_id = u.id JOIN app_group g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
+        $this->connection->executeStatement("INSERT INTO capabilities (userid, action, object) SELECT DISTINCT u.id + 1000, 'modify', LOWER(CONCAT('ou=', g.slug, ',$ldapBase')) FROM app_user u JOIN user_group ug ON ug.user_id = u.id JOIN app_group g ON g.id = ug.group_id WHERE ug.role = 'MASTER'");
 
         $io->text('    ✓ capabilities peuplées');
     }

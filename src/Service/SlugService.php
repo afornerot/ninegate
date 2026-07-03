@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\BlogArticleRepository;
 use App\Repository\BlogRepository;
+use App\Repository\GroupRepository;
 use App\Repository\PageRepository;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -14,6 +15,7 @@ class SlugService
         private PageRepository $pageRepository,
         private BlogRepository $blogRepository,
         private BlogArticleRepository $blogArticleRepository,
+        private GroupRepository $groupRepository,
     ) {
     }
 
@@ -37,6 +39,7 @@ class SlugService
             'Page' => $this->pageRepository->findOneBy(['slug' => $slug]),
             'Blog' => $this->blogRepository->findOneBy(['slug' => $slug]),
             'BlogArticle' => $this->blogArticleRepository->findOneBy(['slug' => $slug]),
+            'Group' => $this->groupRepository->findOneBy(['slug' => $slug]),
             default => null,
         };
 

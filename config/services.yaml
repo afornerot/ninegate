@@ -41,3 +41,8 @@ services:
     App\:
         resource: '../src/'
 
+    App\EventListener\UserAllListener:
+        tags:
+            - { name: doctrine.event_listener, event: doctrine.orm.entity_listener }
+            - { name: doctrine.event_listener, event: postFlush }
+

@@ -48,9 +48,9 @@ Le fichier `volume/glauth/config.cfg` doit être créé manuellement avec le con
 ```toml
 [backend]
   datastore = "plugin"
-  plugin = "/app/mysql.so"
-  pluginhandler = "NewMySQLHandler"
-  database = "user:changeme@tcp(mariadb:3306)/gate"
+  plugin = "/app/pgsql.so"
+  pluginhandler = "NewPostgresHandler"
+  database = "host=postgres port=5432 user=user password=changeme dbname=ninegate sslmode=disable"
   baseDN = "dc=ninegate,dc=local"
 
 [ldap]
