@@ -38,8 +38,10 @@ class StorageFactory
     {
         $client = new S3Client([
             'endpoint' => $parameterBag->get('s3Endpoint'),
-            'access_key' => $parameterBag->get('s3AccessKey'),
-            'secret_key' => $parameterBag->get('s3SecretKey'),
+            'credentials' => [
+                'key' => $parameterBag->get('s3AccessKey'),
+                'secret' => $parameterBag->get('s3SecretKey'),
+            ],
             'region' => $parameterBag->get('s3Region'),
             'version' => 'latest',
             'use_path_style_endpoint' => true,

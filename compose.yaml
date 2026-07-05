@@ -69,9 +69,10 @@ services:
     profiles:
       - s3
     environment:
-      - RUSTFS_ACCESS_KEY=rustfs
+      - RUSTFS_ACCESS_KEY=rustfsadmin
       - RUSTFS_SECRET_KEY=changeme
       - RUSTFS_CONSOLE_ENABLE=true
+    command: /data
     ports:
       - "9000:9000"
       - "9001:9001"
