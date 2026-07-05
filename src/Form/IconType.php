@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Icon;
-use App\Form\Type\IconType as IconInputType;
+use Bnine\FilesBundle\Form\Type\IconUploadType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -15,11 +15,11 @@ class IconType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('route', IconInputType::class, [
+            ->add('route', IconUploadType::class, [
                 'label' => 'Icône',
                 'required' => true,
                 'icon_empty_preview' => 'medias/icon/icon_pin.png',
-                'icon_upload_url' => '/user/upload/crop01/icon?reportThumb=icon_route',
+                'icon_upload_url' => '/bninefiles/uploadmodal/icon/0?path=&crop',
             ])
             ->add('tags', TextType::class, [
                 'label' => 'Tags',

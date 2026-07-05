@@ -79,17 +79,17 @@
             ".php-cs-fixer.dist.php"
         ]
     },
-    "oneup/uploader-bundle": {
-        "version": "5.1",
+    "league/flysystem-bundle": {
+        "version": "3.7",
         "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
+            "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "2.0",
-            "ref": "b19678d1535b9fe7cdf4647fd3483455e4fca458"
+            "version": "1.0",
+            "ref": "913dc3d7a5a1af0d2b044c5ac3a16e2f851d7380"
         },
         "files": [
-            "config/packages/oneup_uploader.yaml",
-            "config/routes/oneup_uploader.yaml"
+            "config/packages/flysystem.yaml",
+            "var/storage/.gitignore"
         ]
     },
     "phpunit/phpunit": {

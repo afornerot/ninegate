@@ -6,7 +6,7 @@
             <div class="widget-select-card card" data-value="{{ choice.value }}" style="cursor: pointer; min-width: 140px;">
                 <div class="card-body p-2 text-center">
                     {% if choice.data.icon %}
-                        <img src="/{{ choice.data.icon.route }}" alt="" style="height: 32px; width: 32px; object-fit: contain; margin-bottom: 4px;">
+                        <img src="{{ bninefile(choice.data.icon.route ) }}" alt="" style="height: 32px; width: 32px; object-fit: contain; margin-bottom: 4px;">
                     {% endif %}
                     <div class="small fw-semibold">{{ choice.data.title }}</div>
                 </div>

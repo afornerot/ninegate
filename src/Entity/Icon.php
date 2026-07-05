@@ -22,8 +22,7 @@ class Icon
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $tags = null;
 
-    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'icon')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'icons')]
     private ?User $user = null;
 
     public function __toString(): string

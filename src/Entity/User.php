@@ -57,8 +57,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $pseudo = null;
 
-    #[ORM\OneToOne(targetEntity: Icon::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?Icon $icon = null;
+    #[ORM\OneToMany(targetEntity: Icon::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private Collection $icons;
 
     #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'users')]
     private Collection $groups;
@@ -74,6 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->icons = new ArrayCollection();
         $this->groups = new ArrayCollection();
         $this->userGroups = new ArrayCollection();
         $this->items = new ArrayCollection();
@@ -214,14 +215,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username ?? '';
     }
 
-    public function getIcon(): ?Icon
+    public function getIcons(): Collection
     {
-        return $this->icon;
+        return $this->icons;
     }
 
-    public function setIcon(?Icon $icon): static
+    public function addIcon(Icon $icon): static
     {
-        $this->icon = $icon;
+        if (!$this->icons->contains($icon)) {
+            $this->icons->add($icon);
+            $icon->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIcon(Icon $icon): static
+    {
+        $this->icons->removeElement($icon);
 
         return $this;
     }

@@ -12,7 +12,6 @@ var/log/
 
 # Build front-end
 public/build/
-public/bundles/
 
 # Tests, docs, etc.
 phpunit.xml

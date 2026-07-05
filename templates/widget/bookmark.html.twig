@@ -29,7 +29,7 @@
              title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
              style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
             {% if item.icon %}
-                <img src="/{{ item.icon.route }}" class="itemlink-item-icon" alt="">
+                <img src="{{ bninefile(item.icon.route ) }}" class="itemlink-item-icon" alt="">
             {% endif %}
             <div class="itemlink-item-content">
                 <strong>{{ item.title }}</strong>

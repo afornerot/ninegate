@@ -36,6 +36,69 @@ docker exec gate php bin/console app:ldap:verify
 | GLAuth (LDAP) | ldap://localhost:389 | Annuaire LDAP |
 | Adminer | http://localhost:6019 | Administration BDD |
 | MailHog | http://localhost:8025 | Catch-all email |
+| RustFS (S3) | http://localhost:9001 | Console RustFS (profile `s3` uniquement) |
+
+## Stockage des fichiers (Filesystem / S3)
+
+L'application supporte deux modes de stockage pour les fichiers uploadés :
+- **Local** (défaut) — fichiers en local dans `/uploads` et `/public/uploads`
+- **S3** — fichiers stockés sur un serveur S3 compatible (RustFS, MinIO, AWS S3, etc.)
+
+### Mode local (défaut)
+
+Aucune configuration requise. Les fichiers sont stockés en local et montés en volumes Docker.
+
+### Mode S3 (RustFS)
+
+#### Dépendances
+
+Le mode S3 utilise les packages suivants (déjà inclus dans `composer.json`) :
+- `league/flysystem-bundle`
+- `league/flysystem-aws-s3-v3`
+
+#### Activation
+
+Dans `.env.local` :
+
+```env
+STORAGE_DSN="s3://ninegate-uploads"
+S3_ENDPOINT="http://rustfs:9000"
+S3_BUCKET="ninegate-uploads"
+S3_ACCESS_KEY="rustfs"
+S3_SECRET_KEY="votre_secret"
+S3_REGION="us-east-1"
+```
+
+#### Démarrage du service RustFS
+
+Le service RustFS est inclus dans `compose.yaml` avec le profile `s3` :
+
+```bash
+docker compose --profile s3 up -d
+```
+
+#### Création du bucket
+
+Au premier démarrage, le bucket `ninegate-uploads` doit être créé :
+
+Via la console RustFS : http://localhost:9001 (identifiants : `rustfs` / `changeme`)
+
+Ou via `mc` (MinIO Client) :
+```bash
+mc alias set rustfs http://localhost:9000 rustfs changeme
+mc mb rustfs/ninegate-uploads
+```
+
+### Variables d'environnement
+
+| Variable | Description | Défaut |
+|----------|-------------|--------|
+| `STORAGE_DSN` | `local://public/uploads` ou `s3://bucket` | `local://public/uploads` |
+| `S3_ENDPOINT` | URL du serveur S3 | `http://rustfs:9000` |
+| `S3_BUCKET` | Nom du bucket S3 | `ninegate-uploads` |
+| `S3_ACCESS_KEY` | Clé d'accès S3 | `rustfs` |
+| `S3_SECRET_KEY` | Clé secrète S3 | `changeme` |
+| `S3_REGION` | Région S3 | `us-east-1` |
 
 ## Configuration GLAuth (LDAP)
 
@@ -48,7 +111,7 @@ Le fichier `volume/glauth/config.cfg` doit être créé manuellement avec le con
 ```toml
 [backend]
   datastore = "plugin"
-  plugin = "/app/pgsql.so"
+  plugin = "/app/postgres.so"
   pluginhandler = "NewPostgresHandler"
   database = "host=postgres port=5432 user=user password=changeme dbname=ninegate sslmode=disable"
   baseDN = "dc=ninegate,dc=local"

@@ -1,9 +1,3 @@
-//== MODAL LOADER =============================================================
-function ModalLoad(idmodal, title, path) {
-	$("#" + idmodal + " .modal-header h4").text(title);
-	$("#" + idmodal + " #framemodal").attr("src", path);
-}
-
 //== SELECT2 INITIALIZATION ===================================================
 $(document).ready(function () {
 	$(document).on('select2:open', () => {
@@ -122,53 +116,6 @@ $(document).ready(function () {
 		$select.on('change', function () {
 			var font = $(this).val();
 			$preview.css('font-family', "'" + font + "', sans-serif");
-		});
-	});
-});
-
-//== ICON/LOGO INPUT INITIALIZATION ===========================================
-$(document).ready(function () {
-	// Icon/Logo input initialization
-	$('.icon-input').each(function () {
-		var $input = $(this);
-		var $id = $input.attr('id') || 'id';
-		var value = $input.val() || $input.data('icon-empty-preview') || '';
-		var endpoint = $input.data('icon-endpoint') || 'icon';
-		var label = $input.data('icon-label') || 'Icon';
-		var uploadUrl = $input.data('upload-url') || '/user/upload/crop01/' + endpoint + '?reportThumb=' + endpoint;
-
-		// Check if already initialized
-		if ($input.parent().hasClass('icon-wrapper')) {
-			return;
-		}
-
-		// Create wrapper
-		var $wrapper = $('<div class="text-center d-flex flex-column align-items-center mb-3 icon-wrapper"></div>');
-		$input.wrap($wrapper);
-
-		// Create preview image
-		var $preview = $('<img id="' + $id + '_img" class="bigavatar mb-2" style="background-color: var(--bs-dark);">');
-		$preview.attr('src', value ? '/' + value : '');
-		if (!value) {
-			$preview.css('display', 'none');
-		}
-		$input.parent().prepend($preview);
-
-		// Create button
-		var $btn = $('<a class="btn btn-info" style="max-width:100%; margin-bottom:15px;" data-bs-toggle="modal" data-bs-target="#mymodal"></a>');
-		$btn.attr('onclick', "ModalLoad('mymodal','" + label + "','" + uploadUrl + "');");
-		$btn.attr('title', 'Ajouter ' + label);
-		$btn.text('Modifier');
-		$input.parent().append($btn);
-
-		// Listen for changes
-		$input.on('change', function () {
-			var val = $(this).val();
-			if (val) {
-				$preview.attr('src', '/' + val).show();
-			} else {
-				$preview.hide();
-			}
 		});
 	});
 });
@@ -356,6 +303,9 @@ $(document).ready(function () {
 			}
 		});
 	}
+
+	window.getCarouselSlides = getCarouselSlides;
+	window.saveCarouselSlides = saveCarouselSlides;
 });
 
 //== ICON ENTITY PICKER ========================================================

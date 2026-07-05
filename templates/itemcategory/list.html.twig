@@ -38,7 +38,7 @@
                             <div class="d-flex align-items-center gap-2 flex-grow-1">
                                 <i class="fas fa-grip-vertical text-muted item-handle" style="cursor: grab;"></i>
                                 {% if item.icon %}
-                                    <img src="/{{ item.icon.route }}" alt="" style="height: 24px; width: 24px; object-fit: contain;">
+                                    <img src="{{ bninefile(item.icon.route) }}" alt="" style="height: 24px; width: 24px; object-fit: contain;">
                                 {% endif %}
                                 <div>
                                     <strong>{{ item.title }}</strong>

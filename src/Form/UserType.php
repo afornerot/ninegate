@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
-use App\Form\Type\IconType;
+use Bnine\FilesBundle\Form\Type\IconUploadType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -52,12 +52,12 @@ class UserType extends AbstractType
             'attr' => ['class' => 'form-control'],
         ])
 
-        ->add('avatar', IconType::class, [
+        ->add('avatar', IconUploadType::class, [
             'label' => false,
             'required' => false,
             'icon_endpoint' => 'avatar',
             'icon_label' => 'Avatar',
-            'icon_upload_url' => '/user/upload/crop01/logo?reportThumb=user_avatar',
+            'icon_upload_url' => '/bninefiles/uploadmodal/avatar/0?path=&crop',
         ]);
 
         if ('profil' != $options['mode']) {

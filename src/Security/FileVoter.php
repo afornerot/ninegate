@@ -11,6 +11,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FileVoter extends AbstractFileVoter
 {
+    private const PUBLIC_DOMAINS = ['avatar', 'logo', 'icon'];
+
     public function __construct(
         private PageWidgetRepository $pageWidgetRepository,
         private BlogArticleRepository $blogArticleRepository,
@@ -20,16 +22,28 @@ class FileVoter extends AbstractFileVoter
 
     protected function canView(string $domain, $id, TokenInterface $token): bool
     {
+        if (in_array($domain, self::PUBLIC_DOMAINS)) {
+            return true;
+        }
+
         return $this->canManage($domain, $id, $token);
     }
 
     protected function canEdit(string $domain, $id, TokenInterface $token): bool
     {
+        if (in_array($domain, self::PUBLIC_DOMAINS)) {
+            return true;
+        }
+
         return $this->canManage($domain, $id, $token);
     }
 
     protected function canDelete(string $domain, $id, TokenInterface $token): bool
     {
+        if (in_array($domain, self::PUBLIC_DOMAINS)) {
+            return true;
+        }
+
         return $this->canManage($domain, $id, $token);
     }
 
@@ -45,7 +59,9 @@ class FileVoter extends AbstractFileVoter
         }
 
         return match ($domain) {
+            'pagewidgetfile' => $this->canManagePageWidget((int) $id, $token),
             'pagewidget' => $this->canManagePageWidget((int) $id, $token),
+            'blogarticle' => $this->canManageBlogArticle((int) $id, $token),
             'blog' => $this->canManageBlog((int) $id, $token),
             default => false,
         };
@@ -88,6 +104,23 @@ class FileVoter extends AbstractFileVoter
         $user = $token->getUser();
 
         $blog = $this->blogRepository->find($id);
+        if (!$blog) {
+            return false;
+        }
+
+        return $this->blogRepository->isBlogAccessibleForUser($blog, $user);
+    }
+
+    private function canManageBlogArticle(int $id, TokenInterface $token): bool
+    {
+        $user = $token->getUser();
+
+        $article = $this->blogArticleRepository->find($id);
+        if (!$article) {
+            return false;
+        }
+
+        $blog = $article->getBlog();
         if (!$blog) {
             return false;
         }

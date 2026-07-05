@@ -25,6 +25,7 @@ services:
       - ./templates:/app/templates:delegated
       - ./config:/app/config:delegated
       - ./public/uploads:/app/public/uploads:delegated
+      - ./public/bundles:/app/public/bundles:delegated
       - ./uploads:/app/uploads:delegated
       - ./misc:/app/misc:delegated
       - ./public/lib:/app/public/lib:delegated
@@ -32,6 +33,9 @@ services:
       - ./.env.local:/app/.env.local
       - ./volume/dex:/app/volume/dex
       - ./volume/glauth:/app/volume/glauth
+      - ../bNine-FilesBundle/src:/app/vendor/bnine/filesbundle/src:delegated
+      - ../bNine-FilesBundle/templates:/app/vendor/bnine/filesbundle/templates:delegated
+      - ../bNine-FilesBundle/Resources/public:/app/vendor/bnine/filesbundle/Resources/public:delegated
   adminer:
     image: adminer
     container_name: ninegate-adminer
@@ -58,4 +62,19 @@ services:
       - "389:3893"
     volumes:
       - ./volume/glauth:/app/config
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: ninegate-rustfs
+    restart: unless-stopped
+    profiles:
+      - s3
+    environment:
+      - RUSTFS_ACCESS_KEY=rustfs
+      - RUSTFS_SECRET_KEY=changeme
+      - RUSTFS_CONSOLE_ENABLE=true
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./volume/rustfs:/data
 

@@ -36,7 +36,7 @@
                             </td>
                             <td>{{ config.code }}</td>
                             <td>{{ config.title }}</td>
-                            <td {% if config.type == 'color' %}style="background-color: {{ config.value }}"{% elseif config.type == 'font' %}style="font-family: '{{ config.value }}', sans-serif"{% elseif config.type == 'logo' %}{% endif %}>{% if config.type == 'logo' %}<img src="{{ asset(config.value) }}" class="logo">{% else %}{{ config.value }}{% endif %}</td>
+                            <td {% if config.type == 'color' %}style="background-color: {{ config.value }}"{% elseif config.type == 'font' %}style="font-family: '{{ config.value }}', sans-serif"{% elseif config.type == 'logo' %}{% endif %}>{% if config.type == 'logo' %}<img src="{{ bninefile(config.value) }}" class="logo">{% else %}{{ config.value }}{% endif %}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

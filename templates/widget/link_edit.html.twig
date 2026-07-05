@@ -89,7 +89,7 @@
                 <div class="d-flex flex-wrap gap-2" id="iconGridLink">
                     {% for icon in icons %}
                         <div class="icon-picker-link-item" data-id="{{ icon.id }}" data-route="{{ icon.route }}" data-tags="{{ icon.tags|default('') }}" title="{{ icon.tags|default(icon.route) }}">
-                            <img src="/{{ icon.route }}" alt="{{ icon.tags|default('') }}" style="height: 40px; width: 40px; object-fit: contain;">
+                            <img src="{{ bninefile(icon.route) }}" alt="{{ icon.tags|default('') }}" style="height: 40px; width: 40px; object-fit: contain;">
                         </div>
                     {% endfor %}
                 </div>

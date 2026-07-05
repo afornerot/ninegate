@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Entity\Config;
 use App\Form\Type\ColorType;
 use App\Form\Type\FontType;
-use App\Form\Type\IconType;
+use Bnine\FilesBundle\Form\Type\IconUploadType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -31,7 +31,7 @@ class ConfigType extends AbstractType
             Config::TYPE_TEXT => TextareaType::class,
             Config::TYPE_COLOR => ColorType::class,
             Config::TYPE_FONT => FontType::class,
-            Config::TYPE_LOGO => IconType::class,
+            Config::TYPE_LOGO => IconUploadType::class,
             default => TextType::class,
         };
 
@@ -45,7 +45,7 @@ class ConfigType extends AbstractType
             $fieldOptions['icon_endpoint'] = 'logo';
             $fieldOptions['icon_label'] = 'Logo';
             $fieldOptions['icon_empty_preview'] = $config instanceof Config ? $config->getValue() : null;
-            $fieldOptions['icon_upload_url'] = '/user/upload/crop01/logo?reportThumb=config_rawValue';
+            $fieldOptions['icon_upload_url'] = '/bninefiles/uploadmodal/logo/0?path=&crop';
         }
 
         if (Config::TYPE_BOOL === $type) {
@@ -64,7 +64,7 @@ class ConfigType extends AbstractType
 
         if (Config::TYPE_LOGO === $type) {
             $fieldOptions['icon_empty_preview'] = $config->getValue();
-            $fieldOptions['icon_upload_url'] = '/user/upload/crop01/logo?reportThumb=config_rawValue';
+            $fieldOptions['icon_upload_url'] = '/bninefiles/uploadmodal/logo/0?path=&crop';
         }
 
         $builder

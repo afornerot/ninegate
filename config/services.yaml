@@ -22,6 +22,12 @@ parameters:
   casLastname: "%env(resolve:CAS_LASTNAME)%"
   casFirstname: "%env(resolve:CAS_FIRSTNAME)%"
   ldapBase: "%env(resolve:LDAP_BASE)%"
+  storageDsn: "%env(resolve:STORAGE_DSN)%"
+  s3Endpoint: "%env(resolve:S3_ENDPOINT)%"
+  s3Bucket: "%env(resolve:S3_BUCKET)%"
+  s3AccessKey: "%env(resolve:S3_ACCESS_KEY)%"
+  s3SecretKey: "%env(resolve:S3_SECRET_KEY)%"
+  s3Region: "%env(resolve:S3_REGION)%"
 
 services:
     _defaults:
@@ -45,4 +51,16 @@ services:
         tags:
             - { name: doctrine.event_listener, event: doctrine.orm.entity_listener }
             - { name: doctrine.event_listener, event: postFlush }
+
+    Bnine\FilesBundle\Service\FileService:
+        arguments:
+            $storage: '@app_storage'
+            $s3: '%env(bool:STORAGE_S3)%'
+
+    League\Flysystem\FilesystemOperator: '@app_storage'
+
+    app_storage:
+        class: League\Flysystem\FilesystemOperator
+        factory: ['App\Service\StorageFactory', 'create']
+        arguments: ['@parameter_bag']
 

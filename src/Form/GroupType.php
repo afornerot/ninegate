@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Group;
-use App\Form\Type\IconType;
+use Bnine\FilesBundle\Form\Type\IconUploadType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -46,12 +46,12 @@ class GroupType extends AbstractType
                 'attr' => ['class' => 'form-control', 'rows' => 3],
                 'required' => false,
             ])
-            ->add('logo', IconType::class, [
+            ->add('logo', IconUploadType::class, [
                 'label' => false,
                 'required' => false,
                 'icon_endpoint' => 'logo',
                 'icon_label' => 'Logo',
-                'icon_upload_url' => '/user/upload/crop01/logo?reportThumb=group_logo',
+                'icon_upload_url' => '/bninefiles/uploadmodal/logo/0?path=&crop',
             ])
             ->add('isOpen', CheckboxType::class, [
                 'label' => 'Groupe ouvert',

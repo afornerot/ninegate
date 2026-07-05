@@ -1,10 +1,9 @@
 {% if canManage %}
 <div class="widget-actions">
-    <button class="btn btn-sm btn-outline-secondary carousel-upload-btn" title="Uploader des images">
+    <button class="btn btn-sm btn-outline-secondary carousel-upload-btn" title="Uploader des images" data-carousel-id="{{ pageWidget.id }}">
         <i class="fas fa-upload"></i>
     </button>
-    <button class="btn btn-sm btn-outline-secondary carousel-edit-btn" title="Éditer les slides"
-            data-bs-toggle="modal" data-bs-target="#carouselEditModal-{{ pageWidget.id }}">
+    <button class="btn btn-sm btn-outline-secondary carousel-edit-btn" title="Éditer les slides" data-carousel-id="{{ pageWidget.id }}">
         <i class="fas fa-edit"></i>
     </button>
 </div>
@@ -63,21 +62,7 @@
     {% endif %}
 </div>
 
-{# Upload modal #}
-<div id="mymodalupload-{{ domain }}-{{ id }}" class="modal" tabindex="-1"
-     data-domain="{{ domain }}" data-id="{{ id }}">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Uploader des images</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-            </div>
-            <div class="modal-body">
-                <iframe id="framemodal-{{ pageWidget.id }}" frameborder="0" width="100%" height="600px"></iframe>
-            </div>
-        </div>
-    </div>
-</div>
+{# Upload modal - removed, using BnineModalOpen #}
 
 {# Edit slides modal #}
 {% if canManage %}
@@ -138,26 +123,49 @@
 {% if canManage %}
 <script>
 $(document).ready(function() {
-    var modalId = 'mymodalupload-{{ domain }}-{{ id }}';
+    var widgetId = 'carousel-widget-{{ pageWidget.id }}';
     var uploadUrl = '{{ path("bninefiles_files_uploadmodal", {domain: domain, id: id, imageOnly: 1}) }}';
+    var listUrl = '{{ path("bninefiles_files", {domain: domain, id: id, editable: 1, compact: 1}) }}';
+    var saveUrl = '{{ path(routeSave, {pageWidgetId: pageWidget.id}) }}';
+    var slidesListId = 'carousel-slides-list-{{ pageWidget.id }}';
 
-    $('.carousel-upload-btn').on('click', function() {
-        $('#' + modalId).find('iframe').attr('src', uploadUrl);
-        var modal = bootstrap.Modal.getOrCreateInstance($('#' + modalId)[0]);
+    $(document).on('click', '[data-carousel-id="{{ pageWidget.id }}"].carousel-upload-btn', function() {
+        BnineModalOpen({id: 'carousel-upload-{{ pageWidget.id }}', title: 'Uploader des images', url: uploadUrl, height: '600px', onClose: function() {
+            $.get(listUrl, function (html) {
+                var $html = $(html);
+                var files = [];
+                $html.find('a[href*="download"]').each(function () {
+                    var href = $(this).attr('href');
+                    var match = href.match(/path=([^&]+)/);
+                    if (match) files.push(decodeURIComponent(match[1]));
+                });
+                if (files.length === 0) return;
+
+                var existingImages = [];
+                $('#' + slidesListId + ' .carousel-slide-card').each(function () {
+                    var imgSrc = $(this).find('img').attr('src');
+                    var pathMatch = imgSrc.match(/path=([^&]+)/);
+                    if (pathMatch) existingImages.push(decodeURIComponent(pathMatch[1]));
+                });
+
+                var slides = window.getCarouselSlides(slidesListId);
+                files.forEach(function (file) {
+                    if (existingImages.indexOf(file) === -1) {
+                        slides.push({ image: file, title: '', description: '', link: '', linkTarget: '_blank' });
+                    }
+                });
+
+                window.saveCarouselSlides(saveUrl, slides);
+            });
+        }});
+    });
+
+    $(document).on('click', '.carousel-edit-btn', function() {
+        var carouselId = $(this).data('carousel-id');
+        var modal = bootstrap.Modal.getOrCreateInstance($('#carouselEditModal-' + carouselId)[0]);
         modal.show();
     });
 
-    window.imageUploadDone = function(filename) {
-        var modal = bootstrap.Modal.getInstance($('#' + modalId)[0]);
-        if (modal) modal.hide();
-        if (filename) {
-            var listUrl = '{{ path("bninefiles_files", {domain: domain, id: id, editable: 1, compact: 1}) }}';
-            $.get(listUrl, function(html) {
-                var $container = $('#carousel-widget-{{ pageWidget.id }}');
-                $container.attr('data-list-files-url', listUrl);
-            });
-        }
-    };
 });
 </script>
 {% endif %}

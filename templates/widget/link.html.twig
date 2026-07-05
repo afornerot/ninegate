@@ -23,7 +23,7 @@
             {% if link.iconId is defined and link.iconId %}
                 {% for icon in icons %}
                     {% if icon.id == link.iconId %}
-                        <img src="/{{ icon.route }}" class="itemlink-item-icon" alt="">
+                        <img src="{{ bninefile(icon.route ) }}" class="itemlink-item-icon" alt="">
                     {% endif %}
                 {% endfor %}
             {% endif %}

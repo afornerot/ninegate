@@ -17,7 +17,7 @@ class IconType extends AbstractType
             'icon_endpoint' => 'icon',
             'icon_label' => 'Icon',
             'icon_empty_preview' => 'medias/icon/icon_pin.png',
-            'icon_upload_url' => '/user/upload/crop01/icon?reportThumb=icon',
+            'icon_upload_url' => null,
         ]);
     }
 
@@ -27,6 +27,8 @@ class IconType extends AbstractType
         $view->vars['attr']['data-icon-label'] = $options['icon_label'];
         $view->vars['attr']['data-icon-empty-preview'] = $options['icon_empty_preview'];
         $view->vars['attr']['data-upload-url'] = $options['icon_upload_url'];
+        $view->vars['icon_endpoint'] = $options['icon_endpoint'];
+        $view->vars['icon_label'] = $options['icon_label'];
     }
 
     public function getParent(): string
