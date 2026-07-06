@@ -33,7 +33,7 @@
 {% endif %}
 
 <div class="article-content">
-    {{ (article.content ?? '')|markdown }}
+    {{ (article.content ?? '')|raw }}
 </div>
 
 {% endblock %}
