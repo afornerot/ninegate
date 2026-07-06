@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(max: 180)]
     private ?string $username = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'jsonb')]
     private array $roles = [];
 
     #[ORM\Column]

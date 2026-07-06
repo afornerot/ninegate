@@ -1511,55 +1511,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     generate_final_classes?: bool|Param, // Default: true
  *     generate_final_entities?: bool|Param, // Default: false
  * }
- * @psalm-type OneupUploaderConfig = array{
- *     chunks?: array{
- *         maxage?: scalar|Param|null, // Default: 604800
- *         storage?: array{
- *             type?: "filesystem"|"gaufrette"|"flysystem"|Param, // Default: "filesystem"
- *             filesystem?: scalar|Param|null, // Default: null
- *             directory?: scalar|Param|null, // Default: null
- *             stream_wrapper?: scalar|Param|null, // Default: null
- *             sync_buffer_size?: scalar|Param|null, // Default: "100K"
- *             prefix?: scalar|Param|null, // Default: "chunks"
- *         },
- *         load_distribution?: bool|Param, // Default: true
- *     },
- *     orphanage?: array{
- *         maxage?: scalar|Param|null, // Default: 604800
- *         directory?: scalar|Param|null, // Default: null
- *     },
- *     twig?: scalar|Param|null, // Default: true
- *     mappings?: array<string, array{ // Default: []
- *         frontend?: "fineuploader"|"blueimp"|"uploadify"|"yui3"|"fancyupload"|"mooupload"|"plupload"|"dropzone"|"custom"|Param,
- *         custom_frontend?: array{
- *             name?: scalar|Param|null, // Default: null
- *             class?: scalar|Param|null, // Default: null
- *         },
- *         storage?: array{
- *             service?: scalar|Param|null, // Default: null
- *             type?: "filesystem"|"gaufrette"|"flysystem"|Param, // Default: "filesystem"
- *             filesystem?: scalar|Param|null, // Default: null
- *             directory?: scalar|Param|null, // Default: null
- *             stream_wrapper?: scalar|Param|null, // Default: null
- *             sync_buffer_size?: scalar|Param|null, // Default: "100K"
- *         },
- *         route_prefix?: scalar|Param|null, // Default: ""
- *         endpoints?: string|array{
- *             upload?: scalar|Param|null, // Default: null
- *             progress?: scalar|Param|null, // Default: null
- *             cancel?: scalar|Param|null, // Default: null
- *         },
- *         allowed_mimetypes?: array<string, list<scalar|Param|null>>,
- *         disallowed_mimetypes?: list<scalar|Param|null>,
- *         error_handler?: scalar|Param|null, // Default: null
- *         max_size?: scalar|Param|null, // Set max_size to -1 for gracefully downgrade this number to the systems max upload size. // Default: 9223372036854775807
- *         use_orphanage?: bool|Param, // Default: false
- *         enable_progress?: bool|Param, // Default: false
- *         enable_cancelation?: bool|Param, // Default: false
- *         namer?: scalar|Param|null, // Default: "oneup_uploader.namer.uniqid"
- *         root_folder?: bool|Param, // Default: false
- *     }>,
- * }
  * @psalm-type FlysystemConfig = array{
  *     storages?: array<string, array{ // Default: []
  *         adapter?: scalar|Param|null, // DEPRECATED: Use the new config format instead (e.g. "local:" instead of "adapter: local")
@@ -1705,7 +1656,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     twig_extra?: TwigExtraConfig,
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
- *     oneup_uploader?: OneupUploaderConfig,
  *     flysystem?: FlysystemConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
@@ -1723,7 +1673,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
- *         oneup_uploader?: OneupUploaderConfig,
  *         flysystem?: FlysystemConfig,
  *     },
  *     "when@prod"?: array{
@@ -1739,7 +1688,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         oneup_uploader?: OneupUploaderConfig,
  *         flysystem?: FlysystemConfig,
  *     },
  *     "when@test"?: array{
@@ -1756,7 +1704,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
- *         oneup_uploader?: OneupUploaderConfig,
  *         flysystem?: FlysystemConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias

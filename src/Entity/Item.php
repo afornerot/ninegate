@@ -52,7 +52,7 @@ class Item
     #[ORM\JoinTable(name: 'item_group')]
     private Collection $groups;
 
-    #[ORM\Column(type: 'json', nullable: true)]
+    #[ORM\Column(type: 'jsonb', nullable: true)]
     private ?array $roles = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'items')]
