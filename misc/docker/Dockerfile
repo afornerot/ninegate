@@ -30,12 +30,14 @@ RUN chown apache:apache /crontab
 WORKDIR /app
 
 # Crée vendor à l’avance et donne les droits
-RUN mkdir -p /app/vendor && chown -R apache:apache /app
+RUN mkdir -p /app/vendor /app/var/log /app/var/cache && chown -R apache:apache /app
 
 USER apache
 COPY --chown=apache:apache . .
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
+
+RUN chmod +x bin/console misc/script/*.sh
 
 RUN mkdir -p /app/uploads \
     && mkdir -p /app/public/uploads/avatar \
