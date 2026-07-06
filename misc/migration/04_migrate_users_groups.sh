@@ -5,15 +5,9 @@ TMP_MARIADB="ninegate-migration-mariadb"
 
 echo "=== [4/6] Migrate users + groups ==="
 
-# Purge
+# Purge (targeted: only tables this script populates)
 docker exec -i ninegate-postgres psql -U user -d ninegate -c "
 DELETE FROM user_group;
-DELETE FROM bookmark;
-DELETE FROM blog_article;
-DELETE FROM blog;
-DELETE FROM item_group;
-DELETE FROM item;
-DELETE FROM item_category;
 DELETE FROM app_user;
 DELETE FROM app_group;
 " 2>&1 > /dev/null

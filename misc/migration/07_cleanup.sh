@@ -1,9 +1,9 @@
 #!/bin/bash
-# Step 6: Cleanup - orphan icons, sequences, stop MariaDB
+# Step 7: Cleanup - orphan icons, sequences, stop MariaDB
 set -e
 TMP_MARIADB="ninegate-migration-mariadb"
 
-echo "=== [6/6] Cleanup ==="
+echo "=== [7/8] Cleanup ==="
 
 # Clean orphan icon references
 docker exec -i ninegate-postgres psql -U user -d ninegate -c "
@@ -28,10 +28,4 @@ SELECT setval(pg_get_serial_sequence('bookmark', 'id'), COALESCE((SELECT MAX(id)
 docker rm -f "$TMP_MARIADB" 2>/dev/null
 rm -f /tmp/ninegate_formatted.sql /tmp/migrate_*.sql /tmp/old_icons.txt
 
-# Summary
-echo ""
-echo "=== Migration Summary ==="
-docker exec -i ninegate-postgres psql -U user -d ninegate -c "
-SELECT 'app_user' t, COUNT(*) c FROM app_user UNION ALL SELECT 'app_group', COUNT(*) FROM app_group UNION ALL SELECT 'user_group', COUNT(*) FROM user_group UNION ALL SELECT 'icon', COUNT(*) FROM icon UNION ALL SELECT 'widget', COUNT(*) FROM widget UNION ALL SELECT 'item_category', COUNT(*) FROM item_category UNION ALL SELECT 'item', COUNT(*) FROM item UNION ALL SELECT 'item_group', COUNT(*) FROM item_group UNION ALL SELECT 'blog', COUNT(*) FROM blog UNION ALL SELECT 'bookmark', COUNT(*) FROM bookmark ORDER BY t;
-"
-echo "✓ Done"
+echo "✓ Cleanup done"
