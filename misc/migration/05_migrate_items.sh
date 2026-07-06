@@ -45,7 +45,8 @@ INSERT INTO new_icons (id, route, basename) VALUES
 (140, 'medias/icon/icon_ninedad.png',  'icon_ninedad.png'),
 (141, 'medias/icon/icon_ninemine.png', 'icon_ninemine.png'),
 (174, 'medias/icon/icon_redmine.png',  'icon_redmine.png'),
-(241, 'medias/icon/icon_xolo.png',     'icon_xolo.png')
+(241, 'medias/icon/icon_xolo.png',     'icon_xolo.png'),
+(250, 'medias/icon/icon_sentry.png',   'icon_sentry.png')
 ON DUPLICATE KEY UPDATE id = id;
 " 2>/dev/null
 
@@ -89,19 +90,21 @@ rm -f "$FINAL"
 # Drop temp table
 docker exec -i "$TMP_MARIADB" mysql -uroot -proot ninegate -e "DROP TABLE IF EXISTS new_icons;" 2>/dev/null
 
-# Hardcoded icon mappings (old filename → new icon route)
+# Hardcoded icon mappings (item title → icon route)
 echo "  Applying hardcoded icon mappings..."
 docker exec -i ninegate-postgres psql -U user -d ninegate -c "
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_cadoles.png') WHERE id = (SELECT id FROM item WHERE title = 'Cadoles');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_corpus.png') WHERE id = (SELECT id FROM item WHERE title = 'Corpus');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_ninedad.png') WHERE id = (SELECT id FROM item WHERE title = 'Ninedad');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_harbor.png') WHERE id = (SELECT id FROM item WHERE title = 'Harbor');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_efs.png') WHERE id = (SELECT id FROM item WHERE title = 'EFS');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_envole.png') WHERE id = (SELECT id FROM item WHERE title = 'Envole');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_ninemine.png') WHERE id = (SELECT id FROM item WHERE title = 'Ninemine MSE');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_grafana.svg') WHERE id = (SELECT id FROM item WHERE title = 'Grafana');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_redmine.png') WHERE id = (SELECT id FROM item WHERE title = 'Redmine');
-UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_xolo.png') WHERE id = (SELECT id FROM item WHERE title = 'Xolo');
+-- Map items by title
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_cadoles.png') WHERE title IN ('Cadoles', 'Organisation', 'Site Vitrine');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_efs.png') WHERE title IN ('EFS', 'Sheila DEV', 'Sheila Recette');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_corpus.png') WHERE title = 'Corpus';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_ninedad.png') WHERE title = 'Ninedad';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_harbor.png') WHERE title = 'Harbor';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_envole.png') WHERE title = 'Envole';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_ninemine.png') WHERE title = 'Ninemine MSE';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_grafana.svg') WHERE title = 'Grafana';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_redmine.png') WHERE title IN ('Redmine', 'DProj');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_xolo.png') WHERE title = 'Xolo';
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_sentry.png') WHERE title = 'Sentry';
 " 2>&1 > /dev/null
 
 IC=$(docker exec -i ninegate-postgres psql -U user -d ninegate -t -A -c "SELECT COUNT(*) FROM item;" 2>/dev/null)
