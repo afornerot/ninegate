@@ -20,11 +20,11 @@ class ResetPasswordType extends AbstractType
                 'mapped' => false,
                 'first_options' => [
                     'label' => 'Nouveau mot de passe',
-                    'attr' => ['class' => 'form-control'],
+                    'attr' => ['class' => 'form-control', 'autocomplete' => 'new-password'],
                 ],
                 'second_options' => [
                     'label' => 'Confirmer le mot de passe',
-                    'attr' => ['class' => 'form-control'],
+                    'attr' => ['class' => 'form-control', 'autocomplete' => 'new-password'],
                 ],
                 'invalid_message' => 'Les mots de passe ne correspondent pas.',
                 'constraints' => [

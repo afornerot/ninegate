@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/reset-password', name: 'app_reset_password')]
+#[Route('/reset-password/{token}', name: 'app_reset_password')]
 class ResetPasswordController extends AbstractController
 {
     public function __invoke(
