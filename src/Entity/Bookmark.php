@@ -23,7 +23,7 @@ class Bookmark
     private ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Icon::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Icon $icon = null;
 
     #[ORM\Column(length: 7, nullable: true)]
@@ -39,7 +39,7 @@ class Bookmark
     private bool $newTab = true;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'bookmarks')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
     public function __toString(): string

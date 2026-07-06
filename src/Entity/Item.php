@@ -26,7 +26,7 @@ class Item
     private ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Icon::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Icon $icon = null;
 
     #[ORM\Column(length: 7, nullable: true)]
