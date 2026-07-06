@@ -982,10 +982,17 @@ body {
 .blog-masonry {
     column-count: 4;
     column-gap: 1rem;
+    overflow: hidden;
 }
 .blog-masonry-item {
     break-inside: avoid;
     margin-bottom: 1rem;
+    overflow: hidden;
+    max-width: 100%;
+}
+.blog-masonry-item .card {
+    overflow: hidden;
+    word-break: break-word;
 }
 @media (max-width: 991px) {
     .blog-masonry { column-count: 3; }

@@ -32,7 +32,7 @@
                         <i class="fas fa-clock"></i> {{ article.createdAt|date('d/m/Y H:i') }}
                     </p>
                     {% if article.content %}
-                        <p class="card-text small">{{ article.content|slice(0, 120)|nl2br }}{% if article.content|length > 120 %}...{% endif %}</p>
+                        <p class="card-text small" style="max-height: 120px; overflow: hidden;">{{ article.content|slice(0, 120)|nl2br }}{% if article.content|length > 120 %}...{% endif %}</p>
                     {% endif %}
                     <a href="{{ path(isAdmin ? 'app_admin_blogarticle_view' : 'app_blogarticle_view', {slug: article.slug}) }}" class="btn btn-sm btn-primary">
                         Lire la suite
