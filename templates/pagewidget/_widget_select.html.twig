@@ -1,16 +1,20 @@
 {% do form_widget(form.widget) %}
 {{ form_start(form, {'attr': {'id': 'widget-select-form', 'action': form_action}}) }}
     <input type="hidden" name="{{ form.widget.vars.full_name }}" id="{{ form.widget.vars.id }}" value="">
-    <div class="d-flex flex-wrap gap-2" id="widget-select-grid">
-        {% for choice in form.widget.vars.choices %}
-            <div class="widget-select-card card" data-value="{{ choice.value }}" style="cursor: pointer; min-width: 140px;">
-                <div class="card-body p-2 text-center">
+    <div class="d-flex flex-wrap gap-3" id="widget-select-grid">
+        {% set sorted_choices = form.widget.vars.choices|sort((a, b) => (a.data.title|default('')) <=> (b.data.title|default(''))) %}
+        {% for choice in sorted_choices %}
+            <div class="widget-select-card card" data-value="{{ choice.value }}" style="cursor: pointer; min-width: 160px; flex: 1 1 160px; max-width: 220px;">
+                <div class="card-body p-3 text-center">
                     {% if choice.data.icon %}
-                        <img src="{{ bninefile(choice.data.icon.route ) }}" alt="" style="height: 32px; width: 32px; object-fit: contain; margin-bottom: 4px;">
+                        <img src="{{ bninefile(choice.data.icon.route) }}" alt="" style="height: 48px; width: 48px; object-fit: contain; margin-bottom: 8px;">
                     {% endif %}
-                    <div class="small fw-semibold">{{ choice.data.title }}</div>
+                    <div class="fw-bold" style="font-size: 1.05rem;">{{ choice.data.title }}</div>
+                    {% if choice.data.description %}
+                        <div class="text-muted mt-1" style="font-size: 0.82rem;">{{ choice.data.description }}</div>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
     </div>
-{{ form_end(form) }}
+{{ form_end(form, {'render_rest': false}) }}

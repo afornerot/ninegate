@@ -23,6 +23,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
         $data = [
             [
                 'title' => 'Notes',
+                'description' => 'Bloc de notes rapide pour garder une idée, un pense-bête ou un commentaire.',
                 'route' => 'pagewidget_note',
                 'icon' => 'pencil',
                 'titleBgColor' => null,
@@ -35,6 +36,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Fichiers',
+                'description' => 'Espace de stockage et de partage de fichiers.',
                 'route' => 'pagewidget_file',
                 'icon' => 'folder',
                 'titleBgColor' => null,
@@ -47,6 +49,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Galerie',
+                'description' => 'Affiche vos images dans une galerie immersive.',
                 'route' => 'pagewidget_gallery',
                 'icon' => 'image',
                 'titleBgColor' => null,
@@ -59,6 +62,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Carousel',
+                'description' => 'Diaporama d\'images défilantes en plein écran.',
                 'route' => 'pagewidget_carousel',
                 'icon' => 'slr',
                 'titleBgColor' => null,
@@ -71,6 +75,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Bureau',
+                'description' => 'Centre de navigation avec vos raccourcis, favoris et accès rapides.',
                 'route' => 'pagewidget_bureau',
                 'icon' => 'computer',
                 'titleBgColor' => null,
@@ -90,6 +95,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Favoris',
+                'description' => 'Vos raccourcis et signets favoris toujours à portée de main.',
                 'route' => 'pagewidget_bookmark',
                 'icon' => 'pin',
                 'titleBgColor' => null,
@@ -105,6 +111,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Liens',
+                'description' => 'Liste de liens web organisés et cliquables.',
                 'route' => 'pagewidget_link',
                 'icon' => 'globe',
                 'titleBgColor' => null,
@@ -117,6 +124,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Flux RSS',
+                'description' => 'Agrège et affiche les actualités de vos flux RSS préférés.',
                 'route' => 'pagewidget_rss',
                 'icon' => 'rss',
                 'titleBgColor' => null,
@@ -134,6 +142,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Météo',
+                'description' => 'Prévisions météo en temps réel pour la ville de votre choix.',
                 'route' => 'pagewidget_weather',
                 'icon' => 'cloud',
                 'titleBgColor' => null,
@@ -151,6 +160,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Horloge',
+                'description' => 'Affiche l\'heure actuelle, avec option de plusieurs fuseaux horaires.',
                 'route' => 'pagewidget_clock',
                 'icon' => 'hourglass',
                 'titleBgColor' => null,
@@ -167,6 +177,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             ],
             [
                 'title' => 'Blog',
+                'description' => 'Derniers articles de blog publiés sur la plateforme.',
                 'route' => 'pagewidget_blog',
                 'icon' => 'news',
                 'titleBgColor' => null,
@@ -192,6 +203,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             }
 
             $widget->setTitle($item['title']);
+            $widget->setDescription($item['description'] ?? null);
             $widget->setRoute($item['route']);
             $widget->setTitleBgColor($item['titleBgColor']);
             $widget->setTitleFontColor($item['titleFontColor']);
