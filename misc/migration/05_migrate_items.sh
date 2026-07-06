@@ -20,20 +20,34 @@ DROP TABLE IF EXISTS new_icons;
 CREATE TABLE new_icons (id INT, route VARCHAR(255), basename VARCHAR(255));
 " 2>/dev/null
 
-# Export new icons to temp file (avoids stdin conflict with docker exec -i)
-TMP_ICONS=$(mktemp)
 docker exec ninegate-postgres psql -U user -d ninegate -t -A -c "
 SELECT id || '|' || route || '|' || SUBSTRING(route FROM LENGTH(route) - POSITION('/' IN REVERSE(route)) + 2) FROM icon;
-" > "$TMP_ICONS" 2>/dev/null
+" > /tmp/new_icons_raw.txt 2>/dev/null
 
-# Load into MariaDB
 while IFS='|' read -r id route basename; do
     [ -z "$id" ] && continue
     docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -e "
     INSERT INTO new_icons (id, route, basename) VALUES ($id, '$route', '$basename');
     " 2>/dev/null
-done < "$TMP_ICONS"
-rm -f "$TMP_ICONS"
+done < /tmp/new_icons_raw.txt
+rm -f /tmp/new_icons_raw.txt
+
+# 2. Add hardcoded icon mappings (old filename → new icon route)
+# These are items whose old UUID icons didn't match any new icon by basename
+docker exec -i "$TMP_MARIADB" mysql -uroot -proot ninegate -e "
+INSERT INTO new_icons (id, route, basename) VALUES
+(25,  'medias/icon/icon_cadoles.png',  'icon_cadoles.png'),
+(51,  'medias/icon/icon_corpus.png',   'icon_corpus.png'),
+(70,  'medias/icon/icon_efs.png',      'icon_efs.png'),
+(72,  'medias/icon/icon_envole.png',   'icon_envole.png'),
+(100, 'medias/icon/icon_grafana.svg',  'icon_grafana.svg'),
+(102, 'medias/icon/icon_harbor.png',   'icon_harbor.png'),
+(140, 'medias/icon/icon_ninedad.png',  'icon_ninedad.png'),
+(141, 'medias/icon/icon_ninemine.png', 'icon_ninemine.png'),
+(174, 'medias/icon/icon_redmine.png',  'icon_redmine.png'),
+(241, 'medias/icon/icon_xolo.png',     'icon_xolo.png')
+ON DUPLICATE KEY UPDATE id = id;
+" 2>/dev/null
 
 echo "  ✓ $(docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "SELECT COUNT(*) FROM new_icons;" 2>/dev/null) new icons loaded into MariaDB"
 
@@ -74,6 +88,21 @@ rm -f "$FINAL"
 
 # Drop temp table
 docker exec -i "$TMP_MARIADB" mysql -uroot -proot ninegate -e "DROP TABLE IF EXISTS new_icons;" 2>/dev/null
+
+# Hardcoded icon mappings (old filename → new icon route)
+echo "  Applying hardcoded icon mappings..."
+docker exec -i ninegate-postgres psql -U user -d ninegate -c "
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_cadoles.png') WHERE id = (SELECT id FROM item WHERE title = 'Cadoles');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_corpus.png') WHERE id = (SELECT id FROM item WHERE title = 'Corpus');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_ninedad.png') WHERE id = (SELECT id FROM item WHERE title = 'Ninedad');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_harbor.png') WHERE id = (SELECT id FROM item WHERE title = 'Harbor');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_efs.png') WHERE id = (SELECT id FROM item WHERE title = 'EFS');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_envole.png') WHERE id = (SELECT id FROM item WHERE title = 'Envole');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_ninemine.png') WHERE id = (SELECT id FROM item WHERE title = 'Ninemine MSE');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_grafana.svg') WHERE id = (SELECT id FROM item WHERE title = 'Grafana');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_redmine.png') WHERE id = (SELECT id FROM item WHERE title = 'Redmine');
+UPDATE item SET icon_id = (SELECT id FROM icon WHERE route = 'medias/icon/icon_xolo.png') WHERE id = (SELECT id FROM item WHERE title = 'Xolo');
+" 2>&1 > /dev/null
 
 IC=$(docker exec -i ninegate-postgres psql -U user -d ninegate -t -A -c "SELECT COUNT(*) FROM item;" 2>/dev/null)
 II=$(docker exec -i ninegate-postgres psql -U user -d ninegate -t -A -c "SELECT COUNT(*) FROM item WHERE icon_id IS NOT NULL;" 2>/dev/null)
