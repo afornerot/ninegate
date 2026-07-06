@@ -103,7 +103,12 @@ class LdapSyncCommand extends Command
             $ldapUser->setGivenname($user->getFirstname() ?? '');
             $ldapUser->setSn($user->getLastname() ?? '');
             $ldapUser->setMail($user->getEmail() ?? '');
-            $ldapUser->setPassbcrypt(bin2hex($user->getPassword()));
+
+            // Store SHA-256 for glauth (glauth reads passsha256 for verification)
+            if ($user->getSha256Hash()) {
+                $ldapUser->setPasssha256($user->getSha256Hash());
+            }
+
             $ldapUser->setDisabled(0);
             $ldapUser->setSshkeys('');
             $this->em->persist($ldapUser);

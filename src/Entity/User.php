@@ -57,6 +57,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $pseudo = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $needsPasswordUpgrade = false;
+
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $sha256Hash = null;
+
     #[ORM\OneToMany(targetEntity: Icon::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private Collection $icons;
 
@@ -197,6 +203,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPseudo(?string $pseudo): static
     {
         $this->pseudo = $pseudo;
+
+        return $this;
+    }
+
+    public function isNeedsPasswordUpgrade(): bool
+    {
+        return $this->needsPasswordUpgrade;
+    }
+
+    public function setNeedsPasswordUpgrade(bool $needsPasswordUpgrade): static
+    {
+        $this->needsPasswordUpgrade = $needsPasswordUpgrade;
+
+        return $this;
+    }
+
+    public function getSha256Hash(): ?string
+    {
+        return $this->sha256Hash;
+    }
+
+    public function setSha256Hash(?string $sha256Hash): static
+    {
+        $this->sha256Hash = $sha256Hash;
 
         return $this;
     }
