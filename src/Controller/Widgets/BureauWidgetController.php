@@ -89,8 +89,15 @@ class BureauWidgetController extends AbstractController
         }
         $items = array_values($itemsById);
 
-        // Sort by order
-        usort($items, fn($a, $b) => $a->getSortOrder() <=> $b->getSortOrder());
+        // Sort by category order first, then item order
+        usort($items, function ($a, $b) {
+            $catA = $a->getCategory()?->getSortOrder() ?? 0;
+            $catB = $b->getCategory()?->getSortOrder() ?? 0;
+            if ($catA !== $catB) {
+                return $catA <=> $catB;
+            }
+            return $a->getSortOrder() <=> $b->getSortOrder();
+        });
 
         // Separate favorites for virtual category
         $favoriteItems = [];
