@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\StorageService;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +15,7 @@ class MigrateBlogImagesCommand extends Command
 {
     public function __construct(
         private StorageService $storage,
+        private Connection $connection,
     ) {
         parent::__construct();
     }
@@ -31,26 +33,38 @@ class MigrateBlogImagesCommand extends Command
             return Command::FAILURE;
         }
 
-        $files = glob($migrationDir . '/*');
+        // Get all blog articles with images
+        $articles = $this->connection->fetchAllAssociative(
+            "SELECT id, blog_id, image FROM blog_article WHERE image IS NOT NULL AND image != ''"
+        );
+
         $count = 0;
         $skipped = 0;
+        $notFound = 0;
 
-        foreach ($files as $file) {
-            $filename = basename($file);
-            $destPath = 'blogarticle/' . $filename;
+        foreach ($articles as $article) {
+            $filename = basename($article['image']);
+            $sourceFile = $migrationDir . '/' . $filename;
+
+            if (!file_exists($sourceFile)) {
+                $notFound++;
+                continue;
+            }
+
+            $destPath = 'blog/' . $article['blog_id'] . '/blogarticle/' . $filename;
 
             if ($this->storage->fileExists($destPath)) {
                 $skipped++;
                 continue;
             }
 
-            $contents = file_get_contents($file);
+            $contents = file_get_contents($sourceFile);
             $this->storage->write($destPath, $contents);
             $count++;
         }
 
-        $io->success("Migration complete: $count images migrated, $skipped skipped (already exist)");
-        $io->text("Storage type: " . ($this->storage->isS3() ? 'S3' : 'Local'));
+        $io->success("$count migrated, $skipped already exist, $notFound source files missing");
+        $io->text("Storage: " . ($this->storage->isS3() ? 'S3' : 'Local'));
 
         return Command::SUCCESS;
     }
