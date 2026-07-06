@@ -33,9 +33,9 @@ while IFS='|' read -r id name user_id submit blog_id; do
     [ -z "$id" ] && continue
     awk -v id="$id" 'BEGIN{f=0} $1==id{f=1;next} f&&/^[0-9]+\t/{exit} f{print}' /tmp/articles_html_raw.txt > "$TMP_HTML/${id}.html"
     if [ -s "$TMP_HTML/${id}.html" ]; then
-        # Clean HTML then convert to Markdown via html2text
+        # Clean HTML then convert to Markdown via html2md
         php /home/afornerot/git/nine-project/ninegate/misc/migration/clean_html.php "$TMP_HTML/${id}.html" "$TMP_HTML/${id}_clean.html"
-        html2text --body-width=0 "$TMP_HTML/${id}_clean.html" > "$TMP_HTML/${id}.md" 2>/dev/null
+        ~/go/bin/html2md -i "$TMP_HTML/${id}_clean.html" > "$TMP_HTML/${id}.md" 2>/dev/null
     fi
 done < /tmp/articles_meta.txt
 
