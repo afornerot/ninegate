@@ -53,6 +53,8 @@ echo "[4/5] Applying to PostgreSQL..."
     echo "SET session_replication_role = 'replica';"
     cat /tmp/migrate_groups.sql /tmp/migrate_users.sql /tmp/migrate_usergroups.sql /tmp/migrate_itemcategories.sql /tmp/migrate_items.sql /tmp/migrate_itemgroups.sql /tmp/migrate_blogs.sql /tmp/migrate_bookmarks.sql
     echo "UPDATE app_group SET slug = 'all', is_system = true WHERE name = 'Tout le Monde';"
+    echo "UPDATE item SET icon_id = NULL WHERE icon_id IS NOT NULL AND icon_id NOT IN (SELECT id FROM icon);"
+    echo "UPDATE bookmark SET icon_id = NULL WHERE icon_id IS NOT NULL AND icon_id NOT IN (SELECT id FROM icon);"
     echo "SET session_replication_role = 'origin';"
 } > "$FINAL_SQL"
 
