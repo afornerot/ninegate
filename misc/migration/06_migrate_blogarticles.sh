@@ -60,7 +60,7 @@ while IFS='|' read -r id name user_id submit image; do
         \$user = '$user_id';
         \$submit = '$submit';
         \$slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', \$name));
-        \$image = '$image';
+        \$image = str_replace('uploads/', '', '$image');
         \$imageSql = empty(\$image) ? 'NULL' : \"'\" . str_replace(\"'\", \"''\", \$image) . \"'\";
         \$html = str_replace(\"'\", \"''\", @file_get_contents('$TMP_HTML/${id}.md') ?: '');
         echo \"INSERT INTO blog_article (id, title, slug, content, image, \\\"created_at\\\", \\\"updated_at\\\", user_id, blog_id) VALUES (\"
