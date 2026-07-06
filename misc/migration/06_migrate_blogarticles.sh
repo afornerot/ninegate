@@ -18,8 +18,8 @@ HEADER
 rm -rf "$TMP_HTML" /tmp/articles_*.txt
 mkdir -p "$TMP_HTML"
 
-# Export metadata (blog Interne only, id=3)
-docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "SELECT CONCAT(id, '|', COALESCE(name, ''), '|', COALESCE(user_id, 'NULL'), '|', submit) FROM blogarticle WHERE blog_id = 3 ORDER BY id;" > /tmp/articles_meta.txt 2>/dev/null
+# Export metadata (blog Interne only, include image path)
+docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "SELECT CONCAT(id, '|', COALESCE(name, ''), '|', COALESCE(user_id, 'NULL'), '|', submit, '|', COALESCE(image, '')) FROM blogarticle WHERE blog_id = 3 ORDER BY id;" > /tmp/articles_meta.txt 2>/dev/null
 
 # Export HTML content (blog Interne only)
 docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate --raw -e "SELECT id, COALESCE(description, '') FROM blogarticle WHERE blog_id = 3 ORDER BY id;" > /tmp/articles_html_raw.txt 2>/dev/null
@@ -50,24 +50,25 @@ INSERT INTO blog (id, title, slug, blog_order) VALUES (3, 'Interne', 'interne', 
 INSERT INTO blog_group (blog_id, group_id) VALUES (3, 5) ON CONFLICT DO NOTHING;
 HEADER
 
-while IFS='|' read -r id name user_id submit; do
+while IFS='|' read -r id name user_id submit image; do
     [ -z "$id" ] && continue
     # Write name to temp file to avoid shell escaping issues
     echo -n "$name" > /tmp/_tmp_name.txt
-    echo -n "$MD" > /tmp/_tmp_md.txt
     php -r "
         \$id = intval('$id');
         \$name = str_replace(\"'\", \"''\", file_get_contents('/tmp/_tmp_name.txt'));
         \$user = '$user_id';
         \$submit = '$submit';
         \$slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', \$name));
+        \$image = '$image';
+        \$imageSql = empty(\$image) ? 'NULL' : \"'\" . str_replace(\"'\", \"''\", \$image) . \"'\";
         \$html = str_replace(\"'\", \"''\", @file_get_contents('$TMP_HTML/${id}.md') ?: '');
         echo \"INSERT INTO blog_article (id, title, slug, content, image, \\\"created_at\\\", \\\"updated_at\\\", user_id, blog_id) VALUES (\"
             . \$id . ', '
             . \"'\" . \$name . \"', \"
             . \"'\" . \$slug . \"', \"
             . \"'\" . \$html . \"', \"
-            . 'NULL, '
+            . \$imageSql . ', '
             . \"'\" . \$submit . \"', \"
             . \"'\" . \$submit . \"', \"
             . \$user . ', 3) ON CONFLICT (id) DO NOTHING;'
@@ -82,6 +83,11 @@ echo "  Applying to PostgreSQL..."
 docker exec -i ninegate-postgres psql -U user -d ninegate < "$FINAL" 2>&1 | grep -i "error" | head -3 || true
 
 ACOUNT=$(docker exec -i ninegate-postgres psql -U user -d ninegate -t -A -c "SELECT COUNT(*) FROM blog_article;" 2>/dev/null)
-echo "✓ $ACOUNT blog articles migrated"
+ICOUNT=$(docker exec -i ninegate-postgres psql -U user -d ninegate -t -A -c "SELECT COUNT(*) FROM blog_article WHERE image IS NOT NULL;" 2>/dev/null)
+echo "✓ $ACOUNT blog articles migrated ($ICOUNT with images)"
 
-rm -rf "$TMP_HTML" /tmp/articles_*.txt "$FINAL"
+# Migrate images to storage
+echo "  Migrating images to storage..."
+docker exec ninegate php bin/console app:migrate-blogimages 2>&1 | grep -E "✓|OK|Error" | head -3
+
+rm -rf "$TMP_HTML" /tmp/articles_*.txt /tmp/_tmp_*.txt "$FINAL"
