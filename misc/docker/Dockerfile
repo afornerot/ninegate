@@ -38,6 +38,7 @@ COPY --chown=apache:apache . .
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
 RUN php bin/console assets:install public/ --no-debug 2>/dev/null || true
+RUN php bin/console asset-map:compile --no-debug 2>/dev/null || true
 
 RUN chmod +x bin/console misc/script/*.sh
 
