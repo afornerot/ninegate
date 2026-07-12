@@ -21,6 +21,12 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    #[Route(path: '/callback', name: 'app_oidc_callback')]
+    public function callback(): void
+    {
+        // Handled by DynamicAuthenticator via firewall
+    }
+
     #[Route(path: '/logout', name: 'app_logout')]
     public function logout(): void
     {

@@ -5,8 +5,10 @@ namespace App\Security;
 use App\Repository\UserRepository;
 use Jumbojett\OpenIDConnectClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
@@ -20,24 +22,22 @@ class DynamicAuthenticator extends AbstractAuthenticator
     public function __construct(
         private UserRepository $userRepository,
         private UserProvider $casUserProvider,
-        private ParameterBagInterface $parameterBag)
+        private ParameterBagInterface $parameterBag,
+        private UrlGeneratorInterface $urlGenerator)
     {
     }
 
     public function supports(Request $request): ?bool
     {
-        // Vérifie si l'utilisateur est déjà connecté
         if ($request->getSession()->get('_security_main')) {
-            return false; // L'utilisateur est déjà authentifié
+            return false;
         }
 
-        // Exclure les routes de login et logout pour éviter les boucles
         $currentPath = $request->getPathInfo();
         if (in_array($currentPath, ['/login', '/logout'])) {
             return false;
         }
 
-        // Authentification requise uniquement pour les routes /admin, /master, /user et /callback (OIDC)
         if (str_starts_with($currentPath, '/admin')
             || str_starts_with($currentPath, '/master')
             || str_starts_with($currentPath, '/user')
@@ -53,13 +53,10 @@ class DynamicAuthenticator extends AbstractAuthenticator
         switch ($this->parameterBag->get('appModeAuth')) {
             case 'SQL':
                 return $this->authenticateWithSql($request);
-
             case 'CAS':
                 return $this->authenticateWithCas($request);
-
             case 'OIDC':
                 return $this->authenticateWithOidc($request);
-
             default:
                 throw new \InvalidArgumentException('Invalid authentication method');
         }
@@ -67,11 +64,15 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        return null;
+        $target = $request->getSession()->get('_security.target_path')
+            ?? $this->parameterBag->get('defaultUri') . '/admin';
+
+        return new RedirectResponse($target);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
+        error_log('OIDC AUTH FAILURE: ' . $exception->getMessage());
         throw $exception;
     }
 
@@ -84,7 +85,6 @@ class DynamicAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('Username and password are required.');
         }
 
-        // Charger l'utilisateur via Doctrine (table user puis table student)
         $user = $this->userRepository->findOneBy(['username' => $username]);
         if (!$user) {
             throw new AuthenticationException('User not found.');
@@ -92,9 +92,7 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
         return new Passport(
             new UserBadge($username, function ($userIdentifier) {
-                $user = $this->userRepository->findOneBy(['username' => $userIdentifier]);
-
-                return $user;
+                return $this->userRepository->findOneBy(['username' => $userIdentifier]);
             }),
             new PasswordCredentials($password)
         );
@@ -102,14 +100,10 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     private function authenticateWithCas(Request $request): Passport
     {
-        // Récupérer l'hôte d'origine derrière le reverse proxy
         $host = $request->headers->get('host');
         $scheme = $request->headers->get('X-Forwarded-Proto') ?? $request->getScheme();
-
-        // Construire l'URL
         $url = $scheme.'://'.$host;
 
-        // \phpCAS::setDebug('/tmp/logcas.log');
         \phpCAS::client(
             CAS_VERSION_2_0,
             $this->parameterBag->get('casHost'),
@@ -137,6 +131,9 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     private function authenticateWithOidc(Request $request): Passport
     {
+        $currentPath = $request->getPathInfo();
+        error_log('OIDC AUTH: path=' . $currentPath . ' code=' . ($request->query->get('code') ?: 'none'));
+
         $oidc = new OpenIDConnectClient(
             $this->parameterBag->get('oidcIssuer'),
             $this->parameterBag->get('oidcClientId'),
@@ -146,18 +143,26 @@ class DynamicAuthenticator extends AbstractAuthenticator
         $oidc->setVerifyPeer(false);
         $oidc->setVerifyHost(false);
         $oidc->setRedirectURL($this->parameterBag->get('oidcRedirectUri'));
+        $oidc->addScope(['openid', 'email', 'profile']);
 
-        // Lance le processus d'authentification (redirections, etc.)
         $oidc->authenticate();
 
-        // Stocke l'id_token pour la déconnexion future
-        $request->getSession()->set('oidc_id_token', $oidc->getIdToken());
+        $idToken = $oidc->getIdToken();
+        $request->getSession()->set('oidc_id_token', $idToken);
 
-        // Récupère les informations de l'utilisateur
-        $userInfo = $oidc->requestUserInfo();
+        // Decode ID token JWT to get claims
+        $parts = explode('.', $idToken);
+        if (count($parts) === 3) {
+            $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
+            $userInfo = (object) $payload;
+        } else {
+            $userInfo = null;
+        }
+
+        error_log('OIDC AUTH: userInfo=' . json_encode($userInfo));
 
         if (!$userInfo) {
-            throw new AuthenticationException('OIDC authentication failed: could not retrieve user info.');
+            throw new AuthenticationException('OIDC authentication failed: could not decode ID token.');
         }
 
         $usernameAttribute = $this->parameterBag->get('oidcUsernameAttribute');
@@ -165,8 +170,14 @@ class DynamicAuthenticator extends AbstractAuthenticator
         $attributes = (array) $userInfo;
 
         if (!$username) {
-            throw new AuthenticationException(sprintf('OIDC authentication failed: "%s" claim is missing or empty.', $usernameAttribute));
+            throw new AuthenticationException(sprintf(
+                'OIDC authentication failed: "%s" claim is missing or empty. Available: %s',
+                $usernameAttribute,
+                implode(', ', array_keys($attributes))
+            ));
         }
+
+        error_log('OIDC AUTH: username=' . $username);
 
         $userBadge = new UserBadge($username, function ($userIdentifier) use ($attributes) {
             return $this->casUserProvider->loadUserByIdentifierAndOIDCAttributes($userIdentifier, $attributes);
