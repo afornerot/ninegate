@@ -9,7 +9,27 @@ class PdoSessionHandlerFactory
 {
     public static function create(Connection $connection): PdoSessionHandler
     {
-        $pdo = $connection->getNativeConnection();
+        $params = $connection->getParams();
+        $drvParams = $params['driverOptions'] ?? [];
+
+        $dsn = match ($params['driver']) {
+            'pdo_pgsql' => sprintf(
+                'pgsql:host=%s;port=%s;dbname=%s',
+                $params['host'] ?? 'localhost',
+                $params['port'] ?? 5432,
+                $params['dbname'],
+            ),
+            'pdo_mysql' => sprintf(
+                'mysql:host=%s;port=%s;dbname=%s',
+                $params['host'] ?? 'localhost',
+                $params['port'] ?? 3306,
+                $params['dbname'],
+            ),
+            'pdo_sqlite' => sprintf('sqlite:%s', $params['path'] ?? $params['dbname']),
+            default => throw new \RuntimeException(sprintf('Unsupported driver "%s" for session handler.', $params['driver'])),
+        };
+
+        $pdo = new \PDO($dsn, $params['user'] ?? null, $params['password'] ?? null, $drvParams);
 
         return new PdoSessionHandler($pdo, [
             'db_table' => 'sessions',
