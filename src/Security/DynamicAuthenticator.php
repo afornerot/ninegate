@@ -65,7 +65,7 @@ class DynamicAuthenticator extends AbstractAuthenticator
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $target = $request->getSession()->get('_security.target_path')
-            ?? $this->parameterBag->get('defaultUri') . '/admin';
+            ?? $this->parameterBag->get('defaultUri');
 
         return new RedirectResponse($target);
     }
