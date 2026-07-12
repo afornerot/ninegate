@@ -1,12 +1,12 @@
 <div class="blog-widget-masonry">
     {% for article in articles %}
-        <div class="blog-widget-item card mb-3">
+        <div class="blog-widget-item card">
             {% if article.image %}
                 <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}">
                     <img src="{{ path('bninefiles_files_thumbnail', {domain: 'blog', id: article.blog.id, path: article.image}) }}" class="card-img-top" alt="{{ article.title }}">
                 </a>
             {% endif %}
-            <div class="card-body py-2 px-3">
+            <div class="card-body">
                 <div class="card-title mb-1">
                     <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}" class="text-decoration-none">
                         <h6 class="mb-0">{{ article.title }}</h6>
@@ -17,6 +17,9 @@
                     &middot;
                     <i class="fas fa-clock"></i> {{ article.createdAt|date('d/m/Y') }}
                 </p>
+                <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}" class="btn btn-sm btn-primary">
+                    Lire la suite
+                </a>
             </div>
         </div>
     {% else %}

@@ -179,7 +179,6 @@ class BlogController extends AbstractController
 
         $articles = $blog->getArticles()->toArray();
         usort($articles, fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
-
         return $this->render('blog/view.html.twig', [
             'usemenu' => true,
             'usesidebar' => $isAdmin,
