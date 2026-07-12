@@ -41,6 +41,7 @@ class UserFixtures extends Fixture
                 $user->setEmail($item['email']);
                 $hashedPassword = $this->passwordHasher->hashPassword($user, $this->parameterBag->get('appAdminPassword'));
                 $user->setPassword($hashedPassword);
+                $user->setSha256Hash(hash('sha256', $this->parameterBag->get('appAdminPassword')));
                 $user->setRoles([$item['role']]);
                 if ($item['avatar']) {
                     $user->setAvatar($item['avatar']);
