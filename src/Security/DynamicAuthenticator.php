@@ -37,10 +37,11 @@ class DynamicAuthenticator extends AbstractAuthenticator
             return false;
         }
 
-        // Authentification requise uniquement pour les routes /admin, /master, /user
+        // Authentification requise uniquement pour les routes /admin, /master, /user et /callback (OIDC)
         if (str_starts_with($currentPath, '/admin')
             || str_starts_with($currentPath, '/master')
-            || str_starts_with($currentPath, '/user')) {
+            || str_starts_with($currentPath, '/user')
+            || $currentPath === '/callback') {
             return true;
         }
 
