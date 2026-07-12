@@ -838,6 +838,10 @@ body {
 .itemlink-small .itemlink-item-content {
     width: 100%;
 }
+.itemlink-small .itemlink-item-content strong {
+    font-size: 0.7rem;
+    line-height: 1.2;
+}
 .itemlink-small .itemlink-summary,
 .itemlink-small .itemlink-item-desc {
     display: none !important;

@@ -106,8 +106,12 @@ class BureauWidgetController extends AbstractController
             $favoriteItems = array_filter($items, fn($item) => in_array($item->getId(), $favoriteIds));
         }
 
-        // Get categories for navbar
-        $categories = $itemCategoryRepository->findBy([], ['sortOrder' => 'ASC']);
+        // Get categories that have at least one accessible item
+        $itemCategoryIds = array_map(fn($item) => $item->getCategory()?->getId(), $items);
+        $itemCategoryIds = array_filter(array_unique($itemCategoryIds));
+        $categories = !empty($itemCategoryIds)
+            ? $itemCategoryRepository->findBy(['id' => $itemCategoryIds], ['sortOrder' => 'ASC'])
+            : [];
 
         return $this->render('widget/bureau.html.twig', [
             'pageWidget' => $pageWidget,
