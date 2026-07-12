@@ -64,3 +64,8 @@ services:
         factory: ['App\Service\StorageFactory', 'create']
         arguments: ['@parameter_bag']
 
+    session.handler.pdo:
+        class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        factory: ['App\Service\PdoSessionHandlerFactory', 'create']
+        arguments: ['@doctrine.dbal.default_connection']
+
