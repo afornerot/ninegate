@@ -4,6 +4,7 @@ parameters:
   appName: "%env(resolve:APP_NAME)%"
   appNoreply: "%env(resolve:APP_NOREPLY)%"
   appAdmin: "%env(resolve:APP_ADMIN)%"
+  appAdminPassword: "%env(resolve:APP_ADMIN_PASSWORD)%"
   appModeAuth: "%env(resolve:APP_MODEAUTH)%"
   appMasterIdentity: "%env(resolve:APP_MASTERIDENTITY)%"
   databaseUrl: "%env(resolve:DATABASE_URL)%"

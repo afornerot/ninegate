@@ -39,7 +39,7 @@ class UserFixtures extends Fixture
                 $user = new User();
                 $user->setUsername($item['username']);
                 $user->setEmail($item['email']);
-                $hashedPassword = $this->passwordHasher->hashPassword($user, $this->parameterBag->get('appSecret'));
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $this->parameterBag->get('appAdminPassword'));
                 $user->setPassword($hashedPassword);
                 $user->setRoles([$item['role']]);
                 if ($item['avatar']) {
