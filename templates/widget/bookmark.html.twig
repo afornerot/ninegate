@@ -25,9 +25,9 @@
 {# Favoris list #}
 <div class="itemlink-items itemlink-medium">
     {% for item in items %}
-        <div class="itemlink-item" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+        <div class="itemlink-item {% if not item.bgcolor %}bg-dark{% endif %}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
              title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
-             style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
+             style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% elseif not item.bgcolor %} color: #fff;{% endif %}">
             {% if item.icon %}
                 <img src="{{ bninefile(item.icon.route ) }}" class="itemlink-item-icon" alt="">
             {% endif %}

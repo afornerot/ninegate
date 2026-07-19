@@ -17,8 +17,8 @@
 {# Links display #}
 <div class="itemlink-items itemlink-medium" id="link-widget-{{ pageWidget.id }}">
     {% for link in links %}
-        <div class="itemlink-item" data-title="{{ link.title|default('')|lower }}" data-summary="{{ link.summary|default('')|lower }}"
-             style="{% if link.bgcolor is defined and link.bgcolor %}background-color: {{ link.bgcolor }};{% endif %}{% if link.color is defined and link.color %} color: {{ link.color }};{% endif %}"
+        <div class="itemlink-item {% if not link.bgcolor|default(false) %}bg-dark{% endif %}" data-title="{{ link.title|default('')|lower }}" data-summary="{{ link.summary|default('')|lower }}"
+             style="{% if link.bgcolor|default(false) %}background-color: {{ link.bgcolor }};{% endif %}{% if link.color|default(false) %} color: {{ link.color }};{% elseif not link.bgcolor|default(false) %} color: #fff;{% endif %}"
              title="{{ link.title|default('') }}{% if link.description is defined and link.description %}\n{{ link.description }}{% endif %}">
             {% if link.iconId is defined and link.iconId %}
                 {% for icon in icons %}

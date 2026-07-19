@@ -43,9 +43,9 @@
         {% endif %}
         <div class="itemlink-items itemlink-{{ config.display|default('medium') }}">
             {% for item in favoriteItems %}
-                <div class="itemlink-item itemlink-fav" data-cat="fav" data-origin-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+                <div class="itemlink-item itemlink-fav {% if not item.bgcolor %}bg-dark{% endif %}" data-cat="fav" data-origin-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
                      title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
-                     style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
+                     style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% elseif not item.bgcolor %} color: #fff;{% endif %}">
                     {% if item.icon %}
                         <img src="{{ bninefile(item.icon.route ) }}" class="itemlink-item-icon" alt="">
                     {% endif %}
@@ -87,9 +87,9 @@
     {% endif %}
 
     {% set isFav = item.id in favoriteIds %}
-    <div class="itemlink-item {% if isFav %}itemlink-fav{% endif %}" data-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+    <div class="itemlink-item {% if not item.bgcolor %}bg-dark{% endif %} {% if isFav %}itemlink-fav{% endif %}" data-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
          title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
-         style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% endif %}">
+         style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% elseif not item.bgcolor %} color: #fff;{% endif %}">
         {% if item.icon %}
             <img src="{{ bninefile(item.icon.route ) }}" class="itemlink-item-icon" alt="">
         {% endif %}
