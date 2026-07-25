@@ -36,7 +36,7 @@ L'application supporte trois modes d'authentification (configuré via la variabl
 ## Fonctionnalités
 
 ### Pages
-Création de pages personnalisables avec un système de widgets drag-and-drop. Les pages sont accessibles par groupe ou par rôle.
+Création de pages personnalisables avec un système de widgets drag-and-drop. Les pages sont accessibles par groupe ou par rôle. Chaque utilisateur peut définir une page préférée (via un coeur dans la navbar) qui sera affichée par défaut à la connexion.
 
 ### Widgets
 Widgets réutilisables sur les pages :

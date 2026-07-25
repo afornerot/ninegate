@@ -9,6 +9,7 @@ use App\Voter\PageVoter;
 use App\Service\SlugService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -231,5 +232,31 @@ class PageController extends AbstractController
             'widgets' => $widgets,
             'isAdmin' => $isAdmin,
         ]);
+    }
+
+    #[Route('/user/page/favorite/{id}', name: 'app_user_page_favorite', methods: ['POST'])]
+    public function toggleFavorite(int $id): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Non connecté'], 401);
+        }
+
+        $page = $this->pageRepository->find($id);
+        if (!$page) {
+            return new JsonResponse(['error' => 'Page introuvable'], 404);
+        }
+
+        if ($user->getFavoritePage()?->getId() === $page->getId()) {
+            $user->setFavoritePage(null);
+            $favorite = false;
+        } else {
+            $user->setFavoritePage($page);
+            $favorite = true;
+        }
+
+        $this->em->flush();
+
+        return new JsonResponse(['success' => true, 'favorite' => $favorite]);
     }
 }

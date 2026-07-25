@@ -1,6 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block navbar_extra %}
+    {% if app.user %}
+        <a class="nav-link px-2 page-favorite-toggle" href="#" data-page-id="{{ page.id }}" title="Page préférée">
+            <i class="fa-solid fa-heart fa-2x" style="color: {{ app.user.favoritePage and app.user.favoritePage.id == page.id ? 'var(--bs-danger)' : 'var(--bs-body-color)' }}; opacity: {{ app.user.favoritePage and app.user.favoritePage.id == page.id ? '1' : '0.4' }};"></i>
+        </a>
+    {% endif %}
     {% if is_granted('page_edit', page) %}
         <a class="nav-link px-2" href="{{ path(isAdmin ? 'app_admin_pagewidget_list' : 'app_user_pagewidget_list', { 'pageId': page.id }) }}" title="Gérer les widgets">
             <i class="fa-solid fa-cubes fa-2x"></i>
@@ -24,23 +29,43 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var widgetsData = document.getElementById('page-widgets-data');
-    if (!widgetsData) return;
-    
-    var widgets = widgetsData.querySelectorAll('.page-widget');
-    widgets.forEach(function(widget) {
-        var location = widget.getAttribute('data-location') || 'R1C1';
-        var target = document.getElementById(location);
-        if (target) {
-            target.appendChild(widget);
-        } else {
-            var defaultTarget = document.getElementById('R1C1');
-            if (defaultTarget) {
-                defaultTarget.appendChild(widget);
+    if (widgetsData) {
+        var widgets = widgetsData.querySelectorAll('.page-widget');
+        widgets.forEach(function(widget) {
+            var location = widget.getAttribute('data-location') || 'R1C1';
+            var target = document.getElementById(location);
+            if (target) {
+                target.appendChild(widget);
+            } else {
+                var defaultTarget = document.getElementById('R1C1');
+                if (defaultTarget) {
+                    defaultTarget.appendChild(widget);
+                }
             }
-        }
+        });
+        widgetsData.remove();
+    }
+
+    document.querySelectorAll('.page-favorite-toggle').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var pageId = this.dataset.pageId;
+            var icon = this.querySelector('i');
+            fetch('/user/page/favorite/' + pageId, { method: 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        if (data.favorite) {
+                            icon.style.color = 'var(--bs-danger)';
+                            icon.style.opacity = '1';
+                        } else {
+                            icon.style.color = 'var(--bs-body-color)';
+                            icon.style.opacity = '0.4';
+                        }
+                    }
+                });
+        });
     });
-    
-    widgetsData.remove();
 });
 </script>
 {% endblock %}

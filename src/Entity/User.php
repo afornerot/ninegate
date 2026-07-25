@@ -78,6 +78,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Bookmark::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $bookmarks;
 
+    #[ORM\ManyToOne(targetEntity: Page::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Page $favoritePage = null;
+
     public function __construct()
     {
         $this->icons = new ArrayCollection();
@@ -351,6 +355,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+    public function getFavoritePage(): ?Page
+    {
+        return $this->favoritePage;
+    }
+
+    public function setFavoritePage(?Page $favoritePage): static
+    {
+        $this->favoritePage = $favoritePage;
         return $this;
     }
 }

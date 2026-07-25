@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use App\Service\PageParameterBag;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,7 @@ class HomeController extends AbstractController
 {
     public function __construct(
         private UserRepository $userRepository,
+        private PageRepository $pageRepository,
         private PageParameterBag $pageParameterBag,
     ) {}
 
@@ -34,6 +36,11 @@ class HomeController extends AbstractController
         }
 
         if (!empty($pages)) {
+            $freshUser = $this->userRepository->find($user->getId());
+            $favorite = $freshUser?->getFavoritePage();
+            if ($favorite && $this->pageRepository->isPageAccessibleForUser($favorite, $user)) {
+                return $this->redirectToRoute('app_page_view', ['slug' => $favorite->getSlug()]);
+            }
             $firstPage = $pages[0];
             return $this->redirectToRoute('app_page_view', ['slug' => $firstPage->getSlug()]);
         }
