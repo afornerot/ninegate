@@ -192,6 +192,20 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
                     'mode' => ['type' => 'choice', 'label' => 'Mode', 'choices' => ['Tous les blogs' => 'all', 'Blogs liés à la page' => 'linked'], 'default' => 'all'],
                 ],
             ],
+            [
+                'title' => 'Annonces',
+                'description' => 'Affiche les annonces accessibles à l\'utilisateur',
+                'route' => 'pagewidget_annonce',
+                'icon' => 'megaphone',
+                'titleBgColor' => null,
+                'titleFontColor' => null,
+                'bodyBgColor' => null,
+                'bodyFontColor' => null,
+                'withBorder' => false,
+                'withTitle' => true,
+                'height' => null,
+                'hideIfEmpty' => true,
+            ],
         ];
 
         foreach ($data as $item) {
@@ -212,6 +226,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
             $widget->setWithBorder($item['withBorder']);
             $widget->setWithTitle($item['withTitle'] ?? true);
             $widget->setHeight($item['height']);
+            $widget->setHideIfEmpty($item['hideIfEmpty'] ?? false);
 
             // Set config if present
             if (!empty($item['config'])) {

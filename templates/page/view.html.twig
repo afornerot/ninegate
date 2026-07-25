@@ -14,6 +14,7 @@
 {% endblock %}
 
 {% block body %}
+<style>.page-grid > div { opacity: 0; }</style>
 {{ page.pageTemplate.template|raw }}
 
 <div id="page-widgets-data" style="display:none;">
@@ -45,6 +46,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         widgetsData.remove();
     }
+
+    setTimeout(function() {
+        document.querySelectorAll('.page-widget-card[data-hide-if-empty]').forEach(function(card) {
+            var body = card.querySelector('.page-widget-body');
+            if (body && body.children.length === 0) {
+                var wrapper = card.closest('.page-widget');
+                if (wrapper) wrapper.style.display = 'none';
+            }
+        });
+        document.querySelectorAll('.page-grid > div').forEach(function(el) {
+            el.style.opacity = '1';
+        });
+    }, 100);
 
     document.querySelectorAll('.page-favorite-toggle').forEach(function(btn) {
         btn.addEventListener('click', function(e) {

@@ -59,6 +59,9 @@ class PageWidget
     #[ORM\JoinColumn(nullable: true)]
     private ?Icon $icon = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $hideIfEmpty = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -228,6 +231,18 @@ class PageWidget
     public function setIcon(?Icon $icon): static
     {
         $this->icon = $icon;
+
+        return $this;
+    }
+
+    public function isHideIfEmpty(): bool
+    {
+        return $this->hideIfEmpty;
+    }
+
+    public function setHideIfEmpty(bool $hideIfEmpty): static
+    {
+        $this->hideIfEmpty = $hideIfEmpty;
 
         return $this;
     }

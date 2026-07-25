@@ -101,6 +101,7 @@ class PageWidgetController extends AbstractController
                 $widget->setWithTitle($selectedWidget->isWithTitle());
                 $widget->setHeight($selectedWidget->getHeight());
                 $widget->setIcon($selectedWidget->getIcon());
+                $widget->setHideIfEmpty($selectedWidget->isHideIfEmpty());
             }
 
             $this->em->persist($widget);

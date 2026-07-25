@@ -1,0 +1,57 @@
+{% if annonces|length > 0 %}
+<div class="d-flex flex-column gap-2">
+    {% for annonce in annonces %}
+        <div class="card" style="{% if annonce.category and annonce.category.bgColor %}background-color: {{ annonce.category.bgColor }} !important;{% endif %}">
+            <div class="card-body" style="{% if annonce.category and annonce.category.textColor %}color: {{ annonce.category.textColor }} !important;{% endif %}">
+                <div class="d-flex align-items-start justify-content-between">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                            {% if annonce.category and annonce.category.icon %}
+                                <img src="{{ bninefile(annonce.category.icon.route) }}" alt="" style="height: 18px; width: 18px; object-fit: contain; vertical-align: text-bottom;">
+                            {% endif %}
+                            {{ annonce.title }}
+                        </h6>
+                        <p class="card-text small mb-1">
+                            {% if annonce.category %}
+                                <span class="badge" style="background-color: {{ annonce.category.color ?: 'var(--bs-secondary)' }};{% if annonce.category.textColor %} color: {{ annonce.category.textColor }};{% endif %}">{{ annonce.category.title }}</span>
+                            {% endif %}
+                            &middot;
+                            <i class="fas fa-clock"></i> {{ annonce.createdAt|date('d/m/Y H:i') }}
+                        </p>
+                        <div class="article-content small">
+                            {{ (annonce.content ?? '')|markdown }}
+                        </div>
+                    </div>
+                    {% if annonce.canBeHidden and not isAdmin %}
+                        <button class="btn btn-sm btn-outline-secondary ms-2 annonce-hide-btn" data-annonce-id="{{ annonce.id }}" title="Masquer">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+<span data-empty-widget></span>
+{% endif %}
+
+{% if not isAdmin %}
+<script>
+document.querySelectorAll('.annonce-hide-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var annonceId = this.dataset.annonceId;
+        var card = this.closest('.card');
+        fetch('/user/widget/annonce/hide/' + annonceId, { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    card.style.transition = 'opacity 0.3s';
+                    card.style.opacity = '0';
+                    setTimeout(function() { card.remove(); }, 300);
+                }
+            });
+    });
+});
+</script>
+{% endif %}

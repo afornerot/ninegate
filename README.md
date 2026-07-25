@@ -1,6 +1,6 @@
 # Ninegate
 
-Portail d'accueil personnalisable avec gestion de pages, blogs, items, chartes et widgets.
+Portail d'accueil personnalisable avec gestion de pages, blogs, items, annonces, chartes et widgets.
 
 ## Installation
 
@@ -49,12 +49,16 @@ Widgets réutilisables sur les pages :
 - Galerie / Carousel
 - Bureau / Favoris
 - Fichiers
+- Annonces
 
 ### Blogs
 Création de blogs avec articles au format Markdown. Chaque blog peut être lié à des groupes.
 
 ### Items
 Système de liens/catégories avec icônes personnalisées, accessible par groupe ou rôle.
+
+### Annonces
+Système d'annonces/catégories avec icônes et couleurs personnalisables, accessible par groupe ou rôle. Les utilisateurs peuvent masquer les annonces (si autorisé par l'admin). Widget dédié avec masquage automatique si aucune annonce n'est disponible.
 
 ### Chartes
 Chartes au format Markdown avec signature obligatoire optionnelle. Les utilisateurs doivent signer les chartes avant d'accéder à l'application.

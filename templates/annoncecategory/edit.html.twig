@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'form/icon_entity_widget.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    <button type="submit" class="btn btn-success">Valider</button>
+    <a href="{{ path('app_admin_annoncecategory_list') }}" class="btn btn-secondary">Annuler</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                {{ form_row(form.title) }}
+            </div>
+            <div class="col-md-2">
+                {{ form_row(form.icon) }}
+            </div>
+            <div class="col-md-2">
+                {{ form_row(form.color) }}
+            </div>
+            <div class="col-md-2">
+                {{ form_row(form.bgColor) }}
+            </div>
+            <div class="col-md-2">
+                {{ form_row(form.textColor) }}
+            </div>
+            <div class="col-md-1">
+                {{ form_row(form.sortOrder) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

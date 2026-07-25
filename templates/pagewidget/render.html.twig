@@ -1,4 +1,4 @@
-<div class="page-widget-card{% if canManage %} page-widget-manageable{% endif %}{% if pageWidget.withBorder %} page-widget-bordered{% endif %}{% if pageWidget.height %} page-widget-fixed-height{% endif %}"
+<div class="page-widget-card{% if canManage %} page-widget-manageable{% endif %}{% if pageWidget.withBorder %} page-widget-bordered{% endif %}{% if pageWidget.height %} page-widget-fixed-height{% endif %}"{% if pageWidget.hideIfEmpty %} data-hide-if-empty{% endif %}
     {% if pageWidget.height %} style="--page-widget-height: {{ pageWidget.height }}px;"{% endif %}>
     {% if pageWidget.withTitle %}
     <div class="page-widget-title"

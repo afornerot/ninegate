@@ -51,6 +51,9 @@ class Widget
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $config = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $hideIfEmpty = false;
+
     public function __toString(): string
     {
         return $this->title ?? '';
@@ -201,6 +204,18 @@ class Widget
     public function setConfig(?array $config): static
     {
         $this->config = $config;
+
+        return $this;
+    }
+
+    public function isHideIfEmpty(): bool
+    {
+        return $this->hideIfEmpty;
+    }
+
+    public function setHideIfEmpty(bool $hideIfEmpty): static
+    {
+        $this->hideIfEmpty = $hideIfEmpty;
 
         return $this;
     }
