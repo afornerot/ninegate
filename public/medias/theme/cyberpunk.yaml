@@ -18,3 +18,4 @@ btn-border-color: "#ff00ff"
 fontHeader: Anton
 fontBody: Roboto
 app-bs-header: "#ff00ff"
+textOnDark: "#e0e0e0"

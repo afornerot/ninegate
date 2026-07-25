@@ -18,3 +18,4 @@ btn-border-color: "#6c757d"
 fontHeader: Acme
 fontBody: Lato
 app-bs-header: "#6c757d"
+textOnDark: "#f8f9fa"

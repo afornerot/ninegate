@@ -18,3 +18,4 @@ btn-border-color: "#f48c06"
 fontHeader: Anton
 fontBody: Lato
 app-bs-header: "#ffba08"
+textOnDark: "#ffffff"

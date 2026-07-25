@@ -8,13 +8,12 @@
             <i class="fas fa-edit"></i> Modifier
         </a>
     {% endif %}
+    <a href="{{ path(isAdmin ? 'app_admin_blog_view' : 'app_blog_view', {slug: blog.slug}) }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour au blog
+    </a>
     {% if pageSlug is defined and pageSlug %}
         <a href="{{ path(isAdmin ? 'app_admin_page_view' : 'app_user_page_view', {slug: pageSlug}) }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Retour à la page
-        </a>
-    {% else %}
-        <a href="{{ path(isAdmin ? 'app_admin_blog_view' : 'app_blog_view', {slug: blog.slug}) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Retour au blog
         </a>
     {% endif %}
 </div>

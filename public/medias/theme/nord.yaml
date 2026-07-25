@@ -18,3 +18,4 @@ btn-border-color: "#5e81ac"
 fontHeader: Overpass
 fontBody: Lato
 app-bs-header: "#f8f9fa"
+textOnDark: "#eceff4"

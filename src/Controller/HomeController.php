@@ -19,10 +19,11 @@ class HomeController extends AbstractController
     public function home(): Response
     {
         $user = $this->getUser();
+
+        $pages = [];
         if ($user) {
             $this->pageParameterBag->load();
-            
-            $pages = [];
+
             if (!empty($this->pageParameterBag->get('group_orga_role'))) {
                 $pages = $this->pageParameterBag->get('group_orga_role');
             } elseif (!empty($this->pageParameterBag->get('personal'))) {
@@ -30,13 +31,17 @@ class HomeController extends AbstractController
             } elseif (!empty($this->pageParameterBag->get('work_group'))) {
                 $pages = $this->pageParameterBag->get('work_group');
             }
-            
-            if (!empty($pages)) {
-                $firstPage = $pages[0];
-                return $this->redirectToRoute('app_page_view', ['slug' => $firstPage->getSlug()]);
-            }
         }
-        
+
+        if (!empty($pages)) {
+            $firstPage = $pages[0];
+            return $this->redirectToRoute('app_page_view', ['slug' => $firstPage->getSlug()]);
+        }
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
         return $this->render('home/home.html.twig', [
             'usemenu' => true,
             'usesidebar' => false,

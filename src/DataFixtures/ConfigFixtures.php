@@ -250,6 +250,17 @@ class ConfigFixtures extends Fixture
                 'configMasterCode' => null,
                 'configMasterValue' => null,
             ],
+            [
+                'code' => 'app-bs-text-on-dark',
+                'title' => 'Couleur du texte sur fond sombre',
+                'value' => null,
+                'defaultValue' => '#ffffff',
+                'type' => Config::TYPE_COLOR,
+                'configGroup' => 'ColorTheme',
+                'order' => 16,
+                'configMasterCode' => null,
+                'configMasterValue' => null,
+            ],
         ];
 
         foreach ($data as $item) {

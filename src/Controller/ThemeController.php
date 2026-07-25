@@ -78,6 +78,7 @@ class ThemeController extends AbstractController
             'appFontHeader' => 'fontHeader',
             'appFontBody' => 'fontBody',
             'app-bs-header' => 'app-bs-header',
+            'app-bs-text-on-dark' => 'textOnDark',
         ];
 
         foreach ($configKeys as $configCode => $themeKey) {

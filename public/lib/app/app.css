@@ -551,6 +551,11 @@ body {
     color: var(--bs-body-color);
 }
 
+.bg-dark,
+.bg-dark .text-muted {
+    color: var(--app-bs-text-on-dark) !important;
+}
+
 .card {
     background-color: var(--bs-card-bg) !important;
     border-color: var(--bs-border-color);
@@ -950,7 +955,6 @@ body {
     word-break: break-word;
 }
 .itemlink-item-desc {
-    opacity: 0.8;
     display: block;
     margin-top: 0.25rem;
     line-height: 1.1;

@@ -18,3 +18,4 @@ btn-border-color: "#00b894"
 fontHeader: Baloo
 fontBody: Lato
 app-bs-header: "#00b894"
+textOnDark: "#ffffff"

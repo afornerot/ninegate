@@ -18,3 +18,4 @@ btn-border-color: "#bd93f8"
 fontHeader: Righteous
 fontBody: Roboto
 app-bs-header: "#bd93f8"
+textOnDark: "#f8f8f2"

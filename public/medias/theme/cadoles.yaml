@@ -18,3 +18,4 @@ btn-border-color: "#0B2634"
 fontHeader: Space Mono
 fontBody: Hack
 app-bs-header: "#F59B41"
+textOnDark: "#e8eaed"

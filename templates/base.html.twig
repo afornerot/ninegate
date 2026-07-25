@@ -67,6 +67,11 @@
                 --app-font-header: '{{ app_config.get('appFontHeader') }}';
                 --app-font-body: '{{ app_config.get('appFontBody') }}';
                 --app-bs-header: {{ app_config.get('app-bs-header')|default('#ffffff') }};
+                --app-bs-text-on-dark: {{ app_config.get('app-bs-text-on-dark')|default('#ffffff') }};
+            }
+
+            :root {
+                --bs-secondary-color: rgba(var(--bs-body-color-rgb), .6);
             }
 
             .table {
