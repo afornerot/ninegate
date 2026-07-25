@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-4">
+                <i class="fas fa-file-contract fa-3x text-warning mb-3"></i>
+                <h1>Signature requise</h1>
+                <p class="text-muted">
+                    Vous devez signer les chartes suivantes avant de pouvoir accéder à l'application.
+                </p>
+            </div>
+
+            {% for charte in chartes %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ charte.title }}</h5>
+                        <div class="article-content mb-3">
+                            {{ (charte.content ?? '')|markdown }}
+                        </div>
+                        <form method="post" action="{{ path('app_user_charte_sign', {id: charte.id}) }}">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-signature"></i> Signer cette charte
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% if chartes|length > 1 %}
+                <div class="text-center mt-4">
+                    <form method="post" action="{{ path('app_charte_sign_all') }}">
+                        <button type="submit" class="btn btn-lg btn-primary">
+                            <i class="fas fa-check-double"></i> Signer toutes les chartes
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            {% if chartes|length == 0 %}
+                <div class="text-center">
+                    <a href="{{ path('app_home') }}" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Accéder à l'application
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

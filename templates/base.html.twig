@@ -223,6 +223,10 @@
                             <i class="fas fa-newspaper fa-fw"></i>
                             <span>Blogs</span>
                         </a>
+                        <a href="{{ path('app_admin_charte_list') }}" title="Chartes">
+                            <i class="fas fa-file-contract fa-fw"></i>
+                            <span>Chartes</span>
+                        </a>
                     </div>
                 {% elseif currentRoute|slice(0,8) == 'app_user' %}
                     <div>
@@ -250,6 +254,10 @@
                         <a href="{{ path('app_user_blog_list') }}" title="Mes Blogs">
                             <i class="fas fa-newspaper fa-fw"></i>
                             <span>Mes Blogs</span>
+                        </a>
+                        <a href="{{ path('app_user_charte_list') }}" title="Mes Chartes">
+                            <i class="fas fa-file-contract fa-fw"></i>
+                            <span>Mes Chartes</span>
                         </a>
                     </div>
                 {% endif %}

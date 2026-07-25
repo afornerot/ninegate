@@ -835,6 +835,7 @@ body {
     align-items: center;
     text-align: center;
     padding: 0.5rem;
+    min-height: 120px;
 }
 .itemlink-small .itemlink-item-icon {
     width: 40px;
@@ -861,6 +862,7 @@ body {
     align-items: center;
     text-align: center;
     padding: 0.75rem;
+    min-height: 150px;
 }
 .itemlink-medium .itemlink-item-icon {
     width: 56px;

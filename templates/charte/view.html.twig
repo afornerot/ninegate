@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+<div class="d-flex gap-2 mb-3">
+    {% if isAdmin %}
+        <a href="{{ path('app_admin_charte_update', {id: charte.id}) }}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{{ path('app_admin_charte_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+    {% else %}
+        <a href="{{ path('app_user_charte_list') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+        {% if charte.requireSignature and not charte.hasUserSigned(app.user) %}
+            <form method="post" action="{{ path('app_user_charte_sign', {id: charte.id}) }}" class="d-inline">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-signature"></i> Signer cette charte
+                </button>
+            </form>
+        {% elseif charte.requireSignature and charte.hasUserSigned(app.user) %}
+            <span class="btn btn-outline-success disabled">
+                <i class="fas fa-check"></i> Signée le {{ charte.signatures|filter(s => s.user.id == app.user.id)|first.signedAt|date('d/m/Y H:i') }}
+            </span>
+        {% endif %}
+    {% endif %}
+</div>
+
+<p class="text-muted">
+    <i class="fas fa-clock"></i> Créée le {{ charte.createdAt|date('d/m/Y H:i') }}
+    {% if charte.requireSignature %}
+        &middot; <i class="fas fa-signature"></i> Signature obligatoire
+    {% endif %}
+    {% if charte.groups|length > 0 %}
+        &middot; <i class="fas fa-users"></i> {{ charte.groups|length }} groupe(s)
+    {% endif %}
+    {% if charte.roles %}
+        &middot; <i class="fas fa-user-shield"></i> {{ charte.roles|length }} rôle(s)
+    {% endif %}
+</p>
+
+<div class="article-content">
+    {{ (charte.content ?? '')|markdown }}
+</div>
+
+{% if isAdmin %}
+<div class="mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0">
+            <i class="fas fa-signature"></i> Signatures ({{ charte.signatures|length }})
+        </h5>
+        {% if charte.signatures|length > 0 %}
+            <a href="{{ path('app_admin_charte_resetsignatures', {id: charte.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer toutes les signatures ?')">
+                <i class="fas fa-trash"></i> Tout supprimer
+            </a>
+        {% endif %}
+    </div>
+    {% if charte.signatures|length > 0 %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Date de signature</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signature in charte.signatures %}
+                    <tr>
+                        <td>{{ signature.user.displayName }}</td>
+                        <td>{{ signature.signedAt|date('d/m/Y H:i') }}</td>
+                        <td class="text-end">
+                            <a href="{{ path('app_admin_charte_removesignature', {charteId: charte.id, userId: signature.user.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Supprimer cette signature ?')">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">Aucune signature.</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
