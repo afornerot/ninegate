@@ -37,7 +37,7 @@ class AnnonceWidgetController extends AbstractController
         $allAnnonces = $this->annonceRepository->findBy([], ['sortOrder' => 'ASC']);
         $annonces = [];
         foreach ($allAnnonces as $annonce) {
-            if ($annonce->isAccessibleToUser($user) && !$annonce->isHiddenByUser($user)) {
+            if ($annonce->isAccessibleToUser($user) && (!$user || !$annonce->isHiddenByUser($user))) {
                 $annonces[] = $annonce;
             }
         }

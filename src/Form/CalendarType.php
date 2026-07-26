@@ -2,63 +2,54 @@
 
 namespace App\Form;
 
+use App\Entity\Calendar;
 use App\Entity\Group;
-use App\Entity\Page;
-use App\Entity\PageTemplate;
 use App\Entity\User;
 use App\Entity\UserGroup;
-use App\Form\Type\Select2EntityType;
+use App\Form\Type\ColorType;
 use App\Form\Type\Select2Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PageType extends AbstractType
+class CalendarType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('submit', SubmitType::class, [
-                'label' => 'Valider',
-                'attr' => ['class' => 'btn btn-success no-print me-1'],
-            ])
+        $isAdmin = $options['isAdmin'] ?? false;
+        $user = $options['user'] ?? null;
+        $mode = $options['mode'] ?? 'submit';
 
+        $builder
             ->add('title', TextType::class, [
                 'label' => 'Titre',
                 'attr' => ['class' => 'form-control'],
             ])
-
-            ->add('pageOrder', TextType::class, [
-                'label' => 'Ordre',
-                'attr' => ['class' => 'form-control'],
+            ->add('color', ColorType::class, [
+                'label' => 'Couleur',
+                'required' => false,
             ])
-
-            ->add('pageTemplate', EntityType::class, [
-                'label' => 'Template',
-                'class' => PageTemplate::class,
-                'required' => true,
-                'attr' => ['class' => 'pageTemplate-select d-none'],
+            ->add('calendarOrder', IntegerType::class, [
+                'label' => 'Ordre',
+                'attr' => ['class' => 'form-control', 'min' => 0],
+                'required' => false,
             ])
         ;
 
-        $mode = $options['mode'];
-        $isAdmin = $options['isAdmin'] ?? false;
-        $user = $options['user'] ?? null;
-
         if ($isAdmin) {
             if ('submit' === $mode) {
-                $builder->add('pageType', ChoiceType::class, [
-                    'label' => 'Type de page',
+                $builder->add('calendarType', ChoiceType::class, [
+                    'label' => 'Type de calendrier',
                     'attr' => ['class' => 'form-select'],
                     'choices' => [
-                        'Page personnelle' => 'personal',
-                        'Page de groupe/role' => 'group_role',
+                        'Calendrier personnel' => 'personal',
+                        'Calendrier de groupe/role' => 'group_role',
                     ],
                     'expanded' => true,
                     'multiple' => false,
@@ -73,11 +64,12 @@ class PageType extends AbstractType
                 'required' => false,
             ]);
 
-            $builder->add('groups', Select2EntityType::class, [
+            $builder->add('groups', EntityType::class, [
                 'label' => 'Groupes',
                 'class' => Group::class,
                 'multiple' => true,
                 'required' => false,
+                'attr' => ['class' => 'form-select'],
             ]);
 
             $builder->add('allUsers', CheckboxType::class, [
@@ -99,14 +91,14 @@ class PageType extends AbstractType
                 'required' => false,
                 'placeholder' => 'Sélectionnez des rôles',
             ]);
-        } elseif ($user && in_array($mode, ['submit', 'update'])) {
+        } elseif ($user) {
             if ('submit' === $mode) {
-                $builder->add('pageType', ChoiceType::class, [
-                    'label' => 'Type de page',
+                $builder->add('calendarType', ChoiceType::class, [
+                    'label' => 'Type de calendrier',
                     'attr' => ['class' => 'form-select'],
                     'choices' => [
-                        'Page personnelle' => 'personal',
-                        'Page de groupe' => 'group',
+                        'Calendrier personnel' => 'personal',
+                        'Calendrier de groupe' => 'group',
                     ],
                     'expanded' => true,
                     'multiple' => false,
@@ -114,16 +106,17 @@ class PageType extends AbstractType
                 ]);
             }
 
-            $masterGroups = $user->getUserGroups()->filter(fn ($ug) => UserGroup::ROLE_MASTER === $ug->getRole())->map(fn ($ug) => $ug->getGroup())->toArray();
-
             $builder->add('user', HiddenType::class, ['required' => false, 'mapped' => false]);
 
-            $builder->add('groups', Select2EntityType::class, [
+            $masterGroups = $user->getUserGroups()->filter(fn ($ug) => UserGroup::ROLE_MASTER === $ug->getRole())->map(fn ($ug) => $ug->getGroup())->toArray();
+
+            $builder->add('groups', EntityType::class, [
                 'label' => 'Groupes (Master uniquement)',
                 'class' => Group::class,
                 'multiple' => true,
                 'required' => false,
                 'choices' => $masterGroups,
+                'attr' => ['class' => 'form-select'],
             ]);
         }
     }
@@ -131,10 +124,10 @@ class PageType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Page::class,
-            'mode' => 'submit',
+            'data_class' => Calendar::class,
             'isAdmin' => false,
             'user' => null,
+            'mode' => 'submit',
         ]);
     }
 }

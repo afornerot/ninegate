@@ -223,6 +223,24 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
                     'mode' => ['type' => 'choice', 'label' => 'Mode', 'choices' => ['Mes tâches' => 'user', 'Tâches de la page' => 'linked'], 'default' => 'user'],
                 ],
             ],
+            [
+                'title' => 'Calendrier',
+                'description' => 'Affiche les prochains événements des calendriers',
+                'route' => 'pagewidget_calendar',
+                'icon' => 'calendar',
+                'titleBgColor' => null,
+                'titleFontColor' => null,
+                'bodyBgColor' => null,
+                'bodyFontColor' => null,
+                'withBorder' => false,
+                'withTitle' => true,
+                'height' => null,
+                'hideIfEmpty' => true,
+                'config' => [
+                    'mode' => ['type' => 'choice', 'label' => 'Mode', 'choices' => ['Mes calendriers' => 'user', 'Calendriers de la page' => 'linked'], 'default' => 'user'],
+                    'nbEvents' => ['type' => 'number', 'label' => 'Nombre d\'événements', 'default' => 10],
+                ],
+            ],
         ];
 
         foreach ($data as $item) {

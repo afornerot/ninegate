@@ -1,0 +1,56 @@
+{% if canManage %}
+<div class="widget-actions">
+    <a href="{{ path('app_calendars_all') }}" class="btn btn-sm btn-outline-secondary" title="Voir tous les calendriers">
+        <i class="fas fa-eye"></i>
+    </a>
+</div>
+{% endif %}
+
+{% if events|length > 0 %}
+<div class="d-flex flex-column gap-2">
+    {% for event in events %}
+        <div class="card">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">
+                            {% if event.calendar and event.calendar.color %}
+                                <span class="badge" style="background-color: {{ event.calendar.color }}; color: #fff;">&nbsp;</span>
+                            {% endif %}
+                            {{ event.title }}
+                        </h6>
+                        <p class="card-text small text-muted mb-1">
+                            {% if event.calendar %}
+                                <span><i class="fas fa-calendar"></i> {{ event.calendar.title }}</span>
+                                &middot;
+                            {% endif %}
+                            {% if event.allDay %}
+                                <i class="fas fa-clock"></i> {{ event.startDate|date('d/m/Y') }}
+                                <span class="badge bg-info">Toute la journée</span>
+                            {% else %}
+                                <i class="fas fa-clock"></i> {{ event.startDate|date('d/m/Y H:i') }}
+                                {% if event.endDate %}
+                                    &rarr; {{ event.endDate|date('d/m/Y H:i') }}
+                                {% endif %}
+                            {% endif %}
+                        </p>
+                        {% if event.description %}
+                            <div class="article-content small text-muted mb-1">
+                                {{ event.description|slice(0, 100)|markdown }}{% if event.description|length > 100 %}...{% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if canManage %}
+                        <a href="{{ path(isAdmin ? 'app_admin_calendarevent_update' : 'app_user_calendarevent_update', {calendarId: event.calendar.id, id: event.id, pageSlug: pageWidget.page.slug}) }}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{{ path(isAdmin ? 'app_admin_calendarevent_delete' : 'app_user_calendarevent_delete', {calendarId: event.calendar.id, id: event.id, pageSlug: pageWidget.page.slug}) }}" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="return confirm('Supprimer cet événement ?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}

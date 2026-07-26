@@ -176,18 +176,24 @@ class Charte
         return false;
     }
 
-    public function isAccessibleToUser(User $user): bool
+    public function isAccessibleToUser(?User $user): bool
     {
-        if ($user->hasRole('ROLE_ADMIN')) {
+        $userRoles = $user ? $user->getRoles() : ['ROLE_VISITOR'];
+
+        if ($user && $user->hasRole('ROLE_ADMIN')) {
             return true;
         }
 
         if (!empty($this->roles)) {
-            foreach ($this->roles as $role) {
-                if ($user->hasRole($role)) {
+            foreach ($userRoles as $role) {
+                if (in_array($role, $this->roles)) {
                     return true;
                 }
             }
+        }
+
+        if (!$user) {
+            return false;
         }
 
         if ($this->groups->count() > 0) {

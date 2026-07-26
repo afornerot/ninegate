@@ -45,7 +45,7 @@ class CharteController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('allUsers')->getData()) {
+            if ($form->has('allUsers') && $form->get('allUsers')->getData()) {
                 $charte->setRoles(['ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_USER', 'ROLE_VISITOR']);
                 $charte->getGroups()->clear();
             }
@@ -78,7 +78,7 @@ class CharteController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('allUsers')->getData()) {
+            if ($form->has('allUsers') && $form->get('allUsers')->getData()) {
                 $charte->setRoles(['ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_USER', 'ROLE_VISITOR']);
                 $charte->getGroups()->clear();
             }

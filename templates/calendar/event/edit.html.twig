@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{% set fromCalendars = app.request.query.get('from') == 'calendars' %}
+
+{{ form_start(form, {'attr': {'action': path(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')|merge({from: 'calendars'}))}}) }}
+<div class="d-flex gap-2 mb-3">
+    <button type="submit" class="btn btn-success">Valider</button>
+    {% if pageSlug is defined and pageSlug %}
+        <a href="{{ path('app_user_page_view', {slug: pageSlug}) }}" class="btn btn-secondary">Annuler</a>
+    {% elseif fromCalendars %}
+        <a href="{{ path('app_calendars_all') }}" class="btn btn-secondary">Annuler</a>
+    {% else %}
+        <a href="{{ path(routecancel, {slug: calendar.slug}) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Événement</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.title) }}
+                {{ form_row(form.description) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Paramètres</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.startDate) }}
+                {{ form_row(form.endDate) }}
+                {{ form_row(form.allDay) }}
+                {{ form_row(form.color) }}
+                {{ form_row(form.calendar) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

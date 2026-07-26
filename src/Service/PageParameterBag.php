@@ -33,7 +33,7 @@ class PageParameterBag extends SymfonyParameterBag
         $workGroupPages = [];
 
         foreach ($allPages as $page) {
-            if ($page->getUser() && $page->getUser()->getId() === $user->getId()) {
+            if ($user && $page->getUser() && $page->getUser()->getId() === $user->getId()) {
                 $personalPages[] = $page;
                 continue;
             }
@@ -41,13 +41,15 @@ class PageParameterBag extends SymfonyParameterBag
             $isWorkGroupMaster = false;
             $isOtherGroup = false;
 
-            foreach ($page->getGroups() as $group) {
-                $userGroup = $group->getUserGroup($user);
-                if ($userGroup) {
-                    if (Group::TYPE_WORK_GROUP === $group->getType()) {
-                        $isWorkGroupMaster = true;
-                    } else {
-                        $isOtherGroup = true;
+            if ($user) {
+                foreach ($page->getGroups() as $group) {
+                    $userGroup = $group->getUserGroup($user);
+                    if ($userGroup) {
+                        if (Group::TYPE_WORK_GROUP === $group->getType()) {
+                            $isWorkGroupMaster = true;
+                        } else {
+                            $isOtherGroup = true;
+                        }
                     }
                 }
             }

@@ -18,9 +18,9 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-header">
-                <h5>Informations</h5>
+                <h5>Permissions</h5>
             </div>
             <div class="card-body">
                 {{ form_row(form.title) }}
@@ -52,9 +52,11 @@
                     <div class="alert alert-info">
                         {% if page.user %}Type: Page personnelle{% elseif page.groups|length > 0 or page.roles|length > 0 %}Type: Page de groupe/role{% endif %}
                     </div>
-                    <div id="page-all-users-wrapper" style="margin-bottom: 10px;">
-                        {{ form_row(form.allUsers) }}
-                    </div>
+                    {% if not page.user %}
+                        <div id="page-all-users-wrapper" style="margin-bottom: 10px;">
+                            {{ form_row(form.allUsers) }}
+                        </div>
+                    {% endif %}
                     {% if page.user %}
                     <div id="page-user-wrapper">
                         {{ form_row(form.user) }}
@@ -92,10 +94,14 @@
                     <div class="alert alert-info">
                         {% if page.user %}Type: Page personnelle{% elseif page.groups|length > 0 %}Type: Page de groupe{% endif %}
                     </div>
-                    <div id="page-all-users-wrapper" style="margin-bottom: 10px;">
+                    {% if form.allUsers is defined %}
+                    <div id="page-all-users-wrapper" style="{% if page.user %}display: none;{% endif %} margin-bottom: 10px;">
                         {{ form_row(form.allUsers) }}
                     </div>
-                    {{ form_row(form.groups) }}
+                    {% endif %}
+                    <div id="page-groups-roles-wrapper"{% if page.user %} style="display: none;"{% endif %}>
+                        {{ form_row(form.groups) }}
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -246,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     if (pageTypeInputs.length > 0 && !document.querySelector('input[type="radio"][name*="pageType"]:checked')) {
-        const pageUser = {{ page.user|default('null') }};
+        const pageUser = {{ page.user ? page.user.id : 'null' }};
         const pageGroups = {{ page.groups|length|default(0) }};
         const pageRoles = {{ page.roles|length|default(0) }};
         

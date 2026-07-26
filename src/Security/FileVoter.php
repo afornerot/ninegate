@@ -26,6 +26,11 @@ class FileVoter extends AbstractFileVoter
             return true;
         }
 
+        $user = $token->getUser();
+        if (!$user) {
+            return true;
+        }
+
         return $this->canManage($domain, $id, $token);
     }
 

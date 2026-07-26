@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+<div class="d-flex gap-2 mb-3">
+    {% if is_granted('calendarevent_create', calendar) %}
+        <a href="{{ path(routeevent_submit, {calendarId: calendar.id}) }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvel Événement
+        </a>
+    {% endif %}
+    {% if is_granted('calendar_edit', calendar) %}
+        <a href="{{ path(isAdmin ? 'app_admin_calendar_update' : 'app_user_calendar_update', {id: calendar.id}) }}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Modifier le calendrier
+        </a>
+    {% endif %}
+    <a href="{{ path(isAdmin ? 'app_admin_calendar_list' : 'app_user_calendar_list') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+
+<div id="calendar"
+     data-events-url="{{ path(isAdmin ? 'app_admin_calendar_events' : 'app_user_calendar_events', {slug: calendar.slug}) }}"
+     data-event-submit-url="{{ path(routeevent_submit, {calendarId: calendar.id}) }}"
+     data-event-move-url="{{ path(isAdmin ? 'app_admin_calendarevent_move' : 'app_user_calendarevent_move', {id: 0}) }}"
+     {% if is_granted('calendarevent_create', calendar) %}data-can-create="1"{% endif %}
+></div>
+{% endblock %}
+
+{% block localscript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var el = document.getElementById('calendar');
+    var cal = new FullCalendar.Calendar(el, {
+        locale: 'fr',
+        firstDay: 1,
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        events: el.dataset.eventsUrl,
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            if (info.event.url) {
+                window.location.href = info.event.url;
+            }
+        },
+        dateClick: function(info) {
+            if (el.dataset.canCreate) {
+                window.location.href = el.dataset.eventSubmitUrl + '?date=' + info.dateStr;
+            }
+        },
+        editable: true,
+        eventDrop: function(info) {
+            var data = {
+                start: info.event.start.toISOString(),
+                end: info.event.end ? info.event.end.toISOString() : null
+            };
+            var moveUrl = el.dataset.eventMoveUrl.replace(/\/0$/, '/' + info.event.id);
+            fetch(moveUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        },
+        height: 'auto'
+    });
+    cal.render();
+});
+</script>
+{% endblock %}

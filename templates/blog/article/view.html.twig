@@ -12,9 +12,15 @@
         <i class="fas fa-arrow-left"></i> Retour au blog
     </a>
     {% if pageSlug is defined and pageSlug %}
-        <a href="{{ path(isAdmin ? 'app_admin_page_view' : 'app_user_page_view', {slug: pageSlug}) }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Retour à la page
-        </a>
+        {% if pageSlug == 'blogs' %}
+            <a href="{{ path('app_blogs_all') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à tous les blogs
+            </a>
+        {% else %}
+            <a href="{{ path(isAdmin ? 'app_admin_page_view' : 'app_user_page_view', {slug: pageSlug}) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour à la page
+            </a>
+        {% endif %}
     {% endif %}
 </div>
 

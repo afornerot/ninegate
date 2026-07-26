@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{% if app.user and calendars|length > 0 %}
+<div class="mb-3">
+    <a href="{{ path('app_user_calendarevent_submit', {calendarId: calendars|first.id, from: 'calendars'}) }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nouvel Événement
+    </a>
+</div>
+{% endif %}
+
+<div id="calendar-public"
+     data-events-url="{{ path('app_calendars_events_json') }}">
+</div>
+{% endblock %}
+
+{% block localscript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var el = document.getElementById('calendar-public');
+    var calConfig = {
+        locale: 'fr',
+        firstDay: 1,
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        events: el.dataset.eventsUrl,
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            {% if app.user %}
+            if (info.event.url) {
+                window.location.href = info.event.url;
+            }
+            {% endif %}
+        },
+    {% if app.user and calendars|length > 0 %}
+        dateClick: function(info) {
+            window.location.href = '{{ path('app_user_calendarevent_submit', {calendarId: calendars|first.id, from: 'calendars'}) }}?date=' + info.dateStr;
+        },
+    {% endif %}
+        editable: false,
+        height: 'auto'
+    };
+    var cal = new FullCalendar.Calendar(el, calConfig);
+    cal.render();
+});
+</script>
+{% endblock %}

@@ -72,7 +72,7 @@ class BureauWidgetController extends AbstractController
 
         $allItems = $allItemsQb->getQuery()->getResult();
 
-        $userRoles = $user->getRoles();
+        $userRoles = $user ? $user->getRoles() : ['ROLE_VISITOR'];
         $roleItems = array_filter($allItems, function ($item) use ($userRoles) {
             $itemRoles = $item->getRoles() ?? [];
             // "Tout le monde" : item accessible à tous si ROLE_VISITOR dans ses rôles

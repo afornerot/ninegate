@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+<div class="d-flex gap-2 mb-3">
+    {% if is_granted('calendarevent_edit', event) %}
+        <a href="{{ path(isAdmin ? 'app_admin_calendarevent_update' : 'app_user_calendarevent_update', {calendarId: calendar.id, id: event.id, from: app.request.query.get('from')}) }}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+    {% endif %}
+    {% if app.request.query.get('from') == 'calendars' %}
+        <a href="{{ path('app_calendars_all') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour aux calendriers
+        </a>
+    {% else %}
+        <a href="{{ path(isAdmin ? 'app_admin_calendar_view' : 'app_user_calendar_view', {slug: calendar.slug}) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au calendrier
+        </a>
+    {% endif %}
+</div>
+
+<p class="text-muted">
+    <i class="fas fa-calendar"></i> {{ calendar.title }}
+    &middot;
+    <i class="fas fa-clock"></i> {{ event.startDate|date('d/m/Y H:i') }}
+    {% if event.endDate %}
+        &rarr; {{ event.endDate|date('d/m/Y H:i') }}
+    {% endif %}
+    {% if event.allDay %}
+        &middot; <span class="badge bg-info">Toute la journée</span>
+    {% endif %}
+</p>
+
+<div class="article-content">
+    {{ (event.description ?? '')|markdown }}
+</div>
+{% endblock %}

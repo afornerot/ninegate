@@ -69,7 +69,7 @@ class BlogVoter extends Voter
         if ($user && $user->hasRole('ROLE_ADMIN') && $this->isAdminRoute()) {
             return true;
         }
-        if (!$blog || !$user) {
+        if (!$blog) {
             return false;
         }
         return $this->blogRepository->isBlogAccessibleForUser($blog, $user);

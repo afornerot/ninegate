@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    <button type="submit" class="btn btn-success">Valider</button>
+    <a href="{{ path(routecancel, {slug: calendar.slug|default('')}) }}" class="btn btn-secondary">Annuler</a>
+    {% if calendar.id is defined and calendar.id %}
+        <a href="{{ path(isAdmin ? 'app_admin_calendar_delete' : 'app_user_calendar_delete', {id: calendar.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Supprimer ce calendrier et tous ses événements ?')">
+            <i class="fas fa-trash"></i> Supprimer
+        </a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Calendrier</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.title) }}
+                {{ form_row(form.color) }}
+                {{ form_row(form.calendarOrder) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">Permissions</h5>
+            </div>
+            <div class="card-body">
+                {% if form.calendarType is defined %}
+                    {{ form_row(form.calendarType) }}
+                    {% if isAdmin %}
+                        <div id="cal-all-users-wrapper" style="display: none; margin-bottom: 10px;">
+                            {{ form_row(form.allUsers) }}
+                        </div>
+                        <div id="cal-user-wrapper" style="display: none;">
+                            {{ form_row(form.user) }}
+                        </div>
+                        <div id="cal-groups-roles-wrapper" style="display: none;">
+                            {{ form_row(form.groups) }}
+                            {{ form_row(form.roles) }}
+                        </div>
+                    {% else %}
+                        <div id="cal-groups-wrapper" style="display: none;">
+                            {{ form_row(form.groups) }}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-info mb-3">
+                        {% if calendar.user %}Type: Calendrier personnel{% elseif calendar.groups|length > 0 or calendar.roles|length > 0 %}Type: Calendrier de groupe/role{% endif %}
+                    </div>
+                    {% if isAdmin %}
+                        <div id="cal-all-users-wrapper" style="{% if calendar.user %}display: none;{% endif %} margin-bottom: 10px;">
+                            {{ form_row(form.allUsers) }}
+                        </div>
+                    {% endif %}
+                    <div id="cal-groups-roles-wrapper" style="{% if calendar.user %}display: none;{% endif %}">
+                        {{ form_row(form.groups) }}
+                        {% if isAdmin %}
+                            {{ form_row(form.roles) }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}
+
+{% block localscript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var radioInputs = document.querySelectorAll('input[type="radio"][name*="calendarType"]');
+    if (radioInputs.length === 0) return;
+
+    var userWrapper = document.getElementById('cal-user-wrapper');
+    var groupsRolesWrapper = document.getElementById('cal-groups-roles-wrapper');
+    var groupsWrapper = document.getElementById('cal-groups-wrapper');
+    var allUsersWrapper = document.getElementById('cal-all-users-wrapper');
+
+    function updateVisibility() {
+        var selected = null;
+        radioInputs.forEach(function(input) { if (input.checked) selected = input.value; });
+
+        if (userWrapper && groupsRolesWrapper) {
+            if (selected === 'personal') {
+                userWrapper.style.display = 'block';
+                groupsRolesWrapper.style.display = 'none';
+                if (allUsersWrapper) allUsersWrapper.style.display = 'none';
+            } else {
+                userWrapper.style.display = 'none';
+                groupsRolesWrapper.style.display = 'block';
+                if (allUsersWrapper) allUsersWrapper.style.display = 'block';
+            }
+        } else if (groupsWrapper) {
+            groupsWrapper.style.display = (selected === 'group' || selected === 'group_role') ? 'block' : 'none';
+        }
+    }
+
+    radioInputs.forEach(function(input) { input.addEventListener('change', updateVisibility); });
+
+    if (!document.querySelector('input[type="radio"][name*="calendarType"]:checked')) {
+        var calUser = {{ calendar.user ? calendar.user.id : 'null' }};
+        var calGroups = {{ calendar.groups|length }};
+        var calRoles = {{ calendar.roles|length|default(0) }};
+        if (calUser) {
+            radioInputs.forEach(function(input) { if (input.value === 'personal') input.checked = true; });
+        } else if (calGroups > 0 || calRoles > 0) {
+            radioInputs.forEach(function(input) { if (input.value === 'group' || input.value === 'group_role') input.checked = true; });
+        }
+    }
+
+    updateVisibility();
+});
+</script>
+{% endblock %}

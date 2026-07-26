@@ -1,6 +1,6 @@
 # Ninegate
 
-Portail d'accueil personnalisable avec gestion de pages, blogs, items, annonces, chartes et widgets.
+Portail d'accueil personnalisable avec gestion de pages, blogs, items, annonces, chartes, calendriers et widgets.
 
 ## Installation
 
@@ -51,6 +51,7 @@ Widgets réutilisables sur les pages :
 - Fichiers
 - Annonces
 - Tâches
+- Calendrier
 
 ### Blogs
 Création de blogs avec articles au format Markdown. Chaque blog peut être lié à des groupes.
@@ -64,6 +65,9 @@ Système d'annonces/catégories avec icônes et couleurs personnalisables, acces
 ### Chartes
 Chartes au format Markdown avec signature obligatoire optionnelle. Les utilisateurs doivent signer les chartes avant d'accéder à l'application.
 
+### Calendriers
+Calendriers personnels ou partagés (groupe/role) avec FullCalendar v6. Création d'événements avec dates, couleurs et descriptions Markdown. Routes publiques `/calendars` et `/blogs` pour la consultation sans authentification.
+
 ### Thèmes
 Système de thèmes CSS variables configurable via l'interface admin. 14 thèmes prédéfinis.
 
@@ -72,7 +76,7 @@ Système de thèmes CSS variables configurable via l'interface admin. 14 thèmes
 - **Framework** : Symfony 7.4
 - **Base de données** : PostgreSQL 17
 - **ORM** : Doctrine (attributs PHP)
-- **Frontend** : Bootstrap 5, jQuery, EasyMDE, Font Awesome, Select2
+- **Frontend** : Bootstrap 5, jQuery, EasyMDE, FullCalendar v6, Font Awesome, Select2
 - **Auth** : Multi-mode (SQL/CAS/OIDC)
 - **Stockage** : Local ou S3 (Flysystem)
 

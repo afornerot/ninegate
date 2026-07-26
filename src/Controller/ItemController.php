@@ -37,7 +37,7 @@ class ItemController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // Handle "Tout le monde" checkbox
-            if ($form->get('allUsers')->getData()) {
+            if ($form->has('allUsers') && $form->get('allUsers')->getData()) {
                 $item->setRoles(['ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_USER', 'ROLE_VISITOR']);
                 $item->getGroups()->clear();
             }
@@ -69,7 +69,7 @@ class ItemController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // Handle "Tout le monde" checkbox
-            if ($form->get('allUsers')->getData()) {
+            if ($form->has('allUsers') && $form->get('allUsers')->getData()) {
                 $item->setRoles(['ROLE_ADMIN', 'ROLE_MASTER', 'ROLE_USER', 'ROLE_VISITOR']);
                 $item->getGroups()->clear();
             }

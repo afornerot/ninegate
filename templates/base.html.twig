@@ -29,6 +29,8 @@
         <script src="{{ asset('lib/jqueryui/jquery-ui.min.js') }}"></script>
         <script src="{{ asset('lib/masonry/masonry.pkgd.min.js') }}"></script>
         <script src="{{ asset('lib/chart/chart.js') }}"></script>
+        <script src="{{ asset('lib/fullcalendar/fullcalendar.min.js') }}"></script>
+        <script src="{{ asset('lib/fullcalendar/locales/fr.js') }}"></script>
         <link rel="stylesheet" href="{{ asset('bundles/bninemdeditor/easymde.min.css') }}">
         <script src="{{ asset('bundles/bninemdeditor/easymde.min.js') }}"></script>
         <script src="{{ asset('bundles/bninefiles/js/bninefiles.js') }}"></script>
@@ -160,6 +162,12 @@
                                 {% endif %}
                             {% endif %}
                         {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_blogs_all') }}">Blogs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_calendars_all') }}">Calendriers</a>
+                            </li>
                             {% if app.user and is_granted('page_create') %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('app_user_page_submit') }}" title="Nouvelle page">
@@ -234,6 +242,10 @@
                             <i class="fas fa-newspaper fa-fw"></i>
                             <span>Blogs</span>
                         </a>
+                        <a href="{{ path('app_admin_calendar_list') }}" title="Calendriers">
+                            <i class="fas fa-calendar fa-fw"></i>
+                            <span>Calendriers</span>
+                        </a>
                         <a href="{{ path('app_admin_charte_list') }}" title="Chartes">
                             <i class="fas fa-file-contract fa-fw"></i>
                             <span>Chartes</span>
@@ -266,13 +278,17 @@
                             <i class="fas fa-newspaper fa-fw"></i>
                             <span>Mes Blogs</span>
                         </a>
-                        <a href="{{ path('app_user_charte_list') }}" title="Mes Chartes">
-                            <i class="fas fa-file-contract fa-fw"></i>
-                            <span>Mes Chartes</span>
+                        <a href="{{ path('app_user_calendar_list') }}" title="Mes Calendriers">
+                            <i class="fas fa-calendar fa-fw"></i>
+                            <span>Mes Calendriers</span>
                         </a>
                         <a href="{{ path('app_user_tache_list') }}" title="Mes Tâches">
                             <i class="fas fa-clipboard-list fa-fw"></i>
                             <span>Mes Tâches</span>
+                        </a>
+                        <a href="{{ path('app_user_charte_list') }}" title="Mes Chartes">
+                            <i class="fas fa-file-contract fa-fw"></i>
+                            <span>Mes Chartes</span>
                         </a>
                     </div>
                 {% endif %}

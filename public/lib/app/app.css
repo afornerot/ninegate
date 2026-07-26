@@ -768,6 +768,8 @@ body {
 .widget-select-card {
     border: 2px solid transparent;
     transition: all 0.15s ease;
+    width: 200px;
+    flex: 0 0 200px;
 }
 .widget-select-card:hover {
     border-color: var(--bs-primary);
@@ -1122,3 +1124,7 @@ body {
     margin-top: auto;
     width: 100%;
 }
+
+/* FullCalendar */
+.fc-toolbar-title { font-size: 1.2rem !important; }
+#calendar table, #calendar-public table { margin-bottom: 0 !important; }

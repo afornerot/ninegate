@@ -32,6 +32,13 @@ security:
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/$, roles: PUBLIC_ACCESS }
+    - { path: ^/page/, roles: PUBLIC_ACCESS }
+    - { path: ^/page, roles: PUBLIC_ACCESS }
+    - { path: ^/blogs, roles: PUBLIC_ACCESS }
+    - { path: ^/calendars, roles: PUBLIC_ACCESS }
+    - { path: ^/calendar/, roles: PUBLIC_ACCESS }
+    - { path: ^/blog/, roles: PUBLIC_ACCESS }
+    - { path: ^/(user|admin)/page/pagewidget/render, roles: PUBLIC_ACCESS }
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/master, roles: [ROLE_MASTER, ROLE_ADMIN] }
     - { path: ^/user, roles: [ROLE_USER, ROLE_MASTER, ROLE_ADMIN] }

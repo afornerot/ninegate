@@ -4,7 +4,7 @@
     <div class="d-flex flex-wrap gap-3" id="widget-select-grid">
         {% set sorted_choices = form.widget.vars.choices|sort((a, b) => (a.data.title|default('')) <=> (b.data.title|default(''))) %}
         {% for choice in sorted_choices %}
-            <div class="widget-select-card card" data-value="{{ choice.value }}" style="cursor: pointer; min-width: 160px; flex: 1 1 160px; max-width: 220px;">
+            <div class="widget-select-card card" data-value="{{ choice.value }}" style="cursor: pointer;">
                 <div class="card-body p-3 text-center">
                     {% if choice.data.icon %}
                         <img src="{{ bninefile(choice.data.icon.route) }}" alt="" style="height: 48px; width: 48px; object-fit: contain; margin-bottom: 8px;">

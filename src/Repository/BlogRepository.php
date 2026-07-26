@@ -28,16 +28,18 @@ class BlogRepository extends ServiceEntityRepository
 
     public function isBlogAccessibleForUser(Blog $blog, ?User $user): bool
     {
-        if (!$user) {
-            return false;
-        }
+        $userRoles = $user ? $user->getRoles() : ['ROLE_VISITOR'];
 
         if (!empty($blog->getRoles())) {
-            foreach ($user->getRoles() as $userRole) {
+            foreach ($userRoles as $userRole) {
                 if (in_array($userRole, $blog->getRoles())) {
                     return true;
                 }
             }
+        }
+
+        if (!$user) {
+            return false;
         }
 
         foreach ($blog->getGroups() as $group) {

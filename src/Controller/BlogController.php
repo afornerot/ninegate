@@ -189,4 +189,26 @@ class BlogController extends AbstractController
             'routearticle_submit' => $isAdmin ? 'app_admin_blogarticle_submit' : 'app_user_blogarticle_submit',
         ]);
     }
+
+    #[Route('/blogs', name: 'app_blogs_all')]
+    public function all(): Response
+    {
+        $user = $this->getUser();
+        $blogs = $this->blogRepository->findAccessibleBlogs($user);
+
+        $articles = [];
+        foreach ($blogs as $blog) {
+            foreach ($blog->getArticles() as $article) {
+                $articles[] = $article;
+            }
+        }
+        usort($articles, fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
+
+        return $this->render('blog/all.html.twig', [
+            'usemenu' => true,
+            'usesidebar' => false,
+            'title' => 'Tous les blogs',
+            'articles' => $articles,
+        ]);
+    }
 }

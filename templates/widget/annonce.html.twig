@@ -22,7 +22,7 @@
                             {{ (annonce.content ?? '')|markdown }}
                         </div>
                     </div>
-                    {% if annonce.canBeHidden and not isAdmin %}
+                    {% if app.user and annonce.canBeHidden and not isAdmin %}
                         <button class="btn btn-sm btn-outline-secondary ms-2 annonce-hide-btn" data-annonce-id="{{ annonce.id }}" title="Masquer">
                             <i class="fas fa-eye-slash"></i>
                         </button>
