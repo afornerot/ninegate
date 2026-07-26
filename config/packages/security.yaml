@@ -32,6 +32,7 @@ security:
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/$, roles: PUBLIC_ACCESS }
+    - { path: ^/caldav, roles: PUBLIC_ACCESS }
     - { path: ^/page/, roles: PUBLIC_ACCESS }
     - { path: ^/page, roles: PUBLIC_ACCESS }
     - { path: ^/blogs, roles: PUBLIC_ACCESS }
