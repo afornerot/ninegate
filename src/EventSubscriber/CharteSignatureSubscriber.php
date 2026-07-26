@@ -18,6 +18,7 @@ class CharteSignatureSubscriber implements EventSubscriberInterface
         '/user/charte/sign-required',
         '/user/charte/sign/',
         '/user/charte/sign-all',
+        '/user/widget/',
         '/logout',
         '/login',
     ];
@@ -63,10 +64,20 @@ class CharteSignatureSubscriber implements EventSubscriberInterface
         if (!$user instanceof User) {
             return;
         }
-        $chartes = $this->charteRepository->findBy(['requireSignature' => true], ['sortOrder' => 'ASC']);
+        $chartes = $this->charteRepository->createQueryBuilder('c')
+            ->leftJoin('c.signatures', 's')
+            ->addSelect('s')
+            ->where('c.requireSignature = :true')
+            ->setParameter('true', true)
+            ->orderBy('c.sortOrder', 'ASC')
+            ->getQuery()
+            ->getResult();
 
         foreach ($chartes as $charte) {
             if ($charte->isAccessibleToUser($user) && !$charte->hasUserSigned($user)) {
+                if (str_starts_with($pathInfo, '/user/widget/') || str_starts_with($pathInfo, '/admin/widget/')) {
+                    return;
+                }
                 $response = new RedirectResponse($request->getSchemeAndHttpHost() . '/user/charte/sign-required');
                 $event->setResponse($response);
                 return;

@@ -50,6 +50,7 @@ Widgets réutilisables sur les pages :
 - Bureau / Favoris
 - Fichiers
 - Annonces
+- Tâches
 
 ### Blogs
 Création de blogs avec articles au format Markdown. Chaque blog peut être lié à des groupes.

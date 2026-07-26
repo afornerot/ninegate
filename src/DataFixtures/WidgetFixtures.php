@@ -206,6 +206,23 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
                 'height' => null,
                 'hideIfEmpty' => true,
             ],
+            [
+                'title' => 'Tâches',
+                'description' => 'Gestion de tâches (todo list)',
+                'route' => 'pagewidget_tache',
+                'icon' => 'clipboard',
+                'titleBgColor' => null,
+                'titleFontColor' => null,
+                'bodyBgColor' => null,
+                'bodyFontColor' => null,
+                'withBorder' => false,
+                'withTitle' => true,
+                'height' => null,
+                'hideIfEmpty' => true,
+                'config' => [
+                    'mode' => ['type' => 'choice', 'label' => 'Mode', 'choices' => ['Mes tâches' => 'user', 'Tâches de la page' => 'linked'], 'default' => 'user'],
+                ],
+            ],
         ];
 
         foreach ($data as $item) {

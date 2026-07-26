@@ -2,6 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\Group;
+use App\Entity\User;
+use App\Entity\UserGroup;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -11,12 +14,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class WidgetConfigService
 {
     public function __construct(
         private FormFactoryInterface $formFactory,
         private EntityManagerInterface $em,
+        private TokenStorageInterface $tokenStorage,
     ) {
     }
 
@@ -61,6 +66,7 @@ class WidgetConfigService
                     'class' => $definition['class'],
                     'required' => $required,
                     'placeholder' => $definition['placeholder'] ?? null,
+                    'choice_filter' => $this->buildFilter($definition['filter_type'] ?? null),
                     'attr' => ['class' => 'form-select'],
                 ]),
                 'choice' => $builder->add($fieldName, ChoiceType::class, [
@@ -108,5 +114,27 @@ class WidgetConfigService
             };
         }
         return $defaults;
+    }
+
+    private function buildFilter(?string $filterType): ?callable
+    {
+        if (!$filterType) {
+            return null;
+        }
+
+        return match ($filterType) {
+            'managed_groups' => function (Group $group) {
+                $user = $this->tokenStorage->getToken()?->getUser();
+                if (!$user instanceof User) {
+                    return false;
+                }
+                if ($user->hasRole('ROLE_ADMIN')) {
+                    return true;
+                }
+                $ug = $this->em->getRepository(UserGroup::class)->findOneBy(['user' => $user, 'group' => $group]);
+                return $ug && UserGroup::ROLE_MASTER === $ug->getRole();
+            },
+            default => null,
+        };
     }
 }

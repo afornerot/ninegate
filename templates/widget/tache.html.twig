@@ -1,0 +1,246 @@
+{% if canManage and pageWidget %}
+<div class="widget-actions">
+    <button class="btn btn-sm btn-outline-secondary tache-add-btn" data-page-widget-id="{{ pageWidget.id }}" title="Ajouter une tâche">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+{% endif %}
+
+{% if taches|length > 0 %}
+<div class="d-flex flex-column gap-2">
+    {% for tache in taches %}
+        <div class="card tache-card" data-tache-id="{{ tache.id }}">
+            <div class="card-body py-2 px-3">
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                    <div class="flex-grow-1">
+                        <strong class="{% if tache.status == 'done' %}text-decoration-line-through text-muted{% endif %}">{{ tache.title }}</strong>
+                    </div>
+                    {% if canManage and pageWidget %}
+                        <button class="btn btn-sm btn-outline-secondary tache-edit-btn" data-tache-id="{{ tache.id }}" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger tache-delete-btn" data-tache-id="{{ tache.id }}" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    {% endif %}
+                </div>
+                {% if tache.content %}
+                    <div class="article-content small text-muted mb-1">
+                        {{ tache.content|slice(0, 100)|markdown }}{% if tache.content|length > 100 %}...{% endif %}
+                    </div>
+                {% endif %}
+                <div class="d-flex align-items-center gap-2 small">
+                    <button class="btn btn-sm p-0 tache-status-btn" data-tache-id="{{ tache.id }}" title="Changer le statut">
+                        {% if tache.status == 'done' %}
+                            <i class="fas fa-check-circle text-success"></i>
+                        {% elseif tache.status == 'in_progress' %}
+                            <i class="fas fa-spinner text-warning"></i>
+                        {% else %}
+                            <i class="far fa-circle text-secondary"></i>
+                        {% endif %}
+                    </button>
+                    {% if tache.status == 'todo' %}
+                        <span class="badge bg-secondary">{{ statuses[tache.status] }}</span>
+                    {% elseif tache.status == 'in_progress' %}
+                        <span class="badge bg-warning text-dark">{{ statuses[tache.status] }}</span>
+                    {% else %}
+                        <span class="badge bg-success">{{ statuses[tache.status] }}</span>
+                    {% endif %}
+                    {% if tache.group %}
+                        <span class="text-muted"><i class="fas fa-users"></i> {{ tache.group.name }}</span>
+                    {% endif %}
+                    {% if tache.assignedUser %}
+                        <span class="text-muted"><i class="fas fa-user"></i> {{ tache.assignedUser.displayName }}</span>
+                    {% endif %}
+                    {% if tache.dueDate %}
+                        <span class="{% if tache.dueDate < date() and tache.status != 'done' %}text-danger fw-bold{% endif %} text-muted">
+                            <i class="fas fa-calendar"></i> {{ tache.dueDate|date('d/m/Y') }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if canManage and pageWidget %}
+<div class="modal fade" id="tacheModal-{{ pageWidget.id }}" tabindex="-1" aria-hidden="true" data-page-groups="{{ pageGroups|json_encode }}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle tâche</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div id="tache-error-{{ pageWidget.id }}" class="alert alert-danger d-none mb-2"></div>
+                <div class="mb-2">
+                    <label class="form-label small">Titre *</label>
+                    <input type="text" id="tache-title-{{ pageWidget.id }}" class="form-control form-control-sm" placeholder="Titre" required>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label small">Description (Markdown)</label>
+                    <textarea id="tache-content-{{ pageWidget.id }}" class="form-control form-control-sm easymde-textarea" rows="6" placeholder="Description"></textarea>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col">
+                        <label class="form-label small">Date de rendu</label>
+                        <input type="date" id="tache-dueDate-{{ pageWidget.id }}" class="form-control form-control-sm">
+                    </div>
+                    <div class="col">
+                        <label class="form-label small">Statut</label>
+                        <select id="tache-status-{{ pageWidget.id }}" class="form-select form-select-sm">
+                            <option value="todo">À faire</option>
+                            <option value="in_progress">En cours</option>
+                            <option value="done">Terminé</option>
+                        </select>
+                    </div>
+                </div>
+                {% if mode == 'linked' %}
+                <div class="mb-2">
+                    <label class="form-label small">Assigné à</label>
+                    <select id="tache-assignedUser-{{ pageWidget.id }}" class="form-select form-select-sm">
+                        <option value="">Non assigné</option>
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success tache-save-btn" data-save-url="{{ path('app_user_pagewidget_tache_save', {pageWidgetId: pageWidget.id}) }}" data-page-widget-id="{{ pageWidget.id }}" data-tache-id="">
+                    <i class="fas fa-check"></i> Créer
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function tacheLoadGroupUsers(pwId) {
+    var sel = document.getElementById('tache-assignedUser-' + pwId);
+    var modal = document.getElementById('tacheModal-' + pwId);
+    if (!sel || !modal) return;
+    var groups = JSON.parse(modal.dataset.pageGroups || '[]');
+    if (groups.length === 0) return;
+    sel.innerHTML = '<option value="">Non assigné</option>';
+    groups.forEach(function(g) {
+        fetch('/user/widget/tache/group-users/' + g.id)
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                users.forEach(function(u) {
+                    var o = document.createElement('option');
+                    o.value = u.id; o.textContent = u.name;
+                    sel.appendChild(o);
+                });
+            });
+    });
+}
+function initTacheEasyMDE(textareaId) {
+    var el = document.getElementById(textareaId);
+    if (el && !el.dataset.mde) {
+        var mde = new EasyMDE({
+            element: el,
+            spellChecker: false,
+            status: false,
+            autosave: { enabled: false, uniqueId: textareaId, delay: 1000 },
+        });
+        el.mdeInstance = mde;
+        el.dataset.mde = '1';
+    }
+}
+$(document).on('shown.bs.modal', '[id^="tacheModal-"]', function() {
+    var pwId = this.id.replace('tacheModal-', '');
+    var el = document.getElementById('tache-content-' + pwId);
+    if (el && !el.dataset.mde) {
+        initTacheEasyMDE('tache-content-' + pwId);
+    }
+});
+function getTacheContent(textareaId) {
+    var el = document.getElementById(textareaId);
+    if (el && el.mdeInstance) {
+        return el.mdeInstance.value();
+    }
+    return el ? el.value : '';
+}
+document.querySelectorAll('.tache-add-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var pwId = this.dataset.pageWidgetId;
+        var m = document.getElementById('tacheModal-' + pwId);
+        m.querySelector('.modal-title').textContent = 'Nouvelle tâche';
+        m.querySelector('.tache-save-btn').dataset.tacheId = '';
+        m.querySelector('.tache-save-btn').innerHTML = '<i class="fas fa-check"></i> Créer';
+        document.getElementById('tache-title-' + pwId).value = '';
+        document.getElementById('tache-content-' + pwId).value = '';
+        document.getElementById('tache-dueDate-' + pwId).value = '';
+        document.getElementById('tache-status-' + pwId).value = 'todo';
+        var sel = document.getElementById('tache-assignedUser-' + pwId);
+        if (sel) sel.value = '';
+        document.getElementById('tache-error-' + pwId).classList.add('d-none');
+        tacheLoadGroupUsers(pwId);
+        bootstrap.Modal.getOrCreateInstance(m).show();
+    });
+});
+document.querySelectorAll('.tache-edit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var tacheId = this.dataset.tacheId;
+        var pwId = document.querySelector('.tache-save-btn').dataset.pageWidgetId;
+        fetch('/user/widget/tache/get/' + tacheId)
+            .then(function(r) { return r.json(); })
+            .then(function(t) {
+                var m = document.getElementById('tacheModal-' + pwId);
+                m.querySelector('.modal-title').textContent = 'Modifier la tâche';
+                m.querySelector('.tache-save-btn').dataset.tacheId = t.id;
+                m.querySelector('.tache-save-btn').innerHTML = '<i class="fas fa-check"></i> Modifier';
+                document.getElementById('tache-title-' + pwId).value = t.title || '';
+                document.getElementById('tache-content-' + pwId).value = t.content || '';
+                document.getElementById('tache-dueDate-' + pwId).value = t.dueDate || '';
+                document.getElementById('tache-status-' + pwId).value = t.status || 'todo';
+                document.getElementById('tache-error-' + pwId).classList.add('d-none');
+                tacheLoadGroupUsers(pwId);
+                if (t.assignedUserId) {
+                    setTimeout(function() { document.getElementById('tache-assignedUser-' + pwId).value = t.assignedUserId; }, 500);
+                }
+                bootstrap.Modal.getOrCreateInstance(m).show();
+            });
+    });
+});
+document.querySelectorAll('.tache-save-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var pwId = this.dataset.pageWidgetId;
+        var saveUrl = this.dataset.saveUrl;
+        var tacheId = this.dataset.tacheId || null;
+        var err = document.getElementById('tache-error-' + pwId);
+        err.classList.add('d-none');
+        var data = {
+            id: tacheId ? parseInt(tacheId) : null,
+            title: document.getElementById('tache-title-' + pwId).value,
+            content: getTacheContent('tache-content-' + pwId),
+            dueDate: document.getElementById('tache-dueDate-' + pwId).value || null,
+            status: document.getElementById('tache-status-' + pwId).value,
+            assignedUserId: (document.getElementById('tache-assignedUser-' + pwId) || {}).value || null,
+        };
+        if (!data.title) { err.textContent = 'Le titre est obligatoire'; err.classList.remove('d-none'); return; }
+        fetch(saveUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+            .then(function(r) { return r.json(); })
+            .then(function(res) { if (res.success) location.reload(); else if (res.error) { err.textContent = res.error; err.classList.remove('d-none'); } })
+            .catch(function() { err.textContent = 'Erreur de connexion'; err.classList.remove('d-none'); });
+    });
+});
+document.querySelectorAll('.tache-status-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        fetch('/user/widget/tache/update/' + this.dataset.tacheId, { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { if (d.success) location.reload(); });
+    });
+});
+document.querySelectorAll('.tache-delete-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        if (!confirm('Supprimer cette tâche ?')) return;
+        var card = this.closest('.tache-card');
+        fetch('/user/widget/tache/delete/' + this.dataset.tacheId, { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(d) { if (d.success) { card.style.transition = 'opacity 0.3s'; card.style.opacity = '0'; setTimeout(function() { card.remove(); }, 300); } });
+    });
+});
+</script>
+{% endif %}
