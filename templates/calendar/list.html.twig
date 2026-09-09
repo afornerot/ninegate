@@ -3,6 +3,18 @@
 {% block body %}
 <h1>{{ title }}</h1>
 
+<div class="card mb-3">
+    <div class="card-body d-flex align-items-center gap-3">
+        <div>
+            <strong>Configuration CalDAV :</strong> URL de découverte :
+        </div>
+        <code class="flex-grow-1">{{ app.request.schemeAndHttpHost }}{{ path('app_caldav') }}/calendars/{{ app.user.username }}/</code>
+        <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ app.request.schemeAndHttpHost }}{{ path('app_caldav') }}/calendars/{{ app.user.username }}/')">
+            <i class="fas fa-copy"></i>
+        </button>
+    </div>
+</div>
+
 <div class="d-flex gap-2 mb-3">
     <a href="{{ path(isAdmin ? 'app_admin_calendar_submit' : 'app_user_calendar_submit') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nouveau Calendrier
@@ -21,6 +33,7 @@
                     <th>Couleur</th>
                     <th>Événements</th>
                     <th>Groupes</th>
+                    <th>URL CalDAV</th>
                 </tr>
             </thead>
             <tbody>
@@ -51,6 +64,14 @@
                             {% else %}
                                 -
                             {% endfor %}
+                        </td>
+                        <td>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm font-monospace" value="{{ app.request.schemeAndHttpHost }}{{ path('app_caldav') }}/calendars/{{ app.user.username }}/{{ calendar.id }}/" readonly>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="navigator.clipboard.writeText('{{ app.request.schemeAndHttpHost }}{{ path('app_caldav') }}/calendars/{{ app.user.username }}/{{ calendar.id }}/')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}

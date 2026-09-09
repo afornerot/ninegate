@@ -63,6 +63,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $sha256Hash = null;
 
+    #[ORM\Column(length: 128, unique: true, nullable: true)]
+    private ?string $apiKey = null;
+
     #[ORM\OneToMany(targetEntity: Icon::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private Collection $icons;
 
@@ -233,6 +236,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->sha256Hash = $sha256Hash;
 
         return $this;
+    }
+
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
+    }
+
+    public function setApiKey(?string $apiKey): static
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
+    }
+
+    public function generateApiKey(): string
+    {
+        $this->apiKey = bin2hex(random_bytes(32));
+
+        return $this->apiKey;
     }
 
     public function getDisplayName(): string

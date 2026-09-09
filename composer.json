@@ -21,6 +21,7 @@
         "phpdocumentor/reflection-docblock": "^6.0.3",
         "phpstan/phpdoc-parser": "^2.3.2",
         "ramsey/uuid": "^4.9.3",
+        "sabre/dav": "^4.7",
         "symfony/asset": "7.4.*",
         "symfony/console": "7.4.*",
         "symfony/doctrine-messenger": "7.4.*",

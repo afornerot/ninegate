@@ -192,6 +192,10 @@ class CalendarBackend extends AbstractBackend
             $event->setColor((string) $vevent->CATEGORIES);
         }
 
+        if (isset($vevent->DTSTART) && $vevent->DTSTART->hasType()) {
+            $event->setAllDay((string) $vevent->DTSTART->getType() === 'DATE');
+        }
+
         $this->em->persist($event);
         $this->em->flush();
         return;
@@ -318,12 +322,18 @@ class CalendarBackend extends AbstractBackend
             $vcal .= "DESCRIPTION:" . str_replace("\n", "\\n", $event->getDescription()) . "\r\n";
         }
 
-        if ($event->getStartDate()) {
-            $vcal .= "DTSTART:" . $event->getStartDate()->format('Ymd\THis') . "\r\n";
-        }
-
-        if ($event->getEndDate()) {
-            $vcal .= "DTEND:" . $event->getEndDate()->format('Ymd\THis') . "\r\n";
+        if ($event->isAllDay()) {
+            $vcal .= "DTSTART;VALUE=DATE:" . $event->getStartDate()->format('Ymd') . "\r\n";
+            if ($event->getEndDate()) {
+                $vcal .= "DTEND;VALUE=DATE:" . $event->getEndDate()->format('Ymd') . "\r\n";
+            }
+        } else {
+            if ($event->getStartDate()) {
+                $vcal .= "DTSTART:" . $event->getStartDate()->format('Ymd\THis') . "\r\n";
+            }
+            if ($event->getEndDate()) {
+                $vcal .= "DTEND:" . $event->getEndDate()->format('Ymd\THis') . "\r\n";
+            }
         }
 
         if ($event->getColor()) {

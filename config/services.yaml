@@ -48,6 +48,18 @@ services:
     App\:
         resource: '../src/'
 
+    App\Repository\UserRepository:
+        public: true
+
+    App\Repository\CalendarRepository:
+        public: true
+
+    App\Repository\CalendarEventRepository:
+        public: true
+
+    App\Repository\TacheRepository:
+        public: true
+
     App\EventListener\UserAllListener:
         tags:
             - { name: doctrine.event_listener, event: doctrine.orm.entity_listener }

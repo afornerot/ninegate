@@ -2,7 +2,7 @@ FROM reg.cadoles.com/envole/nineapache:8.4
 
 USER root
 
-RUN apk add --no-cache tzdata
+RUN apk add --no-cache tzdata php84-xmlreader
 ENV TZ=Europe/Paris
 RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo "Europe/Paris" > /etc/timezone
 

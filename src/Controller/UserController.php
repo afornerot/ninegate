@@ -168,4 +168,30 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
+
+    #[Route('/admin/user/regenerate-apikey/{id}', name: 'app_admin_user_regenerate_apikey')]
+    #[Route('/user/regenerate-apikey', name: 'app_user_regenerate_apikey')]
+    public function regenerateApiKey(int $id = null): Response
+    {
+        if ($id) {
+            $user = $this->userRepository->find($id);
+        } else {
+            $user = $this->userRepository->find($this->getUser()->getId());
+        }
+
+        if (!$user) {
+            return $this->redirectToRoute('app_user');
+        }
+
+        $user->generateApiKey();
+        $this->em->flush();
+
+        $this->addFlash('success', 'Clé API régénérée avec succès');
+
+        if ($id) {
+            return $this->redirectToRoute('app_admin_user_update', ['id' => $id]);
+        }
+
+        return $this->redirectToRoute('app_user_profil');
+    }
 }

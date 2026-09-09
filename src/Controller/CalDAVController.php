@@ -10,6 +10,7 @@ use App\Repository\CalendarEventRepository;
 use App\Repository\CalendarRepository;
 use App\Repository\UserRepository;
 use Sabre\CalDAV\CalendarRoot;
+use Sabre\CalDAV\Plugin as CalDAVPlugin;
 use Sabre\CalDAV\Principal\Collection as PrincipalCollection;
 use Sabre\DAV\Server;
 use Sabre\DAV\SimpleCollection;
@@ -56,9 +57,20 @@ class CalDAVController extends AbstractController
         $server = new Server($root);
         $server->setBaseUri('/caldav/');
         $server->addPlugin(new \Sabre\DAV\Auth\Plugin($authBackend));
+        $server->addPlugin(new CalDAVPlugin());
 
+        ob_start();
         $server->start();
+        $body = ob_get_clean();
 
-        return new Response('');
+        $sapiResponse = $server->httpResponse;
+        $response = new Response($body);
+        $response->setStatusCode($sapiResponse->getStatus());
+
+        foreach ($sapiResponse->getHeaders() as $key => $value) {
+            $response->headers->set($key, $value);
+        }
+
+        return $response;
     }
 }

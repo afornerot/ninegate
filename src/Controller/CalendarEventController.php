@@ -112,6 +112,7 @@ class CalendarEventController extends AbstractController
             if ($newSlug !== $event->getSlug()) {
                 $event->setSlug($newSlug);
             }
+            $event->setUpdatedAt(new \DateTime());
             $this->em->flush();
 
             $this->addFlash('success', 'Événement modifié avec succès');

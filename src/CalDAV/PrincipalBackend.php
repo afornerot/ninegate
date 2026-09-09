@@ -80,11 +80,15 @@ class PrincipalBackend implements BackendInterface
 
     private function mapUser(object $user, string $uri): array
     {
+        $username = $user->getUsername();
+
         return [
             'id' => $uri,
             'uri' => $uri,
             '{DAV:}displayname' => $user->getDisplayName(),
             '{http://sabredav.org/ns}email-address' => $user->getEmail() ?? '',
+            '{http://calendarserver.org/ns/}calendar-home-set' => new \Sabre\DAV\Xml\Property\Href(['/calendars/' . $username . '/']),
+            '{DAV:}calendar-home-set' => new \Sabre\DAV\Xml\Property\Href(['/calendars/' . $username . '/']),
         ];
     }
 
