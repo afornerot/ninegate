@@ -8,7 +8,6 @@ use App\Repository\BlogArticleRepository;
 use App\Repository\BlogRepository;
 use App\Service\SlugService;
 use App\Voter\BlogVoter;
-use Bnine\FilesBundle\Service\FileService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +25,6 @@ class BlogArticleController extends AbstractController
         private BlogArticleRepository $blogArticleRepository,
         private BlogRepository $blogRepository,
         private SlugService $slugService,
-        private \Bnine\FilesBundle\Service\FileService $fileService,
     ) {
     }
 
@@ -57,8 +55,6 @@ class BlogArticleController extends AbstractController
             $this->em->persist($article);
             $this->em->flush();
 
-            $this->fileService->init('blogarticle', (string) $article->getId());
-
             return $this->redirectToRoute('app_blog_view', ['slug' => $blog->getSlug()]);
         }
 
@@ -70,29 +66,6 @@ class BlogArticleController extends AbstractController
             'blog' => $blog,
             'article' => $article,
             'isAdmin' => $isAdmin,
-            'domain' => 'blogarticle',
-            'id' => $article->getId(),
-            'editable' => 1,
-        ]);
-    }
-
-    #[Route('/user'.self::BLOG_PREFIX.'/article/uploadmodal/{blogId}/{id}', name: 'app_user_blogarticle_uploadmodal')]
-    #[Route('/admin'.self::BLOG_PREFIX.'/article/uploadmodal/{blogId}/{id}', name: 'app_admin_blogarticle_uploadmodal')]
-    public function uploadmodal(int $blogId, int $id, Request $request): Response
-    {
-        $article = $this->blogArticleRepository->find($id);
-        if (!$article) {
-            return $this->redirectToRoute('app_admin_blog_list');
-        }
-
-        return $this->render('blog/article/upload.html.twig', [
-            'useheader' => false,
-            'usemenu' => false,
-            'usesidebar' => false,
-            'endpoint' => 'bninefile',
-            'domain' => 'blogarticle',
-            'id' => $id,
-            'path' => '',
         ]);
     }
 

@@ -51,7 +51,9 @@ class GroupType extends AbstractType
                 'required' => false,
                 'icon_endpoint' => 'logo',
                 'icon_label' => 'Logo',
-                'icon_upload_url' => '/bninefiles/uploadmodal/logo/0?path=&crop',
+                'icon_domain' => 'logo',
+                'icon_entity_id' => 0,
+                'crop' => true,
             ])
             ->add('isOpen', CheckboxType::class, [
                 'label' => 'Groupe ouvert',

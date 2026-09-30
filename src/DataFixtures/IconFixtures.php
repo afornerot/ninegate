@@ -31,7 +31,7 @@ class IconFixtures extends Fixture
             }
 
             $filename = basename($file);
-            $route = 'medias/icon/' . $filename;
+            $route = '**public**/medias/icon/' . $filename;
             $tags = pathinfo($filename, PATHINFO_FILENAME);
             $tags = preg_replace('/^icon_/', '', $tags);
 

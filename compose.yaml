@@ -33,9 +33,7 @@ services:
       - ./.env.local:/app/.env.local
       - ./volume/dex:/app/volume/dex
       - ./volume/glauth:/app/volume/glauth
-      - ../bNine-FilesBundle/src:/app/vendor/bnine/filesbundle/src:delegated
-      - ../bNine-FilesBundle/templates:/app/vendor/bnine/filesbundle/templates:delegated
-      - ../bNine-FilesBundle/Resources/public:/app/vendor/bnine/filesbundle/Resources/public:delegated
+      - ../bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
   adminer:
     image: adminer
     container_name: ninegate-adminer

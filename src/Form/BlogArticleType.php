@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\BlogArticle;
-use Bnine\FilesBundle\Form\Type\ImageUploadType;
+use Bnine\FilesBundle\Form\Type\SelectFileType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,13 +19,16 @@ class BlogArticleType extends AbstractType
                 'label' => 'Titre',
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('image', ImageUploadType::class, [
+            ->add('image', SelectFileType::class, [
                 'label' => 'Image à la une',
+                'mode' => 'single',
+                'access' => 'write',
+                'layout' => 'inline',
                 'domain' => 'blog',
-                'entityId' => (string) $options['blogId'],
-                'maxWidth' => 300,
-                'imageOnly' => true,
+                'entity_id' => $options['blogId'],
                 'required' => false,
+                'show_name' => true,
+                'max_height' => 300,
             ])
             ->add('content', TextareaType::class, [
                 'label' => 'Contenu (Markdown)',

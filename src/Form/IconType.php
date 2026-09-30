@@ -19,7 +19,9 @@ class IconType extends AbstractType
                 'label' => 'Icône',
                 'required' => true,
                 'icon_empty_preview' => 'medias/icon/icon_pin.png',
-                'icon_upload_url' => '/bninefiles/uploadmodal/icon/0?path=&crop',
+                'icon_domain' => 'icon',
+                'icon_entity_id' => 0,
+                'crop' => true,
             ])
             ->add('tags', TextType::class, [
                 'label' => 'Tags',

@@ -25,8 +25,6 @@ class GalleryWidgetController extends AbstractController
         $domain = 'pagewidgetfile';
         $id = $pageWidgetId;
 
-        $fileService->init($domain, (string) $id);
-
         return $this->render('widget/gallery.html.twig', [
             'pageWidget' => $pageWidget,
             'canManage' => $canManage,

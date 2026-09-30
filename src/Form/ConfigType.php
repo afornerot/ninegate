@@ -45,7 +45,9 @@ class ConfigType extends AbstractType
             $fieldOptions['icon_endpoint'] = 'logo';
             $fieldOptions['icon_label'] = 'Logo';
             $fieldOptions['icon_empty_preview'] = $config instanceof Config ? $config->getValue() : null;
-            $fieldOptions['icon_upload_url'] = '/bninefiles/uploadmodal/logo/0?path=&crop';
+            $fieldOptions['icon_domain'] = 'logo';
+            $fieldOptions['icon_entity_id'] = 0;
+            $fieldOptions['crop'] = true;
         }
 
         if (Config::TYPE_BOOL === $type) {
@@ -64,7 +66,9 @@ class ConfigType extends AbstractType
 
         if (Config::TYPE_LOGO === $type) {
             $fieldOptions['icon_empty_preview'] = $config->getValue();
-            $fieldOptions['icon_upload_url'] = '/bninefiles/uploadmodal/logo/0?path=&crop';
+            $fieldOptions['icon_domain'] = 'logo';
+            $fieldOptions['icon_entity_id'] = 0;
+            $fieldOptions['crop'] = true;
         }
 
         $builder

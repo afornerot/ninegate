@@ -57,7 +57,9 @@ class UserType extends AbstractType
             'required' => false,
             'icon_endpoint' => 'avatar',
             'icon_label' => 'Avatar',
-            'icon_upload_url' => '/bninefiles/uploadmodal/avatar/0?path=&crop',
+            'icon_domain' => 'avatar',
+            'icon_entity_id' => 0,
+            'crop' => true,
         ]);
 
         if ('profil' != $options['mode']) {

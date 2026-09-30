@@ -1,12 +1,15 @@
 twig:
   file_name_pattern: "*.twig"
-  form_themes: ['bootstrap_5_layout.html.twig']
+  form_themes:
+    - 'bootstrap_5_layout.html.twig'
+    - '@BnineFilesBundle/Form/_theme.html.twig'
   globals:
     appName: "%appName%"
     app_config: '@App\Service\ConfigParameterBag'
     app_pages: '@App\Service\PageParameterBag'
   paths:
     '%kernel.project_dir%/vendor/bnine/filesbundle/templates': BnineFilesBundle
+    '%kernel.project_dir%/vendor/bnine/filesbundle/Resources/public': BnineFilesPublic
 
 when@test:
   twig:

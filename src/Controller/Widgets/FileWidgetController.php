@@ -27,8 +27,6 @@ class FileWidgetController extends AbstractController
         $domain = 'pagewidgetfile';
         $id = $pageWidgetId;
 
-        $fileService->init($domain, (string) $id);
-
         return $this->render('widget/file.html.twig', [
             'pageWidget' => $pageWidget,
             'canManage' => $canManage,

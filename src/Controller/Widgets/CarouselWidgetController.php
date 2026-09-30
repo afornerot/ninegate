@@ -30,8 +30,6 @@ class CarouselWidgetController extends AbstractController
         $domain = 'pagewidgetfile';
         $id = $pageWidgetId;
 
-        $fileService->init($domain, (string) $id);
-
         $content = $pageWidget->getContent() ?? [];
         $slides = $content['slides'] ?? [];
 
