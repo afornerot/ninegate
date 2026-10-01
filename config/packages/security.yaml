@@ -13,6 +13,11 @@ security:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
 
+    bninefiles:
+      pattern: ^/bninefiles/(image|thumbnail)/
+      security: false
+      stateless: true
+
     main:
       pattern: ^/
       provider: sql_provider
