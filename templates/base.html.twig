@@ -165,12 +165,16 @@
                                 {% endif %}
                             {% endif %}
                         {% endif %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('app_blogs_all') }}">Blogs</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('app_calendars_all') }}">Calendriers</a>
-                            </li>
+                            {% if app_pages.get('has_blogs') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_blogs_all') }}">Blogs</a>
+                                </li>
+                            {% endif %}
+                            {% if app_pages.get('has_calendars') %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ path('app_calendars_all') }}">Calendriers</a>
+                                </li>
+                            {% endif %}
                             {% if app.user and is_granted('page_create') %}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ path('app_user_page_submit') }}" title="Nouvelle page">

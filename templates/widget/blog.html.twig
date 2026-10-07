@@ -3,7 +3,7 @@
         <div class="blog-widget-item card">
             {% if article.image %}
                 <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}">
-                    <img src="{{ path('bninefiles_files_thumbnail', {domain: 'blog', id: article.blog.id, path: article.image}) }}" class="card-img-top" alt="{{ article.title }}">
+                    <img src="{{ bninefile(article.image) }}" class="card-img-top" alt="{{ article.title }}">
                 </a>
             {% endif %}
             <div class="card-body">

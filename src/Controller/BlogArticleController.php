@@ -33,10 +33,15 @@ class BlogArticleController extends AbstractController
     public function submit(int $blogId, Request $request, ?string $_route): Response
     {
         $isAdmin = str_starts_with($_route, 'app_admin');
+        $listRoute = $isAdmin ? 'app_admin_blog_list' : 'app_user_blog_list';
 
         $blog = $this->blogRepository->find($blogId);
         if (!$blog) {
-            return $this->redirectToRoute($isAdmin ? 'app_admin_blog_list' : 'app_user_blog_list');
+            return $this->redirectToRoute($listRoute);
+        }
+
+        if (!$this->isGranted(BlogVoter::ARTICLE_CREATE, $blog)) {
+            throw $this->createAccessDeniedException('Accès refusé');
         }
 
         $article = new BlogArticle();
@@ -55,7 +60,10 @@ class BlogArticleController extends AbstractController
             $this->em->persist($article);
             $this->em->flush();
 
-            return $this->redirectToRoute('app_blog_view', ['slug' => $blog->getSlug()]);
+            return $this->redirectToRoute(
+                $isAdmin ? 'app_admin_blog_view' : 'app_blog_view',
+                ['slug' => $blog->getSlug()]
+            );
         }
 
         return $this->render('blog/article/edit.html.twig', [
@@ -74,10 +82,15 @@ class BlogArticleController extends AbstractController
     public function update(int $blogId, int $id, Request $request, ?string $_route): Response
     {
         $isAdmin = str_starts_with($_route, 'app_admin');
+        $listRoute = $isAdmin ? 'app_admin_blog_list' : 'app_user_blog_list';
 
         $article = $this->blogArticleRepository->find($id);
         if (!$article) {
-            return $this->redirectToRoute($isAdmin ? 'app_admin_blog_list' : 'app_user_blog_list');
+            return $this->redirectToRoute($listRoute);
+        }
+
+        if (!$this->isGranted(BlogVoter::ARTICLE_EDIT, $article)) {
+            throw $this->createAccessDeniedException('Accès refusé');
         }
 
         $blog = $article->getBlog();
@@ -95,7 +108,10 @@ class BlogArticleController extends AbstractController
 
             $this->em->flush();
 
-            return $this->redirectToRoute('app_blog_view', ['slug' => $blog->getSlug()]);
+            return $this->redirectToRoute(
+                $isAdmin ? 'app_admin_blog_view' : 'app_blog_view',
+                ['slug' => $blog->getSlug()]
+            );
         }
 
         return $this->render('blog/article/edit.html.twig', [
@@ -114,10 +130,15 @@ class BlogArticleController extends AbstractController
     public function delete(int $blogId, int $id, ?string $_route): Response
     {
         $isAdmin = str_starts_with($_route, 'app_admin');
+        $listRoute = $isAdmin ? 'app_admin_blog_list' : 'app_user_blog_list';
 
         $article = $this->blogArticleRepository->find($id);
         if (!$article) {
-            return $this->redirectToRoute($isAdmin ? 'app_admin_blog_list' : 'app_user_blog_list');
+            return $this->redirectToRoute($listRoute);
+        }
+
+        if (!$this->isGranted(BlogVoter::ARTICLE_EDIT, $article)) {
+            throw $this->createAccessDeniedException('Accès refusé');
         }
 
         $blog = $article->getBlog();
@@ -129,7 +150,10 @@ class BlogArticleController extends AbstractController
             $this->addFlash('error', $e->getMessage());
         }
 
-        return $this->redirectToRoute('app_blog_view', ['slug' => $blog->getSlug()]);
+        return $this->redirectToRoute(
+            $isAdmin ? 'app_admin_blog_view' : 'app_blog_view',
+            ['slug' => $blog->getSlug()]
+        );
     }
 
     #[Route('/article/{slug}', name: 'app_blogarticle_view')]

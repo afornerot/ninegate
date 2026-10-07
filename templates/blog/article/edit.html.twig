@@ -8,7 +8,7 @@
     <button type="submit" class="btn btn-success">
         <i class="fas fa-save"></i> Sauvegarder
     </button>
-    <a href="{{ path('app_blog_view', {slug: blog.slug}) }}" class="btn btn-secondary">Annuler</a>
+    <a href="{{ path(isAdmin ? 'app_admin_blog_view' : 'app_blog_view', {slug: blog.slug}) }}" class="btn btn-secondary">Annuler</a>
 </div>
 
 <div class="card mb-3">

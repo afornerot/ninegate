@@ -17,7 +17,7 @@
             <div class="card">
                 {% if article.image %}
                     <a href="{{ path(isAdmin ? 'app_admin_blogarticle_view' : 'app_blogarticle_view', {slug: article.slug}) }}">
-                        <img src="{{ path('bninefiles_files_thumbnail', {domain: 'blog', id: blog.id, path: article.image}) }}" class="card-img-top" alt="{{ article.title }}">
+                        <img src="{{ bninefile(article.image) }}" class="card-img-top" alt="{{ article.title }}">
                     </a>
                 {% endif %}
                 <div class="card-body">

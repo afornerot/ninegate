@@ -12,24 +12,33 @@ docker exec -i ninegate-postgres psql -U user -d ninegate -c "DELETE FROM blog_a
 
 cat > "$FINAL" << 'HEADER'
 SET session_replication_role = 'replica';
-INSERT INTO blog (id, title, slug, blog_order) VALUES (3, 'Interne', 'interne', 0) ON CONFLICT (id) DO NOTHING;
-INSERT INTO blog_group (blog_id, group_id) VALUES (3, 5) ON CONFLICT DO NOTHING;
 HEADER
 rm -rf "$TMP_HTML" /tmp/articles_*.txt
 mkdir -p "$TMP_HTML"
 
-# Export metadata (blog Interne only, include image path)
-docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "SELECT CONCAT(id, '|', COALESCE(name, ''), '|', COALESCE(user_id, 'NULL'), '|', submit, '|', COALESCE(image, '')) FROM blogarticle WHERE blog_id = 3 ORDER BY id;" > /tmp/articles_meta.txt 2>/dev/null
+# Export metadata (all blogs, include image path and blog_id)
+docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "SELECT CONCAT(id, '|', COALESCE(name, ''), '|', COALESCE(user_id, 'NULL'), '|', submit, '|', blog_id, '|', COALESCE(image, '')) FROM blogarticle ORDER BY id;" > /tmp/articles_meta.txt 2>/dev/null
 
-# Export HTML content (blog Interne only)
-docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate --raw -e "SELECT id, COALESCE(description, '') FROM blogarticle WHERE blog_id = 3 ORDER BY id;" > /tmp/articles_html_raw.txt 2>/dev/null
+# Export HTML content (all blogs)
+docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate --raw -e "SELECT id, COALESCE(description, '') FROM blogarticle ORDER BY id;" > /tmp/articles_html_raw.txt 2>/dev/null
+
+# Export distinct blogs referenced by articles, to create them dynamically
+docker exec "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "SELECT b.id, b.name FROM blog b INNER JOIN blogarticle a ON a.blog_id = b.id GROUP BY b.id, b.name ORDER BY b.id;" > /tmp/blogs_meta.txt 2>/dev/null
+
+# Add blog INSERTs to the header
+while IFS=$'\t' read -r blog_id blog_name; do
+    [ -z "$blog_id" ] && continue
+    echo "INSERT INTO blog (id, title, slug, blog_order) VALUES ($blog_id, '$(echo "$blog_name" | sed "s/'/''/g")', 'blog-$blog_id', 0) ON CONFLICT (id) DO NOTHING;" >> "$FINAL"
+    # Associate each migrated blog with the default group 5 (preserves the original script's behaviour)
+    echo "INSERT INTO blog_group (blog_id, group_id) VALUES ($blog_id, 5) ON CONFLICT DO NOTHING;" >> "$FINAL"
+done < /tmp/blogs_meta.txt
 
 META_COUNT=$(wc -l < /tmp/articles_meta.txt)
 echo "  ✓ $META_COUNT articles found"
 
 # Convert each article
 echo "  Converting HTML → Markdown..."
-while IFS='|' read -r id name user_id submit blog_id; do
+while IFS='|' read -r id name user_id submit blog_id image; do
     [ -z "$id" ] && continue
     awk -v id="$id" 'BEGIN{f=0} $1==id{f=1;next} f&&/^[0-9]+\t/{exit} f{print}' /tmp/articles_html_raw.txt > "$TMP_HTML/${id}.html"
     if [ -s "$TMP_HTML/${id}.html" ]; then
@@ -44,13 +53,8 @@ echo "  ✓ $CONVERTED articles converted"
 
 # Build SQL using PHP for proper escaping
 echo "  Building SQL..."
-cat > "$FINAL" << 'HEADER'
-SET session_replication_role = 'replica';
-INSERT INTO blog (id, title, slug, blog_order) VALUES (3, 'Interne', 'interne', 0) ON CONFLICT (id) DO NOTHING;
-INSERT INTO blog_group (blog_id, group_id) VALUES (3, 5) ON CONFLICT DO NOTHING;
-HEADER
 
-while IFS='|' read -r id name user_id submit image; do
+while IFS='|' read -r id name user_id submit blog_id image; do
     [ -z "$id" ] && continue
     # Write name to temp file to avoid shell escaping issues
     echo -n "$name" > /tmp/_tmp_name.txt
@@ -59,8 +63,10 @@ while IFS='|' read -r id name user_id submit image; do
         \$name = str_replace(\"'\", \"''\", file_get_contents('/tmp/_tmp_name.txt'));
         \$user = '$user_id';
         \$submit = '$submit';
+        \$blog_id = intval('$blog_id');
         \$slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', \$name));
         \$image = str_replace('uploads/', '', '$image');
+        \$image = empty(\$image) ? '' : 'blog/' . \$blog_id . '/' . \$image;
         \$imageSql = empty(\$image) ? 'NULL' : \"'\" . str_replace(\"'\", \"''\", \$image) . \"'\";
         \$html = str_replace(\"'\", \"''\", @file_get_contents('$TMP_HTML/${id}.md') ?: '');
         echo \"INSERT INTO blog_article (id, title, slug, content, image, \\\"created_at\\\", \\\"updated_at\\\", user_id, blog_id) VALUES (\"
@@ -71,7 +77,7 @@ while IFS='|' read -r id name user_id submit image; do
             . \$imageSql . ', '
             . \"'\" . \$submit . \"', \"
             . \"'\" . \$submit . \"', \"
-            . \$user . ', 3) ON CONFLICT (id) DO NOTHING;'
+            . \$user . ', ' . \$blog_id . ') ON CONFLICT (id) DO NOTHING;'
             . PHP_EOL;
     " >> "$FINAL"
 done < /tmp/articles_meta.txt
@@ -90,4 +96,4 @@ echo "✓ $ACOUNT blog articles migrated ($ICOUNT with images)"
 echo "  Migrating images to storage..."
 docker exec ninegate php bin/console app:migrate-blogimages 2>&1 | grep -E "✓|OK|Error" | head -3
 
-rm -rf "$TMP_HTML" /tmp/articles_*.txt /tmp/_tmp_*.txt "$FINAL"
+rm -rf "$TMP_HTML" /tmp/articles_*.txt /tmp/_tmp_*.txt /tmp/blogs_meta.txt "$FINAL"

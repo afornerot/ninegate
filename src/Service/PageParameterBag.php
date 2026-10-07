@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
+use App\Repository\BlogRepository;
+use App\Repository\CalendarRepository;
 use App\Repository\PageRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag as SymfonyParameterBag;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -14,11 +16,16 @@ class PageParameterBag extends SymfonyParameterBag
     public function __construct(
         private PageRepository $pageRepository,
         private TokenStorageInterface $tokenStorage,
+        private BlogRepository $blogRepository,
+        private CalendarRepository $calendarRepository,
     ) {
         $this->add([
             'group_orga_role' => [],
             'personal' => [],
             'work_group' => [],
+            'has_pages' => false,
+            'has_blogs' => false,
+            'has_calendars' => false,
         ]);
     }
 
@@ -75,11 +82,23 @@ class PageParameterBag extends SymfonyParameterBag
         usort($groupOrgaRolePages, fn ($a, $b) => $a->getPageOrder() <=> $b->getPageOrder());
         usort($workGroupPages, fn ($a, $b) => $a->getPageOrder() <=> $b->getPageOrder());
 
+        $accessibleBlogs = $this->blogRepository->findAccessibleBlogs($user);
+        $accessibleCalendars = $this->calendarRepository->findAccessibleCalendars($user);
+
+        $hasPages = count($personalPages) > 0
+            || count($groupOrgaRolePages) > 0
+            || count($workGroupPages) > 0;
+        $hasBlogs = count($accessibleBlogs) > 0;
+        $hasCalendars = count($accessibleCalendars) > 0;
+
         $this->clear();
         $this->add([
             'personal' => $personalPages,
             'group_orga_role' => $groupOrgaRolePages,
             'work_group' => $workGroupPages,
+            'has_pages' => $hasPages,
+            'has_blogs' => $hasBlogs,
+            'has_calendars' => $hasCalendars,
         ]);
     }
 

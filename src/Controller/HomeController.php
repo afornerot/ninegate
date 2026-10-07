@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\BlogRepository;
-use App\Repository\CalendarRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use App\Service\PageParameterBag;
@@ -16,8 +14,6 @@ class HomeController extends AbstractController
     public function __construct(
         private UserRepository $userRepository,
         private PageRepository $pageRepository,
-        private BlogRepository $blogRepository,
-        private CalendarRepository $calendarRepository,
         private PageParameterBag $pageParameterBag,
     ) {}
 
@@ -50,15 +46,13 @@ class HomeController extends AbstractController
         }
 
         if (!$user) {
-            $visitorPages = $this->pageRepository->findAccessiblePages(null);
-            $visitorBlogs = $this->blogRepository->findAccessibleBlogs(null);
-            $visitorCalendars = $this->calendarRepository->findAccessibleCalendars(null);
+            if ($this->pageParameterBag->get('has_pages')) {
+                $visitorPages = $this->pageParameterBag->get('group_orga_role');
 
-            if (!empty($visitorPages)) {
                 return $this->redirectToRoute('app_page_view', ['slug' => reset($visitorPages)->getSlug()]);
             }
 
-            if (!empty($visitorBlogs) || !empty($visitorCalendars)) {
+            if ($this->pageParameterBag->get('has_blogs') || $this->pageParameterBag->get('has_calendars')) {
                 return $this->render('home/home.html.twig', [
                     'usemenu' => true,
                     'usesidebar' => false,

@@ -43,7 +43,7 @@ services:
 
     App\Service\PageParameterBag:
         class: App\Service\PageParameterBag
-        arguments: ['@App\Repository\PageRepository', '@security.token_storage']
+        arguments: ['@App\Repository\PageRepository', '@security.token_storage', '@App\Repository\BlogRepository', '@App\Repository\CalendarRepository']
 
     App\:
         resource: '../src/'

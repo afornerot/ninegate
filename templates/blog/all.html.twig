@@ -3,6 +3,44 @@
 {% block body %}
 <h1>{{ title }}</h1>
 
+<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+    {% if canCreateArticle %}
+        {% if manageableBlogs|length == 1 %}
+            <a href="{{ path('app_user_blogarticle_submit', {blogId: manageableBlogs[0].id}) }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Nouvel Article
+            </a>
+        {% else %}
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-plus"></i> Nouvel Article
+                </button>
+                <ul class="dropdown-menu">
+                    {% for blog in manageableBlogs %}
+                        <li>
+                            <a class="dropdown-item" href="{{ path('app_user_blogarticle_submit', {blogId: blog.id}) }}">
+                                {{ blog.title }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if accessibleBlogs|length > 1 %}
+        <a href="{{ path('app_blogs_all') }}"
+           class="btn btn-sm {{ selectedBlogId is null ? 'btn-secondary' : 'btn-outline-secondary' }}">
+            Tous
+        </a>
+        {% for blog in accessibleBlogs %}
+            <a href="{{ path('app_blogs_all', {blog: blog.id}) }}"
+               class="btn btn-sm {{ selectedBlogId == blog.id ? 'btn-secondary' : 'btn-outline-secondary' }}">
+                {{ blog.title }}
+            </a>
+        {% endfor %}
+    {% endif %}
+</div>
+
 {% if articles|length > 0 %}
 <div class="blog-grid">
     {% for article in articles %}
@@ -10,7 +48,7 @@
             <div class="card">
                 {% if article.image %}
                     <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: 'blogs'}) }}">
-                        <img src="{{ path('bninefiles_files_thumbnail', {domain: 'blog', id: article.blog.id, path: article.image}) }}" class="card-img-top" alt="{{ article.title }}">
+                        <img src="{{ bninefile(article.image) }}" class="card-img-top" alt="{{ article.title }}">
                     </a>
                 {% endif %}
                 <div class="card-body">

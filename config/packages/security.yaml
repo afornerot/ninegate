@@ -13,11 +13,6 @@ security:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
 
-    bninefiles:
-      pattern: ^/bninefiles/(image|thumbnail)/
-      security: false
-      stateless: true
-
     main:
       pattern: ^/
       provider: sql_provider
@@ -34,7 +29,15 @@ security:
       logout:
         path: app_logout
 
+    bninefiles:
+      pattern: ^/bninefiles/(image|thumbnail)/
+      security: false
+      context: main
+      stateless: true
+
   access_control:
+    - { path: ^/bninefiles/(image|thumbnail)/, roles: PUBLIC_ACCESS }
+    - { path: ^/bninefiles/, roles: PUBLIC_ACCESS }
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/$, roles: PUBLIC_ACCESS }
     - { path: ^/caldav, roles: PUBLIC_ACCESS }

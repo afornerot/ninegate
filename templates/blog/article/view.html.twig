@@ -34,7 +34,7 @@
 </p>
 
 {% if article.image %}
-    <img src="{{ path('bninefiles_files_image', {domain: 'blog', id: blog.id, path: article.image}) }}" alt="{{ article.title }}" class="img-fluid mb-4 rounded" style="max-height: 400px; object-fit: cover; width: 100%;">
+    <img src="{{ bninefile(article.image) }}" alt="{{ article.title }}" class="img-fluid mb-4 rounded" style="max-height: 400px; object-fit: cover; width: 100%;">
 {% endif %}
 
 <div class="article-content">

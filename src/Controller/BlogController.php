@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Blog;
+use App\Entity\User;
 use App\Form\BlogType;
 use App\Repository\BlogRepository;
 use App\Voter\BlogVoter;
@@ -191,13 +192,39 @@ class BlogController extends AbstractController
     }
 
     #[Route('/blogs', name: 'app_blogs_all')]
-    public function all(): Response
+    public function all(Request $request): Response
     {
         $user = $this->getUser();
         $blogs = $this->blogRepository->findAccessibleBlogs($user);
 
+        $manageableBlogs = [];
+        if ($user instanceof User) {
+            foreach ($blogs as $blog) {
+                if ($this->blogRepository->isBlogOwnerOrGroupMaster($blog, $user)) {
+                    $manageableBlogs[] = $blog;
+                }
+            }
+        }
+
+        $selectedBlogId = $request->query->get('blog');
+        $selectedBlogId = is_numeric($selectedBlogId) ? (int) $selectedBlogId : null;
+
+        $filteredBlogs = $blogs;
+        $titleSuffix = '';
+        if (null !== $selectedBlogId) {
+            $filteredBlogs = array_values(array_filter(
+                $blogs,
+                fn (Blog $blog) => $blog->getId() === $selectedBlogId
+            ));
+            if (!empty($filteredBlogs)) {
+                $titleSuffix = ' — '.$filteredBlogs[0]->getTitle();
+            } else {
+                $selectedBlogId = null;
+            }
+        }
+
         $articles = [];
-        foreach ($blogs as $blog) {
+        foreach ($filteredBlogs as $blog) {
             foreach ($blog->getArticles() as $article) {
                 $articles[] = $article;
             }
@@ -207,8 +234,12 @@ class BlogController extends AbstractController
         return $this->render('blog/all.html.twig', [
             'usemenu' => true,
             'usesidebar' => false,
-            'title' => 'Tous les blogs',
+            'title' => 'Tous les blogs'.$titleSuffix,
             'articles' => $articles,
+            'accessibleBlogs' => $blogs,
+            'manageableBlogs' => $manageableBlogs,
+            'selectedBlogId' => $selectedBlogId,
+            'canCreateArticle' => $user instanceof User && count($manageableBlogs) > 0,
         ]);
     }
 }
