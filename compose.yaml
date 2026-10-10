@@ -10,7 +10,7 @@ services:
     volumes:
       - ./volume/postgres:/var/lib/postgresql/data
   ninegate:
-    image: ghcr.io/afornerot/ninegate
+    image: reg.cadoles.com/envole/ninegate:3.0
     container_name: ninegate
     restart: unless-stopped
     build:
@@ -35,12 +35,12 @@ services:
       - ./volume/dex:/app/volume/dex
       - ../bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
   openldap:
+    image: reg.cadoles.com/envole/openldap:2.6.8
+    container_name: ninegate-openldap
+    restart: unless-stopped
     build:
       context: .
       dockerfile: ./misc/docker/Dockerfile.openldap
-    image: ninegate-openldap:local
-    container_name: ninegate-openldap
-    restart: unless-stopped
     hostname: openldap
     # Configuration : l'image charge .env au build et .env.local est monté à runtime.
     # Aucune variable n'est listée dans environment: tout vient du .env/.env.local.
