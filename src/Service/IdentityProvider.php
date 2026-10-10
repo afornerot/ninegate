@@ -15,7 +15,6 @@ class IdentityProvider
     public const MASTER_SSO  = 'SSO';
 
     public const SYNC_DISABLED   = 'false';
-    public const SYNC_NINE2GLAUTH = 'NINE2GLAUTH';
     public const SYNC_NINE2LDAP   = 'NINE2LDAP';
     public const SYNC_LDAP2NINE   = 'LDAP2NINE';
 
@@ -54,7 +53,6 @@ class IdentityProvider
 
         $allowedSync = [
             self::SYNC_DISABLED,
-            self::SYNC_NINE2GLAUTH,
             self::SYNC_NINE2LDAP,
             self::SYNC_LDAP2NINE,
         ];
@@ -85,11 +83,6 @@ class IdentityProvider
     public function isSyncEnabled(): bool
     {
         return self::SYNC_DISABLED !== $this->syncIdentity;
-    }
-
-    public function isSyncNineToGlauth(): bool
-    {
-        return self::SYNC_NINE2GLAUTH === $this->syncIdentity;
     }
 
     public function isSyncNineToLdap(): bool

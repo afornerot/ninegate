@@ -16,10 +16,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  * Orchestrateur de synchronisation d'identité.
  *
  * Dispatche vers la sous-commande appropriée selon SYNC_IDENTITY :
- *   - NINE2GLAUTH → app:identity:nine2glauth
- *   - NINE2LDAP   → app:identity:nine2ldap
- *   - LDAP2NINE   → app:identity:ldap2nine
- *   - false       → affiche l'aide, aucune action
+ *   - NINE2LDAP → app:identity:nine2ldap
+ *   - LDAP2NINE → app:identity:ldap2nine
+ *   - false     → affiche l'aide, aucune action
  */
 #[AsCommand(
     name: 'app:identity:sync',
@@ -29,7 +28,7 @@ class IdentitySyncCommand extends Command
 {
     public function __construct(
         private IdentityProvider $identityProvider,
-        private \Symfony\Component\Console\Application $application,
+        private Application $application,
     ) {
         parent::__construct();
     }
@@ -51,17 +50,15 @@ class IdentitySyncCommand extends Command
         if (IdentityProvider::SYNC_DISABLED === $direction) {
             $io->note('SYNC_IDENTITY=false. Aucune synchronisation configurée.');
             $io->listing([
-                'app:identity:nine2glauth — pousse les données ninegate vers GLAuth',
-                'app:identity:nine2ldap   — pousse les données ninegate vers OpenLDAP',
-                'app:identity:ldap2nine   — importe les données OpenLDAP vers ninegate',
+                'app:identity:nine2ldap — pousse les données ninegate vers OpenLDAP',
+                'app:identity:ldap2nine — importe les données OpenLDAP vers ninegate',
             ]);
             return Command::SUCCESS;
         }
 
         $subCommand = match ($direction) {
-            IdentityProvider::SYNC_NINE2GLAUTH => 'app:identity:nine2glauth',
-            IdentityProvider::SYNC_NINE2LDAP   => 'app:identity:nine2ldap',
-            IdentityProvider::SYNC_LDAP2NINE   => 'app:identity:ldap2nine',
+            IdentityProvider::SYNC_NINE2LDAP => 'app:identity:nine2ldap',
+            IdentityProvider::SYNC_LDAP2NINE => 'app:identity:ldap2nine',
             default => null,
         };
 
@@ -71,8 +68,8 @@ class IdentitySyncCommand extends Command
         }
 
         // Règle de cohérence : LDAP2NINE nécessite que la source d'identité ne soit PAS ninegate (SQL).
-// NINE2LDAP reste OK même en MASTERIDENTITY=SQL : on alimente un annuaire local pour les
-// services tiers (Nextcloud, Gitea, etc.) à partir de notre source de vérité.
+        // NINE2LDAP reste OK même en MASTERIDENTITY=SQL : on alimente un annuaire local pour les
+        // services tiers (Nextcloud, Gitea, etc.) à partir de notre source de vérité.
         if (IdentityProvider::SYNC_LDAP2NINE === $direction
             && IdentityProvider::MASTER_SQL === $this->identityProvider->getMasterIdentity()) {
             $io->error(sprintf(

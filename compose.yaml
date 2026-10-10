@@ -33,7 +33,6 @@ services:
       - ./public/medias:/app/public/medias:delegated
       - ./.env.local:/app/.env.local
       - ./volume/dex:/app/volume/dex
-      - ./volume/glauth:/app/volume/glauth
       - ../bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
   openldap:
     build:
@@ -66,17 +65,6 @@ services:
     ports:
       - "8025:8025"
       - "1025:1025"
-  glauth:
-    image: ghcr.io/glauth/glauth-plugins:v2.4.0
-    container_name: ninegate-glauth
-    restart: unless-stopped
-    depends_on:
-      - postgres
-      - ninegate
-    ports:
-      - "389:3893"
-    volumes:
-      - ./volume/glauth:/app/config
   rustfs:
     image: rustfs/rustfs:latest
     container_name: ninegate-rustfs

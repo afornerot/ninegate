@@ -17,12 +17,12 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 
 /**
  * Consomme les messages de sync (temps réel) et pousse les changements
- * vers les sources distantes (OpenLDAP et/ou GLAuth).
+ * vers OpenLDAP.
  *
  * Stratégie :
- *   - On synchronise vers toutes les destinations actives (config `SYNC_IDENTITY`)
+ *   - On synchronise vers OpenLDAP si `SYNC_IDENTITY=NINE2LDAP`
  *   - En cas d'erreur, on throw pour que Messenger puisse retry (3 fois max)
- *   - Si la destination n'est pas joignable, on throw → retry → si KO, msg
+ *   - Si le service n'est pas joignable, on throw → retry → si KO, msg
  *     dans le transport `failed`
  */
 class IdentitySyncHandler
@@ -39,7 +39,7 @@ class IdentitySyncHandler
     #[AsMessageHandler]
     public function handleUser(UserSyncMessage $message): void
     {
-        if (!$this->shouldSync()) {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
             return;
         }
 
@@ -49,30 +49,19 @@ class IdentitySyncHandler
             return;
         }
 
-        // Destination OpenLDAP (si activée)
-        if ($this->identityProvider->isSyncNineToLdap()) {
-            try {
-                $this->ldapService->bind();
-            } catch (\Throwable $e) {
-                throw new UnrecoverableMessageHandlingException('LDAP bind failed', 0, $e);
-            }
-            $this->syncService->syncUser($user);
+        try {
+            $this->ldapService->bind();
+        } catch (\Throwable $e) {
+            throw new UnrecoverableMessageHandlingException('LDAP bind failed', 0, $e);
         }
 
-        // Destination GLAuth (si activée)
-        if ($this->identityProvider->isSyncNineToGlauth()) {
-            try {
-                $this->syncService->syncUserGlauth($user);
-            } catch (\Throwable $e) {
-                throw new UnrecoverableMessageHandlingException('GLAuth sync failed', 0, $e);
-            }
-        }
+        $this->syncService->syncUser($user);
     }
 
     #[AsMessageHandler]
     public function handleGroup(GroupSyncMessage $message): void
     {
-        if (!$this->shouldSync()) {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
             return;
         }
 
@@ -93,7 +82,7 @@ class IdentitySyncHandler
     #[AsMessageHandler]
     public function handleUserGroup(UserGroupSyncMessage $message): void
     {
-        if (!$this->shouldSync()) {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
             return;
         }
 
@@ -109,11 +98,5 @@ class IdentitySyncHandler
         }
 
         $this->syncService->syncGroupMembers($group);
-    }
-
-    private function shouldSync(): bool
-    {
-        return $this->identityProvider->isSyncNineToLdap()
-            || $this->identityProvider->isSyncNineToGlauth();
     }
 }

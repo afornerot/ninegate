@@ -7,20 +7,15 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 /**
  * Service centralisant le calcul du mot de passe hashé au format LDAP.
  *
- * Format canonique en BDD (User::ldapPassword) : `{BCRYPT}$2y$12$...`
- * (hash bcrypt natif de Symfony, lisible et standard).
+ * Le format canonique stocké dans User::ldapPassword est `{BCRYPT}$2y$12$...`
+ * (hash bcrypt natif de Symfony, lisible et standard). Ce format est utilisé pour
+ * pouvoir re-pousser le hash en cas de mise à jour.
  *
- * Selon la destination, le hash est transformé au moment du push :
- *
- *   - OpenLDAP (Alpine officiel) : la glibc/musl Alpine ne supporte pas
- *     bcrypt en `crypt(3)`. On pousse donc un hash `{CRYPT}$6$` (SHA-512)
- *     ou `{CRYPT}$y$` (yescrypt) généré par `crypt()` natif. OpenLDAP
- *     valide ce hash via son module `crypt(3)` sans dépendance externe.
- *
- *   - GLAuth (plugin Postgres) : le code Go de glauth fait
- *     `hex.DecodeString(passbcrypt)` puis `bcrypt.CompareHashAndPassword`.
- *     On doit donc pousser la représentation hexadécimale du hash bcrypt
- *     brut (sans le préfixe `{BCRYPT}`), pour faire correspondre le décodage.
+ * Pour la destination OpenLDAP (Alpine), l'image officielle ne supporte pas
+ * bcrypt via `crypt(3)` (musl sans bcrypt). On stocke donc un second hash
+ * `User::openLdapPassword` au format `{CRYPT}$6$...` (SHA-512 crypt natif)
+ * généré via `crypt()` de PHP. Ce format est natif sur musl/glibc Alpine
+ * sans nécessiter de module supplémentaire côté slapd.
  *
  * Aucun flux ne repasse en clair : les hashes sont produits au moment d'un
  * changement de password (UserController/ResetPassword/UserPasswordCommand)
@@ -53,7 +48,7 @@ class LdapPasswordService
      * Hash compatible avec OpenLDAP Alpine via `crypt(3)` (SHA-512).
      *
      * Format produit : `{CRYPT}$6$<salt>$<hash>`.
-     * Ce format est natif sur la glibc et musl Alpine 3.20, sans nécessiter
+     * Ce format est natif sur la glibc et musl Alpine, sans nécessiter
      * de module supplémentaire côté slapd.
      */
     public function hashForOpenLdap(string $plainPassword): string
@@ -62,22 +57,6 @@ class LdapPasswordService
         $hash = crypt($plainPassword, '$6$' . $salt . '$');
 
         return '{CRYPT}' . $hash;
-    }
-
-    /**
-     * Convertit le format canonique `{BCRYPT}$2y$...` en format hex attendu
-     * par le plugin Postgres de glauth (champ `passbcrypt`).
-     */
-    public function hashForGlauth(string $canonicalLdapPassword): ?string
-    {
-        $hash = $canonicalLdapPassword;
-        if (str_starts_with($hash, '{BCRYPT}')) {
-            $hash = substr($hash, strlen('{BCRYPT}'));
-        }
-        if ('' === $hash || !str_starts_with($hash, '$2')) {
-            return null;
-        }
-        return bin2hex($hash);
     }
 
     /**

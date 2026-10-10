@@ -14,9 +14,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
- * Service bas-niveau qui pousse les entités ninegate vers les sources
- * distantes (OpenLDAP, GLAuth). Utilisé à la fois :
- *   - en batch par les commandes IdentitySync*Command
+ * Service bas-niveau qui pousse les entités ninegate vers OpenLDAP.
+ * Utilisé à la fois :
+ *   - en batch par la commande IdentitySyncNine2LdapCommand
  *   - en temps réel par IdentitySyncHandler (consommateur Messenger)
  *
  * Toutes les méthodes sont idempotentes et peuvent être appelées
@@ -34,7 +34,6 @@ class IdentitySyncService
         private LdapService $ldapService,
         private EntityManagerInterface $em,
         private ParameterBagInterface $parameterBag,
-        private LdapPasswordService $ldapPasswordService,
     ) {
     }
 
@@ -43,7 +42,7 @@ class IdentitySyncService
      */
     public function syncUser(User $user): void
     {
-        if (!$this->shouldSyncToLdap()) {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
             return;
         }
 
@@ -80,7 +79,7 @@ class IdentitySyncService
      */
     public function syncGroup(AppGroup $group): void
     {
-        if (!$this->shouldSyncToLdap()) {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
             return;
         }
 
@@ -112,7 +111,7 @@ class IdentitySyncService
      */
     public function syncGroupMembers(AppGroup $group): void
     {
-        if (!$this->shouldSyncToLdap()) {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
             return;
         }
 
@@ -133,59 +132,6 @@ class IdentitySyncService
             'memberuid' => $members,
         ]);
         $mapping->setSyncedAt(new \DateTimeImmutable());
-    }
-
-    /**
-     * Pousse un user vers GLAuth (legacy).
-     */
-    public function syncUserGlauth(User $user): void
-    {
-        if (!$this->identityProvider->isSyncNineToGlauth()) {
-            return;
-        }
-
-        $ldapUser = $this->em->getRepository(\App\Entity\Ldap\LdapUser::class)
-            ->findOneBy(['uidnumber' => $user->getId() + 1000]);
-        if (!$ldapUser) {
-            $ldapUser = new \App\Entity\Ldap\LdapUser();
-        }
-
-        $primaryGroupGid = 1000;
-        $otherGroupIds = [];
-        foreach ($user->getUserGroups() as $ug) {
-            $gid = $ug->getGroup()->getId() + 1000;
-            if ($ug->getRole() === UserGroup::ROLE_MASTER && $primaryGroupGid === 1000) {
-                $primaryGroupGid = $gid;
-            } else {
-                $otherGroupIds[] = $gid;
-            }
-        }
-        if ($primaryGroupGid === 1000 && !empty($otherGroupIds)) {
-            $primaryGroupGid = array_shift($otherGroupIds);
-        }
-        $otherGroupIds = array_values(array_diff($otherGroupIds, [$primaryGroupGid]));
-
-        $ldapUser->setName($user->getUsername());
-        $ldapUser->setUidnumber($user->getId() + 1000);
-        $ldapUser->setPrimarygroup($primaryGroupGid);
-        $ldapUser->setOthergroups(!empty($otherGroupIds) ? implode(',', $otherGroupIds) : '');
-        $ldapUser->setGivenname($user->getFirstname() ?? '');
-        $ldapUser->setSn($user->getLastname() ?? '');
-        $ldapUser->setMail($user->getEmail() ?? '');
-        if ($user->getLdapPassword()) {
-            $ldapUser->setPassbcrypt($this->ldapPasswordService->hashForGlauth($user->getLdapPassword()));
-        }
-        $ldapUser->setDisabled(0);
-        $ldapUser->setSshkeys('');
-
-        $this->em->persist($ldapUser);
-        $this->em->flush();
-    }
-
-    private function shouldSyncToLdap(): bool
-    {
-        return $this->identityProvider->isSyncNineToLdap()
-            || $this->identityProvider->isSyncNineToGlauth();
     }
 
     /**
