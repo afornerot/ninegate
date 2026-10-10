@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Service\UsernameNormalizer;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Icon;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -30,7 +31,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Assert\Length(max: 180)]
+    #[Assert\Length(min: 3, max: 180)]
+    #[Assert\Regex(
+        pattern: UsernameNormalizer::PATTERN,
+        message: 'Le login doit contenir uniquement des lettres minuscules, chiffres, tirets (-), underscores (_) et points (.) (3 à 180 caractères).'
+    )]
     private ?string $username = null;
 
     #[ORM\Column(type: 'jsonb')]
@@ -60,8 +65,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(options: ['default' => false])]
     private bool $needsPasswordUpgrade = false;
 
-    #[ORM\Column(length: 64, nullable: true)]
-    private ?string $sha256Hash = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
+    private ?string $ldapPassword = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
+    private ?string $openLdapPassword = null;
 
     #[ORM\Column(length: 128, unique: true, nullable: true)]
     private ?string $apiKey = null;
@@ -226,14 +236,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getLdapPassword(): ?string
+    {
+        return $this->ldapPassword;
+    }
+
+    public function setLdapPassword(?string $ldapPassword): static
+    {
+        $this->ldapPassword = $ldapPassword;
+
+        return $this;
+    }
+
+    public function getOpenLdapPassword(): ?string
+    {
+        return $this->openLdapPassword;
+    }
+
+    public function setOpenLdapPassword(?string $openLdapPassword): static
+    {
+        $this->openLdapPassword = $openLdapPassword;
+
+        return $this;
+    }
+
+    /**
+     * À FAIRE : compatibilité ascendante (transitoire).
+     */
     public function getSha256Hash(): ?string
     {
-        return $this->sha256Hash;
+        return $this->ldapPassword;
     }
 
     public function setSha256Hash(?string $sha256Hash): static
     {
-        $this->sha256Hash = $sha256Hash;
+        $this->ldapPassword = $sha256Hash;
 
         return $this;
     }

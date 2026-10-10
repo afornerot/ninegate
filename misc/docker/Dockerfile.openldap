@@ -1,0 +1,33 @@
+FROM alpine:3.20
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apk add --no-cache \
+        openldap \
+        openldap-back-mdb \
+        openldap-clients \
+        openldap-overlay-all \
+        gettext \
+        bash \
+        ca-certificates \
+    && mkdir -p /var/lib/openldap/openldap-data /etc/openldap/slapd.d /app /opt/openldap \
+    && chown -R ldap:ldap /var/lib/openldap /etc/openldap/slapd.d
+
+WORKDIR /app
+
+# Copie du .env du projet au build (valeurs par défaut figées dans l'image)
+# .env.local sera monté en volume à runtime et surchargera ces valeurs
+COPY .env /app/.env
+
+# Templates et entrypoint
+COPY misc/docker/openldap/entrypoint.sh /entrypoint.sh
+COPY misc/docker/openldap/template-slapd.conf /opt/openldap/template-slapd.conf
+COPY misc/docker/openldap/template-db.ldif /opt/openldap/template-db.ldif
+
+RUN chmod +x /entrypoint.sh
+
+VOLUME ["/var/lib/openldap", "/etc/openldap/slapd.d", "/app/.env.local"]
+
+EXPOSE 389
+
+ENTRYPOINT ["/entrypoint.sh"]

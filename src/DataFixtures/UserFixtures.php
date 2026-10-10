@@ -6,6 +6,7 @@ use App\Entity\Group;
 use App\Entity\User;
 use App\Repository\GroupRepository;
 use App\Repository\UserRepository;
+use App\Service\LdapPasswordService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -17,6 +18,7 @@ class UserFixtures extends Fixture
         private ParameterBagInterface $parameterBag,
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $passwordHasher,
+        private LdapPasswordService $ldapPasswordService,
         private GroupRepository $groupRepository,
     ) {
     }
@@ -24,6 +26,10 @@ class UserFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $all = $this->groupRepository->findOneBy(['slug' => 'all']);
+
+        $plainPassword = $this->parameterBag->get('appAdminPassword');
+        $ldapHash = $this->ldapPasswordService->hashForLdap($plainPassword);
+        $openLdapHash = $this->ldapPasswordService->hashForOpenLdap($plainPassword);
 
         $admins = array_map('trim', explode(',', $this->parameterBag->get('appAdmin')));
         $data = [];
@@ -39,14 +45,23 @@ class UserFixtures extends Fixture
                 $user = new User();
                 $user->setUsername($item['username']);
                 $user->setEmail($item['email']);
-                $hashedPassword = $this->passwordHasher->hashPassword($user, $this->parameterBag->get('appAdminPassword'));
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
                 $user->setPassword($hashedPassword);
-                $user->setSha256Hash(hash('sha256', $this->parameterBag->get('appAdminPassword')));
+                $user->setLdapPassword($ldapHash);
+                $user->setOpenLdapPassword($openLdapHash);
                 $user->setRoles([$item['role']]);
                 if ($item['avatar']) {
                     $user->setAvatar($item['avatar']);
                 }
                 $manager->persist($user);
+            } else {
+                // Mise à jour de l'existant : on (re)pose le hash LDAP si absent
+                if (null === $user->getLdapPassword()) {
+                    $user->setLdapPassword($ldapHash);
+                }
+                if (null === $user->getOpenLdapPassword()) {
+                    $user->setOpenLdapPassword($openLdapHash);
+                }
             }
 
             if ($all && !$all->getUserGroup($user)) {

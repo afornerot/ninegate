@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
+use App\Message\UserSyncMessage;
 use App\Repository\UserRepository;
+use App\Service\LdapPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -10,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
@@ -21,7 +24,9 @@ class UserPasswordCommand extends Command
     public function __construct(
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $passwordHasher,
+        private LdapPasswordService $ldapPasswordService,
         private EntityManagerInterface $em,
+        private MessageBusInterface $bus,
     ) {
         parent::__construct();
     }
@@ -30,7 +35,7 @@ class UserPasswordCommand extends Command
     {
         $this
             ->addArgument('username', InputArgument::REQUIRED, 'Username de l\'utilisateur')
-            ->setDescription('Change le mot de passe d\'un utilisateur et synchronise le SHA-256 pour glauth.');
+            ->setDescription('Change le mot de passe d\'un utilisateur et synchronise le hash LDAP (compatible GLAuth et OpenLDAP).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -51,21 +56,23 @@ class UserPasswordCommand extends Command
             return Command::FAILURE;
         }
 
-        // Hash bcrypt
+        // Hash bcrypt (auth ninegate)
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
 
-        // SHA-256 pour glauth
-        $user->setSha256Hash(hash('sha256', $password));
+        // Hash {BCRYPT} (push vers OpenLDAP / GLAuth)
+        $user->setLdapPassword($this->ldapPasswordService->hashForLdap($password));
+        $user->setOpenLdapPassword($this->ldapPasswordService->hashForOpenLdap($password));
 
-        // Clear upgrade flag
         $user->setNeedsPasswordUpgrade(false);
 
         $this->em->flush();
 
         $output->writeln("<info>Mot de passe de '$username' mis à jour avec succès.</info>");
-        $output->writeln("<info>  - bcrypt: OK</info>");
-        $output->writeln("<info>  - SHA-256 (glauth): OK</info>");
+        $output->writeln("<info>  - bcrypt (auth ninegate): OK</info>");
+        $output->writeln("<info>  - {BCRYPT} (OpenLDAP/GLAuth): OK</info>");
+
+        $this->bus->dispatch(new UserSyncMessage($user->getId()));
 
         return Command::SUCCESS;
     }

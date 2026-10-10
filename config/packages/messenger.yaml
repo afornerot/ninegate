@@ -21,3 +21,6 @@ framework:
             Symfony\Component\Mailer\Messenger\SendEmailMessage: async
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
+            App\Message\UserSyncMessage: async
+            App\Message\GroupSyncMessage: async
+            App\Message\UserGroupSyncMessage: async

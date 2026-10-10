@@ -5,14 +5,18 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\UserGroup;
 use App\Form\GroupType;
+use App\Message\GroupSyncMessage;
+use App\Message\UserGroupSyncMessage;
 use App\Repository\GroupRepository;
 use App\Repository\UserRepository;
+use App\Service\IdentityProvider;
 use App\Service\SlugService;
 use App\Voter\GroupVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class GroupController extends AbstractController
@@ -26,6 +30,8 @@ class GroupController extends AbstractController
         private UserRepository $userRepository,
         private GroupRepository $groupRepository,
         private SlugService $slugService,
+        private IdentityProvider $identityProvider,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -102,6 +108,8 @@ class GroupController extends AbstractController
         $group->addUser($user, UserGroup::ROLE_VIEWER);
         $this->em->flush();
 
+        $this->dispatchGroupMemberSync($group);
+
         $this->addFlash('success', 'Vous avez rejoint le groupe '.$group->getName());
 
         return $this->redirectToRoute('app_user_group_list');
@@ -126,6 +134,8 @@ class GroupController extends AbstractController
         $userGroup = $group->getUserGroup($user);
         $this->em->remove($userGroup);
         $this->em->flush();
+
+        $this->dispatchGroupMemberSync($group);
 
         $this->addFlash('success', 'Vous avez quitté le groupe '.$group->getName());
 
@@ -158,6 +168,9 @@ class GroupController extends AbstractController
                 $this->em->persist($userGroup);
                 $this->em->flush();
             }
+
+            $this->dispatchGroupSync($group);
+            $this->dispatchGroupMemberSync($group);
 
             $userGroupRoute = $isAdmin ? 'app_admin_usergroup_update' : 'app_user_usergroup_update';
 
@@ -202,6 +215,8 @@ class GroupController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $group->setSlug($this->slugService->generateUniqueSlug($group->getName(), 'Group', $group->getId()));
             $this->em->flush();
+
+            $this->dispatchGroupSync($group);
 
             return $this->redirectToRoute($listRoute);
         }
@@ -250,5 +265,19 @@ class GroupController extends AbstractController
         }
 
         return $this->redirectToRoute($listRoute);
+    }
+
+    private function dispatchGroupSync(Group $group): void
+    {
+        if ($this->identityProvider->isSyncEnabled()) {
+            $this->bus->dispatch(new GroupSyncMessage($group->getId()));
+        }
+    }
+
+    private function dispatchGroupMemberSync(Group $group): void
+    {
+        if ($this->identityProvider->isSyncEnabled()) {
+            $this->bus->dispatch(new UserGroupSyncMessage($group->getId()));
+        }
     }
 }

@@ -1,7 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>{{ title }}</h1>
+<h1>{{ title }}
+    {% if group and group.isAnnuaire %}
+        <span class="badge bg-warning text-dark ms-2" title="Ce groupe est synchronisé depuis l'annuaire LDAP.">Annuaire</span>
+    {% endif %}
+</h1>
+
+{% if group and group.isAnnuaire %}
+    <div class="alert alert-warning">
+        Ce groupe est synchronisé depuis l'annuaire LDAP. Le nom ne peut pas être modifié ici.
+        Seuls la description, le logo et l'ouverture peuvent être ajustés localement.
+    </div>
+{% endif %}
 
 {{ form_start(form) }}
 <div class="d-flex gap-2 mb-3">

@@ -18,6 +18,7 @@ services:
       dockerfile: ./misc/docker/Dockerfile
     depends_on:
       - postgres
+      - openldap
     ports:
       - "8019:80"
     volumes:
@@ -34,6 +35,22 @@ services:
       - ./volume/dex:/app/volume/dex
       - ./volume/glauth:/app/volume/glauth
       - ../bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
+  openldap:
+    build:
+      context: .
+      dockerfile: ./misc/docker/Dockerfile.openldap
+    image: ninegate-openldap:local
+    container_name: ninegate-openldap
+    restart: unless-stopped
+    hostname: openldap
+    # Configuration : l'image charge .env au build et .env.local est monté à runtime.
+    # Aucune variable n'est listée dans environment: tout vient du .env/.env.local.
+    volumes:
+      - ./volume/openldap/data:/var/lib/openldap/openldap-data
+      - ./volume/openldap/config:/etc/openldap/slapd.d
+      - ./.env.local:/app/.env.local:ro
+    ports:
+      - "1389:389"
   adminer:
     image: adminer
     container_name: ninegate-adminer

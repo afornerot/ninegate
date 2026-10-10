@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\IdentityProvider;
 use Jumbojett\OpenIDConnectClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -13,6 +14,11 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    public function __construct(
+        private IdentityProvider $identityProvider,
+    ) {
+    }
+
     #[Route(path: '/login', name: 'app_login')]
     public function login(
         Request $request,
@@ -39,6 +45,7 @@ class SecurityController extends AbstractController
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
+            'identityProvider' => $this->identityProvider,
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Service\IdentityProvider;
 use Bnine\FilesBundle\Form\Type\IconUploadType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,6 +20,14 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $identityLocal = (IdentityProvider::MASTER_SQL === $options['appMasterIdentity']);
+
+        // Sécurité : en mode identité externe (LDAP/SSO), les champs identité
+        // sont désactivés et peuvent être null (auto-create depuis IdP).
+        // On force donc required=false pour éviter qu'un user soit bloqué
+        // sur son profil par une valeur non modifiable.
+        $identityFieldsRequired = $identityLocal;
+
         $builder
         ->add('submit', SubmitType::class, [
             'label' => 'Valider',
@@ -27,22 +36,31 @@ class UserType extends AbstractType
 
         ->add('username', TextType::class, [
             'label' => 'Login',
-            'disabled' => ('submit' != $options['mode']),
+            'required' => $identityFieldsRequired,
+            'disabled' => ('submit' != $options['mode']) || !$identityLocal,
+            'attr' => [
+                'pattern' => '[a-z0-9._-]{3,180}',
+                'title' => 'Lettres minuscules, chiffres, tirets, underscores et points uniquement (3-180 caractères)',
+            ],
         ])
 
         ->add('email', EmailType::class, [
             'label' => 'Email',
+            'required' => $identityFieldsRequired,
+            'disabled' => !$identityLocal,
         ])
 
         ->add('firstname', TextType::class, [
             'label' => 'Prénom',
-            'required' => false,
+            'required' => $identityFieldsRequired,
+            'disabled' => !$identityLocal,
             'attr' => ['class' => 'form-control'],
         ])
 
         ->add('lastname', TextType::class, [
             'label' => 'Nom',
-            'required' => false,
+            'required' => $identityFieldsRequired,
+            'disabled' => !$identityLocal,
             'attr' => ['class' => 'form-control'],
         ])
 
@@ -71,7 +89,7 @@ class UserType extends AbstractType
             ]);
         }
 
-        if ('SQL' === $options['appModeAuth']) {
+        if ($identityLocal && IdentityProvider::MODE_SQL === $options['appModeAuth']) {
             $builder
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
@@ -94,7 +112,8 @@ class UserType extends AbstractType
             'csrf_field_name' => '_token',
             'csrf_token_id' => static::class,
             'mode' => 'submit',
-            'appModeAuth' => 'SQL',
+            'appModeAuth' => IdentityProvider::MODE_SQL,
+            'appMasterIdentity' => IdentityProvider::MASTER_SQL,
         ]);
     }
 }

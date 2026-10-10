@@ -47,7 +47,12 @@
                     <td>
                         <img src="{{ bninefile(group.logo) }}" alt="Logo" style="width: 32px; height: 32px; object-fit: cover;">
                     </td>
-                    <td>{{ group.name }}</td>
+                    <td>
+                        {{ group.name }}
+                        {% if group.isAnnuaire %}
+                            <span class="badge bg-warning text-dark ms-1" title="Groupe synchronisé depuis l'annuaire LDAP.">Annuaire</span>
+                        {% endif %}
+                    </td>
                     <td>{{ group.description }}</td>
                     <td>{{ admin ? group.type : (group.isOpen ? 'Ouvert' : 'Fermé') }}</td>
                 </tr>

@@ -5,14 +5,17 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
+use App\Message\UserGroupSyncMessage;
 use App\Repository\UserGroupRepository;
 use App\Repository\UserRepository;
+use App\Service\IdentityProvider;
 use App\Voter\GroupVoter;
 use App\Voter\UserGroupVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -26,6 +29,8 @@ class UserGroupController extends AbstractController
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private UserGroupRepository $userGroupRepository,
+        private IdentityProvider $identityProvider,
+        private MessageBusInterface $bus,
     ) {
     }
 
@@ -113,6 +118,10 @@ class UserGroupController extends AbstractController
                     }
                 }
                 $this->em->flush();
+
+                if ($this->identityProvider->isSyncEnabled()) {
+                    $this->bus->dispatch(new UserGroupSyncMessage($group->getId()));
+                }
 
                 return $this->redirectToRoute($_route, ['id' => $id]);
             }

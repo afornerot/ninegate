@@ -37,6 +37,9 @@ class Group
     #[ORM\Column]
     private bool $isSystem = false;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isAnnuaire = false;
+
     #[ORM\Column(length: 50)]
     private string $type = self::TYPE_WORK_GROUP;
 
@@ -120,6 +123,18 @@ class Group
     public function setIsSystem(bool $isSystem): static
     {
         $this->isSystem = $isSystem;
+
+        return $this;
+    }
+
+    public function isAnnuaire(): bool
+    {
+        return $this->isAnnuaire;
+    }
+
+    public function setIsAnnuaire(bool $isAnnuaire): static
+    {
+        $this->isAnnuaire = $isAnnuaire;
 
         return $this;
     }

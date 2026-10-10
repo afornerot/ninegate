@@ -43,7 +43,7 @@ class LdapUser
     #[ORM\Column(type: 'smallint')]
     private int $disabled = 0;
 
-    #[ORM\Column(length: 64)]
+    #[ORM\Column(length: 255)]
     private ?string $passsha256 = '';
 
     #[ORM\Column(type: 'text')]

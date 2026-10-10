@@ -31,9 +31,11 @@
                 Valider
             </button>
 
-            <div class="text-center mt-3">
-                <a href="{{ path('app_forgot_password') }}" class="text-muted small">Mot de passe oublié ?</a>
-            </div>
+            {% if identityProvider.canManagePassword %}
+                <div class="text-center mt-3">
+                    <a href="{{ path('app_forgot_password') }}" class="text-muted small">Mot de passe oublié ?</a>
+                </div>
+            {% endif %}
         </div>
     </form>
 {% endblock %}

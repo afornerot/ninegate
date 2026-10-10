@@ -26,6 +26,9 @@
             </div>
             <div class="card-body">
                 {{ form_row(form.username) }}
+                <small class="form-text text-muted d-block mb-3">
+                    Lettres minuscules, chiffres, tirets (-), underscores (_) et points (.) uniquement. 3 caractères minimum.
+                </small>
                 {{ form_row(form.email) }}
                 {{ form_row(form.firstname) }}
                 {{ form_row(form.lastname) }}

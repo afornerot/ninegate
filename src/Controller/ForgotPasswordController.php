@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Form\ForgotPasswordType;
 use App\Repository\UserRepository;
 use App\Repository\PasswordResetRequestRepository;
+use App\Service\IdentityProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,11 +24,18 @@ class ForgotPasswordController extends AbstractController
         private UserRepository $userRepository,
         private PasswordResetRequestRepository $resetRequestRepo,
         private EntityManagerInterface $em,
+        private IdentityProvider $identityProvider,
     ) {
     }
 
     public function __invoke(Request $request, MailerInterface $mailer, UrlGeneratorInterface $urlGenerator): Response
     {
+        if (!$this->identityProvider->canManagePassword()) {
+            $this->addFlash('error', 'La réinitialisation de mot de passe n\'est pas disponible : votre mot de passe est géré par votre fournisseur d\'identité.');
+
+            return $this->redirectToRoute('app_login');
+        }
+
         $form = $this->createForm(ForgotPasswordType::class);
         $form->handleRequest($request);
 

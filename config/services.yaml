@@ -7,6 +7,7 @@ parameters:
   appAdminPassword: "%env(resolve:APP_ADMIN_PASSWORD)%"
   appModeAuth: "%env(resolve:APP_MODEAUTH)%"
   appMasterIdentity: "%env(resolve:APP_MASTERIDENTITY)%"
+  syncIdentity: "%env(resolve:SYNC_IDENTITY)%"
   databaseUrl: "%env(resolve:DATABASE_URL)%"
   defaultUri: "%env(resolve:DEFAULT_URI)%"
   oidcIssuer: "%env(resolve:OIDC_ISSUER)%"
@@ -15,6 +16,8 @@ parameters:
   oidcRedirectUri: "%env(resolve:OIDC_REDIRECTURI)%"
   oidcMailAttribute: "%env(resolve:OIDC_MAILATTRIBUTE)%"
   oidcUsernameAttribute: "%env(resolve:OIDC_USERNAMEATTRIBUTE)%"
+  oidcFirstnameAttribute: "%env(resolve:OIDC_FIRSTNAMEATTRIBUTE)%"
+  oidcLastnameAttribute: "%env(resolve:OIDC_LASTNAMEATTRIBUTE)%"
   casHost: "%env(resolve:CAS_HOST)%"
   casPort: "%env(resolve:CAS_PORT)%"
   casPath: "%env(resolve:CAS_PATH)%"
@@ -22,7 +25,22 @@ parameters:
   casMail: "%env(resolve:CAS_MAIL)%"
   casLastname: "%env(resolve:CAS_LASTNAME)%"
   casFirstname: "%env(resolve:CAS_FIRSTNAME)%"
-  ldapBase: "%env(resolve:LDAP_BASE)%"
+  ldapBase: "%env(resolve:LDAP_BASEDN)%"
+  ldapUsersDn: "%env(resolve:LDAP_USERSDN)%"
+  ldapGroupsDn: "%env(resolve:LDAP_GROUPSDN)%"
+  ldapHost: "%env(resolve:LDAP_HOST)%"
+  ldapPort: "%env(int:LDAP_PORT)%"
+  ldapTls: "%env(bool:LDAP_TLS)%"
+  ldapAttrUsername: "%env(resolve:LDAP_ATTR_USERNAME)%"
+  ldapAttrLastname: "%env(resolve:LDAP_ATTR_LASTNAME)%"
+  ldapAttrFirstname: "%env(resolve:LDAP_ATTR_FIRSTNAME)%"
+  ldapAttrEmail: "%env(resolve:LDAP_ATTR_EMAIL)%"
+  ldapAttrPassword: "%env(resolve:LDAP_ATTR_PASSWORD)%"
+  ldapAttrGroupCn: "%env(resolve:LDAP_ATTR_GROUP_CN)%"
+  ldapAttrGroupMember: "%env(resolve:LDAP_ATTR_GROUP_MEMBER)%"
+  ldapAttrGroupGid: "%env(resolve:LDAP_ATTR_GROUP_GID)%"
+  ldapWriterDn: "%env(resolve:LDAP_WRITER_DN)%"
+  ldapWriterPassword: "%env(resolve:LDAP_WRITER_PASSWORD)%"
   storageDsn: "%env(resolve:STORAGE_DSN)%"
   s3Endpoint: "%env(resolve:S3_ENDPOINT)%"
   s3Bucket: "%env(resolve:S3_BUCKET)%"
@@ -37,8 +55,16 @@ services:
 
     Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
 
+    # Pour l'orchestrateur IdentitySyncCommand — injection via alias
+    Symfony\Component\Console\Application: '@console.messenger.application'
+
+    # Symfony LDAP adapter
+    Symfony\Component\Ldap\Adapter\AdapterInterface:
+        class: Symfony\Component\Ldap\Adapter\ExtLdap\Adapter
+        factory: ['App\Service\LdapAdapterFactory', 'create']
+        arguments: ['@parameter_bag']
+
     App\Service\ConfigParameterBag:
-        class: App\Service\ConfigParameterBag
         arguments: ['@App\Repository\ConfigRepository']
 
     App\Service\PageParameterBag:

@@ -1,0 +1,31 @@
+# ============================================================
+# Bootstrap initial de l'annuaire LDAP
+# Généré depuis misc/docker/openldap/template-db.ldif
+# Les variables ${...} sont interpolées par envsubst au démarrage
+# ============================================================
+
+# Entrée racine
+dn: ${LDAP_BASEDN}
+objectClass: dcObject
+objectClass: organization
+o: Ninegate
+dc: ninegate
+
+# OU Users
+dn: ${LDAP_USERSDN}
+objectClass: organizationalUnit
+ou: users
+
+# OU Groups
+dn: ${LDAP_GROUPSDN}
+objectClass: organizationalUnit
+ou: groups
+
+# Compte admin/writer (rootDN)
+# Le hash __WRITER_HASH__ est remplacé au runtime par slappasswd
+dn: ${LDAP_WRITER_DN}
+objectClass: organizationalRole
+objectClass: simpleSecurityObject
+cn: ${APP_ADMIN}
+description: LDAP administrator
+userPassword: __WRITER_HASH__

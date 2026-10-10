@@ -18,6 +18,7 @@ class GroupType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $group = $options['data'] ?? null;
+        $readOnly = $group instanceof Group && $group->isAnnuaire();
 
         $builder
             ->add('submit', SubmitType::class, [
@@ -29,6 +30,7 @@ class GroupType extends AbstractType
             $builder->add('type', ChoiceType::class, [
                 'label' => 'Type',
                 'attr' => ['class' => 'form-select'],
+                'disabled' => $readOnly,
                 'choices' => [
                     'Organisation' => Group::TYPE_ORGANISATION,
                     'Groupe de Travail' => Group::TYPE_WORK_GROUP,
@@ -39,6 +41,7 @@ class GroupType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom',
+                'disabled' => $readOnly,
                 'attr' => ['class' => 'form-control'],
             ])
             ->add('description', TextareaType::class, [
@@ -59,6 +62,7 @@ class GroupType extends AbstractType
                 'label' => 'Groupe ouvert',
                 'attr' => ['class' => 'form-check-input'],
                 'required' => false,
+                'disabled' => $readOnly,
             ])
         ;
     }
