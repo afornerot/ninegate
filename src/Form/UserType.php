@@ -39,7 +39,7 @@ class UserType extends AbstractType
             'required' => $identityFieldsRequired,
             'disabled' => ('submit' != $options['mode']) || !$identityLocal,
             'attr' => [
-                'pattern' => '[a-z0-9._-]{3,180}',
+                'pattern' => '[a-z0-9._\-]{3,180}',
                 'title' => 'Lettres minuscules, chiffres, tirets, underscores et points uniquement (3-180 caractères)',
             ],
         ])
@@ -89,7 +89,9 @@ class UserType extends AbstractType
             ]);
         }
 
-        if ($identityLocal && IdentityProvider::MODE_SQL === $options['appModeAuth']) {
+        // Le mot de passe est géré par l'application dès que masterIdentity
+        // est SQL : c'est la seule condition requise.
+        if ($identityLocal) {
             $builder
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,

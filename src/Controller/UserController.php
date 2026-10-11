@@ -67,7 +67,7 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
             $password = $user->getPassword();
-            if (IdentityProvider::MODE_SQL !== $this->identityProvider->getModeAuth()) {
+            if (!$password) {
                 $password = Uuid::uuid4();
             }
 
