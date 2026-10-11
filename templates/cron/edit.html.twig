@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{{ title }}</h1>
+
+{{ form_start(form) }}
+<div class="d-flex gap-2 mb-3">
+    {{ form_widget(form.submit) }}
+    {% if routecancel is defined %}
+        <a href="{{ path(routecancel) }}" class="btn btn-secondary">Annuler</a>
+    {% endif %}
+    {% if routedelete is defined %}
+        <a href="{{ path(routedelete, {id: cron.id}) }}" class="btn btn-danger ms-auto" onclick="return confirm('Voulez-vous supprimer ce cron ?')">Supprimer</a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Informations</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.command) }}
+                {{ form_row(form.jsonargument) }}
+                {{ form_row(form.statut) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Planification</h5>
+            </div>
+            <div class="card-body">
+                {{ form_row(form.nextexecdate) }}
+                {{ form_row(form.repeatinterval) }}
+                {{ form_row(form.repeatcall) }}
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>Dernière exécution</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-5">Début</dt>
+                    <dd class="col-7">{{ cron.startexecdate ? cron.startexecdate|date('d/m/Y H:i:s') : '-' }}</dd>
+                    <dt class="col-5">Fin</dt>
+                    <dd class="col-7">{{ cron.endexecdate ? cron.endexecdate|date('d/m/Y H:i:s') : '-' }}</dd>
+                    <dt class="col-5">Échecs répétés</dt>
+                    <dd class="col-7">{{ cron.repeatexec }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+{% endblock %}

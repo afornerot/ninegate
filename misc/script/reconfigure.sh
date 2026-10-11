@@ -15,4 +15,9 @@ nohup bin/console messenger:consume async --time-limit=3600 --memory-limit=128M 
 disown
 echo "Worker Messenger lancé (PID: $!)"
 
+# Lancer le scheduler supercronic en tâche de fond
+supercronic -quiet -no-reap /crontab &
+disown
+echo "Supercronic lancé (PID: $!)"
+
 exec $@
