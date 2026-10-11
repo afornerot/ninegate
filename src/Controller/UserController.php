@@ -78,7 +78,6 @@ class UserController extends AbstractController
             $user->setPassword($hashedPassword);
             $user->setLdapPassword($this->ldapPasswordService->hashForLdap($password));
             $user->setOpenLdapPassword($this->ldapPasswordService->hashForOpenLdap($password));
-            $user->setOpenLdapPassword($this->ldapPasswordService->hashForOpenLdap($password));
 
             $this->em->persist($user);
             $this->em->flush();
@@ -117,8 +116,11 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
-            if ($user->getPassword()) {
-                $plainPassword = $user->getPassword();
+            $plainPassword = $user->getPassword();
+            if (!$plainPassword) {
+                // Mot de passe non modifié : on préserve le hash préexistant
+                $user->setPassword($hashedPassword);
+            } else {
                 $hashedPassword = $passwordHasher->hashPassword(
                     $user,
                     $plainPassword
@@ -185,8 +187,11 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $form->getData();
-            if ($user->getPassword()) {
-                $plainPassword = $user->getPassword();
+            $plainPassword = $user->getPassword();
+            if (!$plainPassword) {
+                // Mot de passe non modifié : on préserve le hash préexistant
+                $user->setPassword($hashedPassword);
+            } else {
                 $hashedPassword = $passwordHasher->hashPassword(
                     $user,
                     $plainPassword
