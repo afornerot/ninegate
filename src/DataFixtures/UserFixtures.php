@@ -34,7 +34,7 @@ class UserFixtures extends Fixture
         $admins = array_map('trim', explode(',', $this->parameterBag->get('appAdmin')));
         $data = [];
         foreach ($admins as $admin) {
-            $data[] = ['username' => $admin, 'email' => $this->parameterBag->get('appNoreply'), 'role' => 'ROLE_ADMIN', 'avatar' => 'medias/avatar/admin.jpg'];
+            $data[] = ['username' => $admin, 'email' => $this->parameterBag->get('appNoreply'), 'role' => 'ROLE_ADMIN', 'avatar' => '**public**/medias/avatar/admin.jpg'];
         }
         $data[] = ['username' => 'master', 'email' => 'master@example.com', 'role' => 'ROLE_MASTER', 'avatar' => null];
         $data[] = ['username' => 'user', 'email' => 'user@example.com', 'role' => 'ROLE_USER', 'avatar' => null];
