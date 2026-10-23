@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Entity\UserGroup;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Calendar>
@@ -95,7 +96,7 @@ class CalendarRepository extends ServiceEntityRepository
             ->innerJoin('c.groups', 'g')
             ->where('g.id IN (:groupIds)')
             ->setParameter('groupIds', $groupIds)
-            ->orderBy('c.calendarOrder', 'ASC')
+            ->orderBy('c.calendarOrder', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

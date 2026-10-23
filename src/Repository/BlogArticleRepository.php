@@ -7,6 +7,7 @@ use App\Entity\BlogArticle;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<BlogArticle>
@@ -30,7 +31,7 @@ class BlogArticleRepository extends ServiceEntityRepository
             ->leftJoin('g.userGroups', 'ug')
             ->where('ug.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('a.createdAt', 'DESC')
+            ->orderBy('a.createdAt', SortDirection::Descending)
             ->setMaxResults($limit);
 
         $articles = $qb->getQuery()->getResult();
@@ -59,7 +60,7 @@ class BlogArticleRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('a')
             ->where('a.blog IN (:blogIds)')
             ->setParameter('blogIds', $blogIds)
-            ->orderBy('a.createdAt', 'DESC')
+            ->orderBy('a.createdAt', SortDirection::Descending)
             ->setMaxResults($limit);
 
         return $qb->getQuery()->getResult();

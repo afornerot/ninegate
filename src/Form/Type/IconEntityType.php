@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use SortDirection;
 
 class IconEntityType extends AbstractType
 {
@@ -54,7 +55,7 @@ class IconEntityType extends AbstractType
         $icons = $this->iconRepository->createQueryBuilder('i')
             ->where('i.user IS NULL OR i.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('i.route', 'ASC')
+            ->orderBy('i.route', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
 

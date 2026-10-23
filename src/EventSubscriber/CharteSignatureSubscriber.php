@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use SortDirection;
 
 class CharteSignatureSubscriber implements EventSubscriberInterface
 {
@@ -69,7 +70,7 @@ class CharteSignatureSubscriber implements EventSubscriberInterface
             ->addSelect('s')
             ->where('c.requireSignature = :true')
             ->setParameter('true', true)
-            ->orderBy('c.sortOrder', 'ASC')
+            ->orderBy('c.sortOrder', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
 

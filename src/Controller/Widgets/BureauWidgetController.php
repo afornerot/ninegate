@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use SortDirection;
 
 class BureauWidgetController extends AbstractController
 {
@@ -56,11 +57,11 @@ class BureauWidgetController extends AbstractController
             }
         }
 
-        $groupItems = $qb->orderBy('i.sortOrder', 'ASC')->getQuery()->getResult();
+        $groupItems = $qb->orderBy('i.sortOrder', SortDirection::Ascending)->getQuery()->getResult();
 
         // Also get items accessible by role (JSON field, filtered in PHP)
         $allItemsQb = $itemRepository->createQueryBuilder('i')
-            ->orderBy('i.sortOrder', 'ASC');
+            ->orderBy('i.sortOrder', SortDirection::Ascending);
 
         // Filter by category if specified
         if (!empty($config['categoryId'])) {

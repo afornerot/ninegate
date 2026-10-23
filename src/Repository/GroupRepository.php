@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Group;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Group>
@@ -27,7 +28,7 @@ class GroupRepository extends ServiceEntityRepository
                ->setParameter('ids', $excludeIds);
         }
 
-        return $qb->orderBy('g.name', 'ASC')
+        return $qb->orderBy('g.name', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

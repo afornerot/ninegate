@@ -6,6 +6,7 @@ use App\Entity\CalendarEvent;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<CalendarEvent>
@@ -29,7 +30,7 @@ class CalendarEventRepository extends ServiceEntityRepository
             ->leftJoin('g.userGroups', 'ug')
             ->where('ug.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('e.startDate', 'DESC')
+            ->orderBy('e.startDate', SortDirection::Descending)
             ->setMaxResults($limit);
 
         $events = $qb->getQuery()->getResult();
@@ -57,7 +58,7 @@ class CalendarEventRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('e')
             ->where('e.calendar IN (:calendarIds)')
             ->setParameter('calendarIds', $calendarIds)
-            ->orderBy('e.startDate', 'ASC')
+            ->orderBy('e.startDate', SortDirection::Ascending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -74,7 +75,7 @@ class CalendarEventRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('e')
             ->where('e.calendar IN (:calendarIds)')
             ->setParameter('calendarIds', $calendarIds)
-            ->orderBy('e.startDate', 'ASC')
+            ->orderBy('e.startDate', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
