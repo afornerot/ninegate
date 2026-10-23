@@ -2,6 +2,8 @@
 flysystem:
     storages:
         default.storage:
-            adapter: 'local'
-            options:
+            # Format « discoverable » (flysystem-bundle >= 3.5) : le type d'adaptateur
+            # est la clé, ses options sont en dessous. L'ancien format adapter/options
+            # est déprécié.
+            local:
                 directory: '%kernel.project_dir%/var/storage/default'

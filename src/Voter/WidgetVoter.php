@@ -6,6 +6,7 @@ use App\Entity\PageWidget;
 use App\Repository\PageRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class WidgetVoter extends Voter
@@ -26,7 +27,7 @@ class WidgetVoter extends Voter
             && $subject instanceof PageWidget;
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
 

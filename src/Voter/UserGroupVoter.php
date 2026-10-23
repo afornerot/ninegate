@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserGroup;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class UserGroupVoter extends Voter
@@ -23,7 +24,7 @@ class UserGroupVoter extends Voter
         return in_array($attribute, [self::REMOVE, self::CHANGE_ROLE]) && $subject instanceof UserGroup;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
         if (!$user instanceof User) {

@@ -222,7 +222,7 @@ class UserController extends AbstractController
 
     #[Route('/admin/user/regenerate-apikey/{id}', name: 'app_admin_user_regenerate_apikey')]
     #[Route('/user/regenerate-apikey', name: 'app_user_regenerate_apikey')]
-    public function regenerateApiKey(int $id = null): Response
+    public function regenerateApiKey(?int $id = null): Response
     {
         if ($id) {
             $user = $this->userRepository->find($id);

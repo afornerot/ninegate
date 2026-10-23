@@ -6,6 +6,7 @@ use App\Entity\Icon;
 use App\Entity\User;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class IconVoter extends Voter
@@ -23,7 +24,7 @@ class IconVoter extends Voter
         return in_array($attribute, [self::EDIT, self::DELETE]) && $subject instanceof Icon;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
         if (!$user instanceof User) {
