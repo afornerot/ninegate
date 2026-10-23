@@ -10,7 +10,7 @@ services:
     volumes:
       - ./volume/postgres:/var/lib/postgresql/data
   ninegate:
-    image: reg.cadoles.com/envole/ninegate:3.0
+    image: reg.cadoles.com/envole/ninegate:latest
     container_name: ninegate
     restart: unless-stopped
     build:
@@ -33,7 +33,7 @@ services:
       - ./public/medias:/app/public/medias:delegated
       - ./.env.local:/app/.env.local
       - ./volume/dex:/app/volume/dex
-      - ../bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
+      - ../bnine/bNine-FilesBundle:/app/vendor/bnine/filesbundle:delegated
   openldap:
     image: reg.cadoles.com/envole/openldap:2.6.8
     container_name: ninegate-openldap
