@@ -12,16 +12,7 @@ COPY ./misc/docker/apache.conf /etc/apache2/conf.d/nine/site.conf
 ENV COMPOSER_HOME=/tmp/composer
 RUN mkdir -p /tmp/composer && chown -R apache:apache /tmp/composer
 
-# Latest releases available at https://github.com/aptible/supercronic/releases
-ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.43/supercronic-linux-amd64 \
-    SUPERCRONIC_SHA1SUM=f97b92132b61a8f827c3faf67106dc0e4467ccf2 \
-    SUPERCRONIC=supercronic-linux-amd64
-
-RUN curl -fsSLO "$SUPERCRONIC_URL" \
-    && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
-    && chmod +x "$SUPERCRONIC" \
-    && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
-    && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
+# supercronic est fourni par l'image de base nineapache (inutile de le réinstaller)
 
 RUN echo "* * * * * php /app/bin/console app:cron >> /app/var/log/cron.log 2>&1" > /crontab
 RUN chown apache:apache /crontab
