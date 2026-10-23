@@ -46,6 +46,9 @@ echo "[openldap] Initialisation de l'annuaire LDAP..."
 
 # Nettoyage systématique de la config (la BDD reste persistée)
 rm -rf /etc/openldap/slapd.d/*
+# Le volume monté sur /var/lib/openldap masque le répertoire créé dans l'image :
+# sans lui, mdb ne peut pas ouvrir la base et slaptest échoue.
+mkdir -p /var/lib/openldap/openldap-data
 chown -R ldap:ldap /etc/openldap/slapd.d /var/lib/openldap
 
 # Interpolation des templates
@@ -62,10 +65,24 @@ CONFIG_ROOT_HASH=$(slappasswd -h "{SSHA}" -s "${LDAP_WRITER_PASSWORD}")
 sed -i "s|__CONFIG_ROOT_HASH__|${CONFIG_ROOT_HASH}|g" /etc/openldap/slapd.conf
 
 # Conversion slapd.conf → slapd.d
-slaptest -f /etc/openldap/slapd.conf -F /etc/openldap/slapd.d
+# Au premier démarrage la base mdb n'existe pas encore : slaptest sort en
+# erreur (« test would succeed using the -u switch ») mais écrit bien la config.
+# On tolère donc son code de sortie, sinon set -e interrompt le script avant le
+# slapadd et l'annuaire reste vide (conteneur en boucle).
+slaptest -f /etc/openldap/slapd.conf -F /etc/openldap/slapd.d 2>&1 | tail -2 || true
 
 # Chargement du bootstrap initial (n'efface pas la BDD existante)
-slapadd -F /etc/openldap/slapd.d -l /tmp/bootstrap.ldif 2>/dev/null || echo "[openldap] Bootstrap déjà chargé (ignoré)"
+# L'erreur n'est plus avalée : un slapadd en échec laissait un annuaire vide
+# et le conteneur bouclait sans aucun message exploitable.
+if ! slapadd -F /etc/openldap/slapd.d -l /tmp/bootstrap.ldif 2>/tmp/slapadd.err; then
+    if grep -qi "already exists" /tmp/slapadd.err; then
+        echo "[openldap] Bootstrap déjà chargé (ignoré)"
+    else
+        echo "[openldap] ERREUR slapadd :"
+        sed 's/^/    /' /tmp/slapadd.err
+    fi
+fi
+rm -f /tmp/slapadd.err
 
 # Fix permissions
 chown -R ldap:ldap /etc/openldap/slapd.d /var/lib/openldap
