@@ -12,7 +12,7 @@ framework:
     # Proxies de confiance : renseigner TRUSTED_PROXIES (IP/CIDR des proxies)
     # uniquement quand l'app est servie derrière un reverse proxy.
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
-    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto']
 
     #esi: true
     #fragments: true
