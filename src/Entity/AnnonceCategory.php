@@ -6,6 +6,7 @@ use App\Repository\AnnonceCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use SortDirection;
 
 #[ORM\Entity(repositoryClass: AnnonceCategoryRepository::class)]
 #[ORM\Table(name: 'annonce_category')]
@@ -36,7 +37,7 @@ class AnnonceCategory
     private int $sortOrder = 0;
 
     #[ORM\OneToMany(targetEntity: Annonce::class, mappedBy: 'category', cascade: ['remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['sortOrder' => 'ASC'])]
+    #[ORM\OrderBy(['sortOrder' => SortDirection::Ascending])]
     private Collection $annonces;
 
     public function __construct()

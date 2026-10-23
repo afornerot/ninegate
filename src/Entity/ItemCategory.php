@@ -6,6 +6,7 @@ use App\Repository\ItemCategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use SortDirection;
 
 #[ORM\Entity(repositoryClass: ItemCategoryRepository::class)]
 #[ORM\Table(name: 'item_category')]
@@ -23,7 +24,7 @@ class ItemCategory
     private int $sortOrder = 0;
 
     #[ORM\OneToMany(targetEntity: Item::class, mappedBy: 'category', orphanRemoval: true)]
-    #[ORM\OrderBy(['sortOrder' => 'ASC'])]
+    #[ORM\OrderBy(['sortOrder' => SortDirection::Ascending])]
     private Collection $items;
 
     public function __construct()
