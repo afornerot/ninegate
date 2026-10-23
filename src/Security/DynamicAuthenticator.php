@@ -3,7 +3,6 @@
 namespace App\Security;
 
 use App\Repository\UserRepository;
-use Jumbojett\OpenIDConnectClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,10 +18,13 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class DynamicAuthenticator extends AbstractAuthenticator
 {
+    private const SESSION_STATE_KEY = 'openid_connect_state';
+
     public function __construct(
         private UserRepository $userRepository,
         private UserProvider $casUserProvider,
         private ParameterBagInterface $parameterBag,
+        private OidcClient $oidcClient,
         private UrlGeneratorInterface $urlGenerator)
     {
     }
@@ -72,6 +74,10 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
+        if ($exception instanceof OidcRedirectException) {
+            return new RedirectResponse($exception->getAuthorizationUrl());
+        }
+
         error_log('OIDC AUTH FAILURE: ' . $exception->getMessage());
         throw $exception;
     }
@@ -134,42 +140,31 @@ class DynamicAuthenticator extends AbstractAuthenticator
         $currentPath = $request->getPathInfo();
         error_log('OIDC AUTH: path=' . $currentPath . ' code=' . ($request->query->get('code') ?: 'none'));
 
-        $oidc = new OpenIDConnectClient(
-            $this->parameterBag->get('oidcIssuer'),
-            $this->parameterBag->get('oidcClientId'),
-            $this->parameterBag->get('oidcClientSecret')
-        );
+        $session = $request->getSession();
+        $code = $request->query->get('code');
 
-        $oidc->setVerifyPeer(false);
-        $oidc->setVerifyHost(false);
-        $oidc->setRedirectURL($this->parameterBag->get('oidcRedirectUri'));
-        $oidc->addScope(['openid', 'email', 'profile']);
-
-        $oidc->authenticate();
-
-        $idToken = $oidc->getIdToken();
-        $request->getSession()->set('oidc_id_token', $idToken);
-
-        // Decode ID token JWT to get claims
-        $parts = explode('.', $idToken);
-        if (count($parts) === 3) {
-            $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
-            $userInfo = (object) $payload;
-        } else {
-            $userInfo = null;
+        if (!\is_string($code) || '' === $code) {
+            throw new OidcRedirectException($this->oidcClient->createAuthorizationUrlSymfonySession($session));
         }
 
-        error_log('OIDC AUTH: userInfo=' . json_encode($userInfo));
+        $sessionState = $session->get(self::SESSION_STATE_KEY);
+        $requestState = $request->query->get('state');
 
-        if (!$userInfo) {
-            throw new AuthenticationException('OIDC authentication failed: could not decode ID token.');
+        if (!\is_string($sessionState) || '' === $sessionState
+            || !\is_string($requestState) || !\hash_equals($sessionState, $requestState)) {
+            throw new AuthenticationException('OIDC authentication failed: invalid state.');
         }
+
+        $session->remove(self::SESSION_STATE_KEY);
+
+        $attributes = $this->oidcClient->exchangeCode($code);
+
+        error_log('OIDC AUTH: userInfo=' . json_encode($attributes));
 
         $usernameAttribute = $this->parameterBag->get('oidcUsernameAttribute');
-        $username = $userInfo->{$usernameAttribute} ?? null;
-        $attributes = (array) $userInfo;
+        $username = $attributes[$usernameAttribute] ?? null;
 
-        if (!$username) {
+        if (!\is_string($username) || '' === $username) {
             throw new AuthenticationException(sprintf(
                 'OIDC authentication failed: "%s" claim is missing or empty. Available: %s',
                 $usernameAttribute,

@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\Security\OidcClient;
 use App\Service\IdentityProvider;
-use Jumbojett\OpenIDConnectClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,6 +16,7 @@ class SecurityController extends AbstractController
 {
     public function __construct(
         private IdentityProvider $identityProvider,
+        private OidcClient $oidcClient,
     ) {
     }
 
@@ -26,17 +27,7 @@ class SecurityController extends AbstractController
         ParameterBagInterface $parameterBag,
     ): Response {
         if ($parameterBag->get('appModeAuth') === 'OIDC') {
-            $oidc = new OpenIDConnectClient(
-                $parameterBag->get('oidcIssuer'),
-                $parameterBag->get('oidcClientId'),
-                $parameterBag->get('oidcClientSecret')
-            );
-            $oidc->setVerifyPeer(false);
-            $oidc->setVerifyHost(false);
-            $oidc->setRedirectURL($parameterBag->get('oidcRedirectUri'));
-            $oidc->addScope(['openid', 'email', 'profile']);
-
-            $oidc->authenticate();
+            return new RedirectResponse($this->oidcClient->createAuthorizationUrlSymfonySession($request->getSession()));
         }
 
         $error = $authenticationUtils->getLastAuthenticationError();
