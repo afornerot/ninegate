@@ -25,6 +25,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public const ROLE_MASTER = 'ROLE_MASTER';
     public const ROLE_USER = 'ROLE_USER';
     public const ROLE_VISITOR = 'ROLE_VISITOR';
+
+    private const DEFAULT_AVATAR = '**public**/medias/avatar/noavatar.png';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -178,7 +180,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAvatar(): ?string
     {
-        return $this->avatar ? $this->avatar : '**public**/medias/avatar/noavatar.png';
+        if (!$this->avatar) {
+            return self::DEFAULT_AVATAR;
+        }
+
+        if (str_starts_with($this->avatar, 'medias/')) {
+            return '**public**/'.$this->avatar;
+        }
+
+        return $this->avatar;
     }
 
     public function setAvatar(?string $avatar): static

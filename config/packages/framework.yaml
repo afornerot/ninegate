@@ -17,6 +17,16 @@ framework:
     #esi: true
     #fragments: true
 
+    # Choix explicite : on conserve le comportement actuel (le défaut passera à true en 8.0)
+    property_info:
+        with_constructor_extractor: false
+
+when@dev:
+    framework:
+        profiler:
+            # Recommandé par Symfony 7.3+ (le défaut passera à true)
+            collect_serializer_data: true
+
 when@test:
     framework:
         test: true
