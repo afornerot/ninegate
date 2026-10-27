@@ -675,10 +675,18 @@ $(document).ready(function () {
 	});
 
 	// Icon clear button
+	// Le bouton est dans un <div class="d-flex"> imbrique : ses siblings sont
+	// les autres boutons, pas .link-icon-id ni .link-icon-preview (qui sont
+	// des oncles). On remonte donc au conteneur de carte.
 	$(document).on('click', '.link-icon-clear', function () {
-		$(this).siblings('.link-icon-id').val('');
-		$(this).siblings('.link-icon-preview').attr('src', '').hide();
-		$(this).hide();
+		var $btn = $(this);
+		var $scope = $btn.closest('.col-md-1, .link-card, .link-edit-row');
+		if (!$scope.length) {
+			$scope = $btn.parent().parent();
+		}
+		$scope.find('.link-icon-id').val('');
+		$scope.find('.link-icon-preview').attr('src', '').hide();
+		$btn.hide();
 	});
 
 	// Save links
