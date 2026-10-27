@@ -2,7 +2,7 @@
 
 {% block body %}
     <form method="post">
-        <img src="{{asset(app_config.get('appLogo'))}}" style="margin: 15px auto 15px auto; width:100px; display:block;">
+        <img src="{{ bninefile(app_config.get('appLogo')) }}" style="margin: 15px auto 15px auto; width:100px; display:block;">
         <h1 style="font-size:200%;margin-bottom:30px; text-align:center;">{{app_config.get('appName')}}</h1>
         <div class="card card-body m-auto" style="width:300px">
             {% if error %}

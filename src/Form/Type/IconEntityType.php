@@ -62,6 +62,16 @@ class IconEntityType extends AbstractType
         $view->vars['icons'] = $icons;
     }
 
+    public function getBlockPrefix(): string
+    {
+        // Sans cette methode, Symfony derive le prefixe du nom de classe et
+        // obtient 'icon_entity_type'. Le bloc du theme s'appelle
+        // 'icon_entity_widget' (templates/form/icon_entity_widget.html.twig)
+        // et ne correspondait donc a rien : le champ etait rendu comme un
+        // HiddenType brut, sans bouton ni modal de selection.
+        return 'icon_entity';
+    }
+
     public function getParent(): string
     {
         return HiddenType::class;

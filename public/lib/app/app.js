@@ -327,7 +327,7 @@ $(document).ready(function () {
 				if ($item.length) {
 					var route = $item.data('route');
 					var tags = $item.data('tags');
-					$preview.attr('src', '/' + route).show();
+					$preview.attr('src', route).show();
 					$name.text(tags || route).removeClass('text-muted');
 					$clearBtn.show();
 					return;
@@ -373,7 +373,7 @@ $(document).ready(function () {
 		var $clearBtn = $activeWrapper.find('.icon-entity-clear');
 
 		$input.val(iconId).trigger('change');
-		$preview.attr('src', '/' + route).show();
+		$preview.attr('src', route).show();
 		$name.text(tags || route).removeClass('text-muted');
 		$clearBtn.show();
 
@@ -650,7 +650,7 @@ $(document).ready(function () {
 
 		if ($currentIconTarget) {
 			$currentIconTarget.find('.link-icon-id').val(iconId);
-			$currentIconTarget.find('.link-icon-preview').attr('src', '/' + route).show();
+			$currentIconTarget.find('.link-icon-preview').attr('src', route).show();
 			$currentIconTarget.find('.link-icon-clear').show();
 		}
 
