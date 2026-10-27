@@ -5,7 +5,7 @@
         <title>{{ app_config.get('appName') }}{% block title %}{% endblock %}</title>
         <meta name="description" content="{{ app_config.get('appDescription') }}">
         
-        <link rel="icon" href="{{ asset(app_config.get('appLogo')) }}">
+        <link rel="icon" href="{{ bninefile(app_config.get('appLogo')) }}">
 
         <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
         <link rel="stylesheet" href="{{ asset('lib/bootswatch/bootswatch.min.css') }}">
@@ -112,7 +112,7 @@
         <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
             <div class="container-fluid">                
                 <a class="navbar-brand" href="{{ path('app_home') }}">
-                    <img src="{{asset(app_config.get('appLogo'))}}"  alt="{{app_config.get('appName')}}"> {{app_config.get('appName')}}
+                    <img src="{{ bninefile(app_config.get('appLogo')) }}" alt="{{ app_config.get('appName') }}"> {{app_config.get('appName')}}
                 </a>
                 
                 <div class="collapse navbar-collapse" id="navbarColor02">

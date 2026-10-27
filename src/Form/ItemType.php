@@ -6,7 +6,6 @@ use App\Entity\Group;
 use App\Entity\Item;
 use App\Entity\ItemCategory;
 use App\Form\Type\ColorType;
-use App\Form\Type\IconEntityType;
 use App\Form\Type\Select2Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -36,9 +35,6 @@ class ItemType extends AbstractType
                 'label' => 'Description',
                 'attr' => ['class' => 'form-control', 'rows' => 4],
                 'required' => false,
-            ])
-            ->add('icon', IconEntityType::class, [
-                'required' => true,
             ])
             ->add('bgcolor', ColorType::class, [
                 'label' => 'Couleur de fond',

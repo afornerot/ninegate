@@ -45,7 +45,7 @@ class ConfigFixtures extends Fixture
                 'code' => 'appLogo',
                 'title' => 'Logo du site',
                 'value' => null,
-                'defaultValue' => 'medias/logo/logo.png',
+                'defaultValue' => '**public**/medias/logo/logo.png',
                 'type' => Config::TYPE_LOGO,
                 'configGroup' => 'Site',
                 'order' => 2,
