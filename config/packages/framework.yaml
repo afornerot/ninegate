@@ -4,10 +4,11 @@ framework:
 
     session:
         handler_id: 'session.handler.pdo'
-        gc_maxlifetime: 604800
         cookie_secure: auto
         cookie_httponly: true
         cookie_samesite: lax
+        cookie_lifetime: 3600
+        gc_maxlifetime: 3600
 
     # Proxies de confiance : renseigner TRUSTED_PROXIES (IP/CIDR des proxies)
     # uniquement quand l'app est servie derrière un reverse proxy.
