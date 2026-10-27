@@ -23,7 +23,7 @@
                     {# Colonne 1 : Icône #}
                     <div class="col-md-1 text-center">
                         <img class="link-icon-preview"
-                             src="{% if link.iconId is defined and link.iconId %}{% for icon in icons %}{% if icon.id == link.iconId %}/{{ icon.route }}{% endif %}{% endfor %}{% endif %}"
+                             src="{% if link.iconId is defined and link.iconId %}{% for icon in icons %}{% if icon.id == link.iconId %}{{ bninefile(icon.route) }}{% endif %}{% endfor %}{% endif %}"
                              style="width: 48px; height: 48px; object-fit: contain; margin-bottom: 4px; {% if not link.iconId is defined or not link.iconId %}display: none;{% endif %}">
                         <input type="hidden" class="link-icon-id" value="{{ link.iconId|default('') }}">
                         <div class="d-flex gap-1 justify-content-center mt-1">
