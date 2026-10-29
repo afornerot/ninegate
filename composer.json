@@ -10,7 +10,7 @@
         "apereo/phpcas": ">=1.6.2",
         "bnine/filesbundle": "^1.5.12",
         "bnine/mdeditorbundle": "^1.1.6",
-        "doctrine/doctrine-bundle": "^3.3",
+        "doctrine/doctrine-bundle": "^3.3.4",
         "doctrine/doctrine-fixtures-bundle": "^4.3.1",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.7.5",
