@@ -6,6 +6,7 @@ use App\Entity\Item;
 use App\Form\ItemType;
 use App\Repository\ItemCategoryRepository;
 use App\Repository\ItemRepository;
+use App\Service\ItemOrderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,7 +24,7 @@ class ItemController extends AbstractController
     }
 
     #[Route('/admin/item/submit/{categoryId}', name: 'app_admin_item_submit')]
-    public function submit(int $categoryId, Request $request): Response
+    public function submit(int $categoryId, Request $request, ItemOrderService $itemOrderService): Response
     {
         $category = $this->itemCategoryRepository->find($categoryId);
         if (!$category) {
@@ -32,6 +33,8 @@ class ItemController extends AbstractController
 
         $item = new Item();
         $item->setCategory($category);
+        // Par défaut le nouvel item arrive en fin de catégorie
+        $item->setSortOrder($itemOrderService->nextSortOrder($category));
 
         $form = $this->createForm(ItemType::class, $item);
         $form->handleRequest($request);
@@ -100,31 +103,19 @@ class ItemController extends AbstractController
         return $this->redirectToRoute('app_admin_itemcategory_list');
     }
 
-    #[Route('/admin/item/move/{id}', name: 'app_admin_item_move', methods: ['POST'])]
-    public function move(int $id, Request $request): JsonResponse
+    #[Route('/admin/item/reorder', name: 'app_admin_item_reorder', methods: ['POST'])]
+    public function reorder(Request $request, ItemOrderService $itemOrderService): JsonResponse
     {
-        $item = $this->itemRepository->find($id);
-        if (!$item) {
-            return new JsonResponse(['success' => false, 'error' => 'Item introuvable'], 404);
-        }
-
         $data = json_decode($request->getContent(), true);
-        $newCategoryId = $data['categoryId'] ?? null;
-        $newOrder = $data['order'] ?? null;
+        $orders = $data['orders'] ?? [];
 
-        if ($newCategoryId !== null) {
-            $newCategory = $this->itemCategoryRepository->find($newCategoryId);
-            if ($newCategory) {
-                $item->setCategory($newCategory);
-            }
+        if (!is_array($orders)) {
+            return new JsonResponse(['success' => false, 'error' => 'Ordre invalide'], 400);
         }
 
-        if ($newOrder !== null) {
-            $item->setSortOrder($newOrder);
-        }
-
+        $applied = $itemOrderService->applyOrders($orders);
         $this->em->flush();
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse(['success' => true, 'orders' => $applied]);
     }
 }

@@ -19,6 +19,10 @@
                     <span class="badge bg-secondary">{{ category.items|length }}</span>
                 </div>
                 <div class="d-flex gap-1">
+                    <button type="button" class="btn btn-sm btn-warning btn-sort-alpha" title="Forcer l'ordre alphabétique des items"
+                            data-category-id="{{ category.id }}" data-url="{{ path('app_admin_itemcategory_sortalpha', {id: category.id}) }}">
+                        <i class="fas fa-sort-alpha-down"></i>
+                    </button>
                     <a href="{{ path('app_admin_item_submit', {categoryId: category.id}) }}" class="btn btn-sm btn-success" title="Ajouter un item">
                         <i class="fas fa-plus"></i>
                     </a>
@@ -96,7 +100,7 @@
 <script>
 $(function() {
     var reorderCategoryUrl = '{{ path("app_admin_itemcategory_reorder") }}';
-    var moveItemUrl = '{{ path("app_admin_item_move", {id: 0}) }}'.replace(/\/0$/, '');
+    var reorderItemUrl = '{{ path("app_admin_item_reorder") }}';
 
     // Category sortable
     $('#category-sortable').sortable({
@@ -140,15 +144,19 @@ $(function() {
         drop: function(event, ui) {
             $(this).css('background', '');
 
+            var $target = $(this);
             var $item = ui.draggable;
             var itemId = $item.data('item-id');
-            var newCategoryId = $(this).data('category-id');
+            var newCategoryId = $target.data('category-id');
             var oldCategoryId = $item.data('category-id');
+            var $source = $('.item-drop-zone[data-category-id="' + oldCategoryId + '"]');
 
-            // Calculate order based on drop position
+            // Pendant le glissement jqueryui ajoute une copie de l'item dans la
+            // zone : elle est écartée du calcul de la position d'insertion
+            var $items = $target.find('.item-card').not($item).not(ui.helper);
+            var helperRect = ui.helper[0].getBoundingClientRect();
+            var dropY = helperRect.top + helperRect.height / 2;
             var order = 0;
-            var $items = $(this).find('.item-card');
-            var dropY = ui.offset.top + ui.helper.height() / 2;
 
             $items.each(function(i) {
                 var rect = this.getBoundingClientRect();
@@ -157,10 +165,14 @@ $(function() {
                 }
             });
 
+            // Ordre demandé : items de la zone cible, item déplacé inséré à sa place
+            var targetIds = itemIds($target, itemId);
+            targetIds.splice(order, 0, itemId);
+
             // Move DOM element
             var $clone = $item.clone().css({opacity: '1', position: '', top: '', left: ''});
             if (order >= $items.length) {
-                $(this).append($clone);
+                $target.append($clone);
             } else {
                 $items.eq(order).before($clone);
             }
@@ -176,21 +188,50 @@ $(function() {
                 start: function() { $(this).css('opacity', '0.4'); },
                 stop: function() { $(this).css('opacity', '1'); }
             });
-            $clone.data('category-id', newCategoryId);
+            $clone.attr('data-category-id', newCategoryId).data('category-id', newCategoryId);
 
             // Remove empty message if present
-            $(this).find('.empty-msg').remove();
+            $target.find('.empty-msg').remove();
 
-            // AJAX
+            // AJAX : on envoie l'ordre complet des catégories concernées
+            var orders = {};
+            orders[newCategoryId] = targetIds;
+            if (oldCategoryId != newCategoryId) {
+                orders[oldCategoryId] = itemIds($source, itemId);
+            }
+
             $.ajax({
-                url: moveItemUrl + '/' + itemId,
+                url: reorderItemUrl,
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ categoryId: newCategoryId, order: order }),
-                success: function() { showToast('Item déplacé', 'success'); },
+                data: JSON.stringify({ orders: orders }),
+                success: function(response) {
+                    applyOrders(response.orders);
+                    showToast('Ordre sauvegardé', 'success');
+                },
                 error: function() { showToast('Erreur', 'danger'); }
             });
         }
+    });
+
+    // Bouton ordre alphabétique
+    $(document).on('click', '.btn-sort-alpha', function() {
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+
+        $.ajax({
+            url: $btn.data('url'),
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                var orders = {};
+                orders[$btn.data('category-id')] = response.order;
+                applyOrders(orders);
+                showToast('Ordre alphabétique appliqué', 'success');
+            },
+            error: function() { showToast('Erreur', 'danger'); },
+            complete: function() { $btn.prop('disabled', false); }
+        });
     });
 
     // Info button
@@ -199,6 +240,53 @@ $(function() {
         $('#itemInfoContent').text(desc);
         new bootstrap.Modal(document.getElementById('itemInfoModal')).show();
     });
+
+    // Identifiants des items d'une zone, dans l'ordre du DOM
+    function itemIds($zone, excludeId) {
+        var ids = [];
+        $zone.find('.item-card').each(function() {
+            var id = $(this).data('item-id');
+            if (excludeId !== undefined && id == excludeId) {
+                return;
+            }
+            ids.push(id);
+        });
+        return ids;
+    }
+
+    // Applique au DOM l'ordre renvoyé par le serveur
+    function applyOrders(orders) {
+        if (orders) {
+            Object.keys(orders).forEach(function(categoryId) {
+                var $zone = $('.item-drop-zone[data-category-id="' + categoryId + '"]');
+                var $cards = {};
+
+                $zone.find('.item-card').each(function() {
+                    $cards[$(this).data('item-id')] = $(this);
+                });
+
+                orders[categoryId].forEach(function(itemId) {
+                    if ($cards[itemId]) {
+                        $zone.append($cards[itemId]);
+                        delete $cards[itemId];
+                    }
+                });
+
+                // Les items absents de l'ordre restent en fin de zone
+                Object.keys($cards).forEach(function(itemId) {
+                    $zone.append($cards[itemId]);
+                });
+            });
+        }
+
+        // La catégorie affichée fait foi pour l'item qui s'y trouve
+        $('.item-drop-zone').each(function() {
+            var categoryId = $(this).data('category-id');
+            $(this).find('.item-card').each(function() {
+                $(this).attr('data-category-id', categoryId).data('category-id', categoryId);
+            });
+        });
+    }
 
     function showToast(message, type) {
         var $container = $('.toast-container');

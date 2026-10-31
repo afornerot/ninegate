@@ -4,6 +4,11 @@ framework:
 
     session:
         handler_id: 'session.handler.pdo'
+        # Cookie propre à cette application : plusieurs apps PHP partagent le
+        # même hôte sur des ports différents et un navigateur n'isole pas les
+        # cookies par port. Le PHPSESSID par défaut serait écrasé par une autre
+        # app, ce qui déconnecte l'utilisateur de ninegate.
+        name: NINEGATESESSID
         cookie_secure: auto
         cookie_httponly: true
         cookie_samesite: lax

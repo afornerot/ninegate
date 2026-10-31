@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\ItemCategory;
 use App\Form\ItemCategoryType;
 use App\Repository\ItemCategoryRepository;
+use App\Service\ItemOrderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -107,5 +108,19 @@ class ItemCategoryController extends AbstractController
         $this->em->flush();
 
         return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/admin/itemcategory/sortalpha/{id}', name: 'app_admin_itemcategory_sortalpha', methods: ['POST'])]
+    public function sortAlpha(int $id, ItemOrderService $itemOrderService): JsonResponse
+    {
+        $category = $this->itemCategoryRepository->find($id);
+        if (!$category) {
+            return new JsonResponse(['success' => false, 'error' => 'Catégorie introuvable'], 404);
+        }
+
+        $order = $itemOrderService->sortAlphabetically($category);
+        $this->em->flush();
+
+        return new JsonResponse(['success' => true, 'order' => $order]);
     }
 }

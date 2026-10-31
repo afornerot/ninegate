@@ -24,7 +24,7 @@ class ItemCategory
     private int $sortOrder = 0;
 
     #[ORM\OneToMany(targetEntity: Item::class, mappedBy: 'category', orphanRemoval: true)]
-    #[ORM\OrderBy(['sortOrder' => SortDirection::Ascending])]
+    #[ORM\OrderBy(['sortOrder' => SortDirection::Ascending, 'id' => SortDirection::Ascending])]
     private Collection $items;
 
     public function __construct()
