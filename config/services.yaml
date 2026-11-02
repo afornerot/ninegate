@@ -21,6 +21,9 @@ parameters:
   casHost: "%env(resolve:CAS_HOST)%"
   casPort: "%env(resolve:CAS_PORT)%"
   casPath: "%env(resolve:CAS_PATH)%"
+  # URL interne de l'IdP, pour la validation serveur-a-serveur du ticket.
+  # Vide = utiliser casHost/casPort (comportement historique).
+  casInternalUrl: "%env(resolve:CAS_INTERNAL_URL)%"
   casUsername: "%env(resolve:CAS_USERNAME)%"
   casMail: "%env(resolve:CAS_MAIL)%"
   casLastname: "%env(resolve:CAS_LASTNAME)%"

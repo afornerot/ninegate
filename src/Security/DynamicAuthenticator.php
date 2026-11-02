@@ -139,6 +139,22 @@ class DynamicAuthenticator extends AbstractAuthenticator
             $url,
             false);
 
+        // Un seul probleme a resoudre ici : le RESEAU. Le navigateur atteint
+        // l'IdP par son nom public (CAS_HOST), mais la validation du ticket est
+        // faite par le serveur, depuis le reseau des conteneurs ou ce nom ne
+        // resout pas. On pointe donc serviceValidate vers CAS_INTERNAL_URL.
+        //
+        // Ne PAS appeler setFixedServiceURL() ici : phpCAS deduit deja l'URL du
+        // service de la requete courante et sait retirer ?ticket= (getURL).
+        // La figer casse deux choses : le parametre service= de l'URL de login,
+        // et la redirection de retour apres validation (elle repartirait sur
+        // /login, d'ou une boucle).
+        $internalUrl = (string) $this->parameterBag->get('casInternalUrl');
+        if ('' !== $internalUrl) {
+            $internalBase = rtrim($internalUrl, '/').$this->parameterBag->get('casPath');
+            \phpCAS::setServerServiceValidateURL($internalBase.'/serviceValidate');
+        }
+
         \phpCAS::setNoCasServerValidation();
         \phpCAS::forceAuthentication();
 

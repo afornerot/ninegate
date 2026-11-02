@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6012fbf25f718cf8c88913705732ad9c",
+    "content-hash": "d122ffc82ec64b376aac9d48b93625fa",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -230,16 +230,16 @@
         },
         {
             "name": "bnine/filesbundle",
-            "version": "v1.5.12",
+            "version": "v1.5.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/afornerot/bNine-FilesBundle.git",
-                "reference": "6bafea0b770b07515d01945ebb75624da2f20152"
+                "reference": "35c4346ded5efa8a0b2f38a02644ada3321048b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/afornerot/bNine-FilesBundle/zipball/6bafea0b770b07515d01945ebb75624da2f20152",
-                "reference": "6bafea0b770b07515d01945ebb75624da2f20152",
+                "url": "https://api.github.com/repos/afornerot/bNine-FilesBundle/zipball/35c4346ded5efa8a0b2f38a02644ada3321048b5",
+                "reference": "35c4346ded5efa8a0b2f38a02644ada3321048b5",
                 "shasum": ""
             },
             "require": {
@@ -300,9 +300,9 @@
             ],
             "support": {
                 "issues": "https://github.com/afornerot/bNine-FilesBundle/issues",
-                "source": "https://github.com/afornerot/bNine-FilesBundle/tree/v1.5.12"
+                "source": "https://github.com/afornerot/bNine-FilesBundle/tree/v1.5.13"
             },
-            "time": "2026-10-23T12:07:54+00:00"
+            "time": "2026-11-02T14:01:54+00:00"
         },
         {
             "name": "bnine/mdeditorbundle",
