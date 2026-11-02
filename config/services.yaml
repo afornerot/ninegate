@@ -74,6 +74,13 @@ services:
     App\:
         resource: '../src/'
 
+    # Hasher de transition v2 -> v3 : verifie les hashs {SSHA} herites puis
+    # produit du bcrypt. Le cout est fixe ici car la branche `id:` de
+    # security.password_hashers n'injecte aucune option dans le service
+    # (contrairement a `algorithm:`).
+    App\Security\SshaPasswordHasher:
+        arguments: [12]
+
     App\Repository\UserRepository:
         public: true
 

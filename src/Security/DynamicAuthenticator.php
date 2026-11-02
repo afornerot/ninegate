@@ -35,8 +35,29 @@ class DynamicAuthenticator extends AbstractAuthenticator
             return false;
         }
 
+        // Le mode CAS s'authentifie a chaque requete protegee via phpCAS
+        // (redirection vers l'IdP puis retour). La page /login doit donc le
+        // declencher aussi : sinon le visiteur reste bloque sur le formulaire
+        // local et le SSO n'est jamais sollicite.
+        if ('CAS' === $this->parameterBag->get('appModeAuth')) {
+            $currentPath = $request->getPathInfo();
+
+            if ('/logout' === $currentPath) {
+                return false;
+            }
+
+            if ('/login' === $currentPath
+                || str_starts_with($currentPath, '/admin')
+                || str_starts_with($currentPath, '/master')
+                || str_starts_with($currentPath, '/user')) {
+                return true;
+            }
+
+            return false;
+        }
+
         $currentPath = $request->getPathInfo();
-        if (in_array($currentPath, ['/login', '/logout'])) {
+        if (in_array($currentPath, ['/login', '/logout'], true)) {
             return false;
         }
 

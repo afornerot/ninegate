@@ -1,5 +1,12 @@
 security:
   password_hashers:
+    # SshaPasswordHasher accepte les hashs {SSHA} herites de ninegate v2 ET le
+    # bcrypt qu'il produit lui-meme ; Symfony rehash donc en bcrypt a la
+    # premiere connexion reussie.
+    # La cle est la CLASSE D'ENTITE : c'est ainsi que Symfony associe un hasher
+    # a un utilisateur.
+    App\Entity\User:
+      id: App\Security\SshaPasswordHasher
     Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
     ldap:
       algorithm: bcrypt
