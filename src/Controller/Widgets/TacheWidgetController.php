@@ -2,6 +2,7 @@
 
 namespace App\Controller\Widgets;
 
+use App\Entity\PageWidget;
 use App\Entity\Tache;
 use App\Entity\User;
 use App\Entity\UserGroup;
@@ -53,15 +54,14 @@ class TacheWidgetController extends AbstractController
             return new Response('');
         }
 
-        $canManage = $this->isGranted(WidgetVoter::CAN_MANAGE, $pageWidget);
         $user = $this->getUser();
+        $canManagePage = $this->isGranted(WidgetVoter::CAN_MANAGE, $pageWidget);
+        $mode = $this->getWidgetMode($pageWidget);
 
-        $configFields = $pageWidget->getWidget()->getConfig() ?? [];
-        $instanceConfig = $pageWidget->getContent() ?? [];
-        $widgetDefaults = $this->widgetConfigService->getDefaults($configFields);
-        $config = array_merge($widgetDefaults, $instanceConfig);
-
-        $mode = $config['mode'] ?? 'user';
+        // Mode « Mes tâches » : ce sont les tâches personnelles de l'utilisateur qui sont
+        // affichées, il peut donc toujours les gérer. Mode « Tâches de la page » : les
+        // tâches appartiennent à la page, la permission de gestion de la page est requise.
+        $canManage = 'linked' === $mode ? $canManagePage : $user instanceof User;
 
         $taches = $this->loadTaches($user, $mode, $pageWidget);
 
@@ -82,6 +82,15 @@ class TacheWidgetController extends AbstractController
             'mode' => $mode,
             'pageGroups' => $pageGroups,
         ]);
+    }
+
+    private function getWidgetMode(PageWidget $pageWidget): string
+    {
+        $configFields = $pageWidget->getWidget()->getConfig() ?? [];
+        $instanceConfig = $pageWidget->getContent() ?? [];
+        $config = array_merge($this->widgetConfigService->getDefaults($configFields), $instanceConfig);
+
+        return $config['mode'] ?? 'user';
     }
 
     #[Route('/user/tache/save', name: 'app_user_tache_save', methods: ['POST'])]
@@ -107,6 +116,14 @@ class TacheWidgetController extends AbstractController
         $data = json_decode($request->getContent(), true);
         if (!$data) {
             return new JsonResponse(['error' => 'Données invalides'], 400);
+        }
+
+        $mode = 'user';
+        if ($pageWidget) {
+            $mode = $this->getWidgetMode($pageWidget);
+            if ('linked' === $mode && !$this->isGranted(WidgetVoter::CAN_MANAGE, $pageWidget)) {
+                return new JsonResponse(['error' => 'Accès refusé'], 403);
+            }
         }
 
         if (!empty($data['id'])) {
@@ -142,19 +159,10 @@ class TacheWidgetController extends AbstractController
             }
             $tache->setGroup($group);
         } else {
-            if ($pageWidget) {
-                $configFields = $pageWidget->getWidget()->getConfig() ?? [];
-                $instanceConfig = $pageWidget->getContent() ?? [];
-                $widgetDefaults = $this->widgetConfigService->getDefaults($configFields);
-                $config = array_merge($widgetDefaults, $instanceConfig);
-                $mode = $config['mode'] ?? 'user';
-
-                if ($mode === 'linked') {
-                    $page = $pageWidget->getPage();
-                    $pageGroups = $page->getGroups()->toArray();
-                    if (!empty($pageGroups)) {
-                        $tache->setGroup($pageGroups[0]);
-                    }
+            if ($pageWidget && 'linked' === $mode) {
+                $pageGroups = $pageWidget->getPage()->getGroups()->toArray();
+                if (!empty($pageGroups)) {
+                    $tache->setGroup($pageGroups[0]);
                 }
             }
         }

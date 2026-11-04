@@ -9,7 +9,7 @@
 {% if taches|length > 0 %}
 <div class="d-flex flex-column gap-2">
     {% for tache in taches %}
-        <div class="card tache-card" data-tache-id="{{ tache.id }}">
+        <div class="card tache-card" data-tache-id="{{ tache.id }}" data-page-widget-id="{{ pageWidget.id }}">
             <div class="card-body py-2 px-3">
                 <div class="d-flex align-items-start justify-content-between gap-2">
                     <div class="flex-grow-1">
@@ -72,7 +72,7 @@
                 <h5 class="modal-title">Nouvelle tâche</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
-            <div class="modal-body">
+            <form id="tache-form-{{ pageWidget.id }}" class="modal-body">
                 <div id="tache-error-{{ pageWidget.id }}" class="alert alert-danger d-none mb-2"></div>
                 <div class="mb-2">
                     <label class="form-label small">Titre *</label>
@@ -104,9 +104,9 @@
                     </select>
                 </div>
                 {% endif %}
-            </div>
+            </form>
             <div class="modal-footer">
-                <button class="btn btn-success tache-save-btn" data-save-url="{{ path('app_user_pagewidget_tache_save', {pageWidgetId: pageWidget.id}) }}" data-page-widget-id="{{ pageWidget.id }}" data-tache-id="">
+                <button type="button" class="btn btn-success tache-save-btn" data-save-url="{{ path('app_user_pagewidget_tache_save', {pageWidgetId: pageWidget.id}) }}" data-page-widget-id="{{ pageWidget.id }}" data-tache-id="" form="tache-form-{{ pageWidget.id }}" formnovalidate>
                     <i class="fas fa-check"></i> Créer
                 </button>
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -154,6 +154,9 @@ $(document).on('shown.bs.modal', '[id^="tacheModal-"]', function() {
     if (el && !el.dataset.mde) {
         initTacheEasyMDE('tache-content-' + pwId);
     }
+    // EasyMDE s'initialise au premier affichage : le focus est posé après.
+    var title = document.getElementById('tache-title-' + pwId);
+    if (title) title.focus();
 });
 function getTacheContent(textareaId) {
     var el = document.getElementById(textareaId);
@@ -183,14 +186,14 @@ document.querySelectorAll('.tache-add-btn').forEach(function(btn) {
 document.querySelectorAll('.tache-edit-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         var tacheId = this.dataset.tacheId;
-        var pwId = document.querySelector('.tache-save-btn').dataset.pageWidgetId;
+        var pwId = this.closest('.tache-card').dataset.pageWidgetId;
         fetch('/user/widget/tache/get/' + tacheId)
             .then(function(r) { return r.json(); })
             .then(function(t) {
                 var m = document.getElementById('tacheModal-' + pwId);
-                m.querySelector('.modal-title').textContent = 'Modifier la tâche';
-                m.querySelector('.tache-save-btn').dataset.tacheId = t.id;
-                m.querySelector('.tache-save-btn').innerHTML = '<i class="fas fa-check"></i> Modifier';
+                var saveBtn = m.querySelector('.tache-save-btn');
+                saveBtn.dataset.tacheId = t.id;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i> Modifier';
                 document.getElementById('tache-title-' + pwId).value = t.title || '';
                 document.getElementById('tache-content-' + pwId).value = t.content || '';
                 document.getElementById('tache-dueDate-' + pwId).value = t.dueDate || '';
@@ -204,26 +207,33 @@ document.querySelectorAll('.tache-edit-btn').forEach(function(btn) {
             });
     });
 });
+function tacheSubmit(btn) {
+    var pwId = btn.dataset.pageWidgetId;
+    var saveUrl = btn.dataset.saveUrl;
+    var tacheId = btn.dataset.tacheId || null;
+    var err = document.getElementById('tache-error-' + pwId);
+    err.classList.add('d-none');
+    var data = {
+        id: tacheId ? parseInt(tacheId) : null,
+        title: document.getElementById('tache-title-' + pwId).value,
+        content: getTacheContent('tache-content-' + pwId),
+        dueDate: document.getElementById('tache-dueDate-' + pwId).value || null,
+        status: document.getElementById('tache-status-' + pwId).value,
+        assignedUserId: (document.getElementById('tache-assignedUser-' + pwId) || {}).value || null,
+    };
+    if (!data.title) { err.textContent = 'Le titre est obligatoire'; err.classList.remove('d-none'); return; }
+    fetch(saveUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(function(r) { return r.json(); })
+        .then(function(res) { if (res.success) location.reload(); else if (res.error) { err.textContent = res.error; err.classList.remove('d-none'); } })
+        .catch(function() { err.textContent = 'Erreur de connexion'; err.classList.remove('d-none'); });
+}
 document.querySelectorAll('.tache-save-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var pwId = this.dataset.pageWidgetId;
-        var saveUrl = this.dataset.saveUrl;
-        var tacheId = this.dataset.tacheId || null;
-        var err = document.getElementById('tache-error-' + pwId);
-        err.classList.add('d-none');
-        var data = {
-            id: tacheId ? parseInt(tacheId) : null,
-            title: document.getElementById('tache-title-' + pwId).value,
-            content: getTacheContent('tache-content-' + pwId),
-            dueDate: document.getElementById('tache-dueDate-' + pwId).value || null,
-            status: document.getElementById('tache-status-' + pwId).value,
-            assignedUserId: (document.getElementById('tache-assignedUser-' + pwId) || {}).value || null,
-        };
-        if (!data.title) { err.textContent = 'Le titre est obligatoire'; err.classList.remove('d-none'); return; }
-        fetch(saveUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-            .then(function(r) { return r.json(); })
-            .then(function(res) { if (res.success) location.reload(); else if (res.error) { err.textContent = res.error; err.classList.remove('d-none'); } })
-            .catch(function() { err.textContent = 'Erreur de connexion'; err.classList.remove('d-none'); });
+    btn.addEventListener('click', function() { tacheSubmit(this); });
+});
+document.querySelectorAll('[id^="tache-form-"]').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        tacheSubmit(document.querySelector('.tache-save-btn[form="' + this.id + '"]'));
     });
 });
 document.querySelectorAll('.tache-status-btn').forEach(function(btn) {
