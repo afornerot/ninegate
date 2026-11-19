@@ -36,6 +36,17 @@ class PageTemplateFixtures extends Fixture
 </div>',
             ],
             [
+                'name' => 'Grille 3 Colonnes Centre Large + 2 Colonnes Sous le Centre',
+                'logo' => 'medias/icon/grid.png',
+                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 1.5fr 1.5fr 1fr; grid-template-rows: auto auto;">
+    <div id="R1C1" style="grid-column: 1; grid-row: 1 / span 2;"></div>
+    <div id="R1C2" style="grid-column: 2 / span 2; grid-row: 1;"></div>
+    <div id="R1C3" style="grid-column: 4; grid-row: 1 / span 2;"></div>
+    <div id="R2C1" style="grid-column: 2; grid-row: 2;"></div>
+    <div id="R2C2" style="grid-column: 3; grid-row: 2;"></div>
+</div>',
+            ],
+            [
                 'name' => 'Deux Colonnes Égales',
                 'logo' => 'medias/icon/grid.png',
                 'template' => '<div class="page-grid" style="grid-template-columns: 1fr 1fr;">

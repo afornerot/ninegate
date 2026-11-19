@@ -6,6 +6,7 @@ use App\Repository\GroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GroupRepository::class)]
 #[ORM\Table(name: 'app_group')]
@@ -24,6 +25,10 @@ class Group
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
+
+    #[Assert\Email(message: 'Veuillez entrer un email valide.')]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
@@ -87,6 +92,18 @@ class Group
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
 
         return $this;
     }

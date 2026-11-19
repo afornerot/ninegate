@@ -7,6 +7,7 @@ use Bnine\FilesBundle\Form\Type\IconUploadType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -48,6 +49,12 @@ class GroupType extends AbstractType
                 'label' => 'Description',
                 'attr' => ['class' => 'form-control', 'rows' => 3],
                 'required' => false,
+            ])
+            ->add('email', EmailType::class, [
+                'label' => 'Email',
+                'required' => false,
+                'disabled' => $readOnly,
+                'attr' => ['class' => 'form-control'],
             ])
             ->add('logo', IconUploadType::class, [
                 'label' => false,

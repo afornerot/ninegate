@@ -42,6 +42,7 @@ parameters:
   ldapAttrGroupCn: "%env(resolve:LDAP_ATTR_GROUP_CN)%"
   ldapAttrGroupMember: "%env(resolve:LDAP_ATTR_GROUP_MEMBER)%"
   ldapAttrGroupGid: "%env(resolve:LDAP_ATTR_GROUP_GID)%"
+  ldapAttrGroupEmail: "%env(default::LDAP_ATTR_GROUP_EMAIL)%"
   ldapWriterDn: "%env(resolve:LDAP_WRITER_DN)%"
   ldapWriterPassword: "%env(resolve:LDAP_WRITER_PASSWORD)%"
   storageDsn: "%env(resolve:STORAGE_DSN)%"

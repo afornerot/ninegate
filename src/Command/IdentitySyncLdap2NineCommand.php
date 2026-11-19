@@ -186,10 +186,15 @@ class IdentitySyncLdap2NineCommand extends Command
     private function syncLdapGroups(SymfonyStyle $io, bool $dryRun): void
     {
         $groupsDn = $this->getLdapGroupsDn();
+        $groupEmailAttr = trim((string) $this->parameterBag->get('ldapAttrGroupEmail'));
+        $searchAttrs = ['cn', 'description', 'memberuid', 'gidnumber'];
+        if ('' !== $groupEmailAttr) {
+            $searchAttrs[] = $groupEmailAttr;
+        }
         $entries = $this->ldapService->search(
             $groupsDn,
             '(objectClass=groupOfNames)',
-            ['cn', 'description', 'memberuid', 'gidnumber']
+            $searchAttrs
         );
 
         foreach ($entries as $entry) {
@@ -221,6 +226,9 @@ class IdentitySyncLdap2NineCommand extends Command
             $group->setIsAnnuaire(true);
             $group->setIsSystem(false);
             $group->setType(AppGroup::TYPE_ORGANISATION);
+            if ('' !== $groupEmailAttr) {
+                $group->setEmail($attrs[$groupEmailAttr][0] ?? $group->getEmail());
+            }
 
             $this->em->flush();
 
