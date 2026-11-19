@@ -17,7 +17,9 @@
                         <th class="text-nowrap" data-orderable="false" width="100px">Actions</th>
                         <th class="text-nowrap" data-orderable="false" width="100px">Avatar</th>
                         <th>Login</th>
+                        <th>Nom</th>
                         <th>Email</th>
+                        <th>Groupes</th>
                         <th>Roles</th>
                     </tr>
                 </thead>
@@ -39,8 +41,10 @@
                         <td>
                             <img src="{{ bninefile(user.avatar) }}" alt="Avatar" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;background-color: var(--bs-dark);">
                         </td>
+                        <td>{{ user.username }}</td>
                         <td>{{ user.displayName }}</td>
                         <td>{{ user.email }}</td>
+                        <td>{{ user.groups|map(g => g.name)|join(', ') }}</td>
                         <td>{{ user.roles|join(', ') }}</td>
                     </tr>
                     {% endfor %}
