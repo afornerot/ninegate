@@ -934,6 +934,12 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     transform: translateY(-1px);
 }
+
+/* When widget has no border, items with bg-dark should match card background */
+.page-widget-card:not(.page-widget-bordered) .itemlink-item.bg-dark {
+    background-color: var(--bs-card-bg) !important;
+    color: var(--bs-body-color) !important;
+}
 .itemlink-item a.stretched-link {
     text-decoration: none;
 }
