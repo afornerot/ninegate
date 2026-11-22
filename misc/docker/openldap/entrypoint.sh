@@ -64,6 +64,13 @@ sed -i "s|__WRITER_HASH__|${WRITER_HASH}|g" /tmp/bootstrap.ldif
 CONFIG_ROOT_HASH=$(slappasswd -h "{SSHA}" -s "${LDAP_WRITER_PASSWORD}")
 sed -i "s|__CONFIG_ROOT_HASH__|${CONFIG_ROOT_HASH}|g" /etc/openldap/slapd.conf
 
+# Overlay memberof : suit l'attribut DN des groupes (LDAP_ATTR_GROUP_MEMBER_DN,
+# ex: cadolesmember) ; défaut 'member' si non configuré.
+GROUP_OC="${LDAP_GROUP_OC:-posixGroup}"
+MEMBER_AD="${LDAP_ATTR_GROUP_MEMBER_DN:-member}"
+sed -i "s|__GROUP_OC__|${GROUP_OC}|g" /etc/openldap/slapd.conf
+sed -i "s|__MEMBER_AD__|${MEMBER_AD}|g" /etc/openldap/slapd.conf
+
 # Conversion slapd.conf → slapd.d
 # Au premier démarrage la base mdb n'existe pas encore : slaptest sort en
 # erreur (« test would succeed using the -u switch ») mais écrit bien la config.
@@ -74,7 +81,13 @@ slaptest -f /etc/openldap/slapd.conf -F /etc/openldap/slapd.d 2>&1 | tail -2 || 
 # Chargement du bootstrap initial (n'efface pas la BDD existante)
 # L'erreur n'est plus avalée : un slapadd en échec laissait un annuaire vide
 # et le conteneur bouclait sans aucun message exploitable.
-if ! slapadd -F /etc/openldap/slapd.d -l /tmp/bootstrap.ldif 2>/tmp/slapadd.err; then
+# Import initial : LDIF fourni (volume import.ldif) si présent, sinon bootstrap
+IMPORT_LDIF=/tmp/bootstrap.ldif
+if [ -s /opt/openldap/import.ldif ]; then
+    IMPORT_LDIF=/opt/openldap/import.ldif
+    echo "[openldap] Import du LDIF fourni : /opt/openldap/import.ldif"
+fi
+if ! slapadd -F /etc/openldap/slapd.d -l "${IMPORT_LDIF}" 2>/tmp/slapadd.err; then
     if grep -qi "already exists" /tmp/slapadd.err; then
         echo "[openldap] Bootstrap déjà chargé (ignoré)"
     else
