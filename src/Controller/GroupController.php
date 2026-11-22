@@ -264,7 +264,19 @@ class GroupController extends AbstractController
             return $this->redirectToRoute($routePrefix.'_update', ['id' => $id]);
         }
 
+        $this->dispatchGroupSyncById($id);
+
         return $this->redirectToRoute($listRoute);
+    }
+
+    /**
+     * Dispatch après suppression : l'entité n'existe plus, on passe par l'id.
+     */
+    private function dispatchGroupSyncById(int $groupId): void
+    {
+        if ($this->identityProvider->isSyncEnabled()) {
+            $this->bus->dispatch(new GroupSyncMessage($groupId, 'delete'));
+        }
     }
 
     private function dispatchGroupSync(Group $group): void

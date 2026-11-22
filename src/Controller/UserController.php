@@ -167,6 +167,10 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_admin_user_update', ['id' => $id]);
         }
 
+        if ($this->identityProvider->isSyncEnabled()) {
+            $this->bus->dispatch(new UserSyncMessage($id, 'delete'));
+        }
+
         return $this->redirectToRoute('app_admin_user');
     }
 

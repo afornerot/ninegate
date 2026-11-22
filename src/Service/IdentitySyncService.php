@@ -52,7 +52,7 @@ class IdentitySyncService
         $mapping = $this->mappingRepository->findForUser($user->getId());
         $newDn = $this->ldapService->userDnFor($user->getUsername());
 
-        if ($mapping && $mapping->getLdapDn() !== $newDn) {
+        if ($mapping && !$this->ldapService->dnEquals($mapping->getLdapDn(), $newDn)) {
             // MODRDN en cas de rename du username
             $this->ldapService->modifyRdn($mapping->getLdapDn(), 'uid=' . $this->normalizeForUid($user->getUsername()));
             $mapping->setLdapDn($newDn);
@@ -77,6 +77,68 @@ class IdentitySyncService
         $this->ldapService->modify($newDn, $attrs);
 
         $mapping->setSyncedAt(new \DateTimeImmutable());
+    }
+
+    /**
+     * Supprime l'entrée LDAP + le mapping d'un user supprimé en BDD.
+     * Nettoie aussi les memberuid des groupes qui le référencent encore.
+     */
+    public function removeUser(int $userId): void
+    {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
+            return;
+        }
+
+        $mapping = $this->mappingRepository->findForUser($userId);
+        if (!$mapping) {
+            return;
+        }
+
+        $this->ldapService->delete($mapping->getLdapDn());
+        $this->em->remove($mapping);
+        $this->em->flush();
+
+        // memberuid résiduels dans les groupes : nettoyage
+        $this->cleanupMemberUid($this->normalizeForUid($mapping->getLdapUid() ?? ''));
+    }
+
+    /**
+     * Supprime l'entrée LDAP + le mapping d'un group supprimé en BDD.
+     */
+    public function removeGroup(int $groupId): void
+    {
+        if (!$this->identityProvider->isSyncNineToLdap()) {
+            return;
+        }
+
+        $mapping = $this->mappingRepository->findForGroup($groupId);
+        if (!$mapping) {
+            return;
+        }
+
+        $this->ldapService->delete($mapping->getLdapDn());
+        $this->em->remove($mapping);
+        $this->em->flush();
+    }
+
+    /**
+     * Retire $uid des memberuid de toutes les groupes qui le référencent.
+     */
+    private function cleanupMemberUid(string $uid): void
+    {
+        if ('' === $uid) {
+            return;
+        }
+
+        $groupsDn = $this->parameterBag->get('ldapGroupsDn');
+        $results = $this->ldapService->search($groupsDn, '(memberuid='.$uid.')', ['dn']);
+        foreach ($results as $entry) {
+            $dn = method_exists($entry, 'getDn') ? $entry->getDn() : ($entry['dn'] ?? null);
+            if (null === $dn) {
+                continue;
+            }
+            $this->ldapService->modify((string) $dn, ['memberuid' => []]);
+        }
     }
 
     /**
@@ -131,7 +193,7 @@ class IdentitySyncService
         $mapping = $this->mappingRepository->findForGroup($group->getId());
         $newDn = $this->ldapService->groupDnFor($group->getSlug());
 
-        if ($mapping && $mapping->getLdapDn() !== $newDn) {
+        if ($mapping && !$this->ldapService->dnEquals($mapping->getLdapDn(), $newDn)) {
             $this->ldapService->modifyRdn($mapping->getLdapDn(), 'cn=' . $this->normalizeForCn($group->getSlug()));
             $mapping->setLdapDn($newDn);
         }

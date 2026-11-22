@@ -43,6 +43,17 @@ class IdentitySyncHandler
             return;
         }
 
+        if ('delete' === $message->action) {
+            try {
+                $this->ldapService->bind();
+            } catch (\Throwable $e) {
+                throw new UnrecoverableMessageHandlingException('LDAP bind failed', 0, $e);
+            }
+            $this->syncService->removeUser($message->userId);
+
+            return;
+        }
+
         $user = $this->userRepository->find($message->userId);
         if (!$user) {
             // User supprimé, ne pas retry
@@ -62,6 +73,17 @@ class IdentitySyncHandler
     public function handleGroup(GroupSyncMessage $message): void
     {
         if (!$this->identityProvider->isSyncNineToLdap()) {
+            return;
+        }
+
+        if ('delete' === $message->action) {
+            try {
+                $this->ldapService->bind();
+            } catch (\Throwable $e) {
+                throw new UnrecoverableMessageHandlingException('LDAP bind failed', 0, $e);
+            }
+            $this->syncService->removeGroup($message->groupId);
+
             return;
         }
 
