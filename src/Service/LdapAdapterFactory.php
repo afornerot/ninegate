@@ -19,6 +19,11 @@ class LdapAdapterFactory
             'options' => [
                 'protocol_version' => 3,
                 'referrals' => false,
+                // Sans ces timeouts, une requête sur un socket mort (slapd
+                // redémarré, TCP idle fermé) bloque le worker indéfiniment.
+                'network_timeout' => (int) $parameterBag->get('ldapNetworkTimeout'),
+                'timeout' => (int) $parameterBag->get('ldapTimeout'),
+                'timelimit' => (int) $parameterBag->get('ldapTimeout'),
             ],
         ]);
     }

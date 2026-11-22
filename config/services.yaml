@@ -34,6 +34,8 @@ parameters:
   ldapHost: "%env(resolve:LDAP_HOST)%"
   ldapPort: "%env(int:LDAP_PORT)%"
   ldapTls: "%env(bool:LDAP_TLS)%"
+  ldapNetworkTimeout: "%env(int:default:5:LDAP_NETWORK_TIMEOUT)%"
+  ldapTimeout: "%env(int:default:10:LDAP_TIMEOUT)%"
   ldapAttrUsername: "%env(resolve:LDAP_ATTR_USERNAME)%"
   ldapAttrLastname: "%env(resolve:LDAP_ATTR_LASTNAME)%"
   ldapAttrFirstname: "%env(resolve:LDAP_ATTR_FIRSTNAME)%"
