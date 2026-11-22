@@ -17,14 +17,17 @@
     </button>
 </div>
 
+{# Items grouped by category - exclude favorites if showFavorites enabled #}
+{% set displayItems = config.showFavorites ? items|filter(i => i.id not in favoriteIds) : items %}
+{% set navCategories = categories|filter(c => displayItems|filter(i => i.category.id == c.id)|length > 0) %}
 {# Category navbar - single select #}
-{% if config.showCategoryNav and categories|length > 0 %}
+{% if config.showCategoryNav and navCategories|length > 0 %}
 <div class="itemlink-category-nav mb-2 d-flex gap-1 flex-wrap" data-bureau-id="{{ pageWidget.id }}">
     <a href="#" class="badge category-all active" style="background: var(--bs-primary); cursor: pointer;">Toutes</a>
     {% if config.showFavorites and favoriteItems|length > 0 %}
         <a href="#" class="badge category-filter" data-cat="fav" style="background: var(--bs-danger); cursor: pointer;"><i class="fas fa-heart"></i> Favoris</a>
     {% endif %}
-    {% for cat in categories %}
+    {% for cat in navCategories %}
         <a href="#" class="badge category-filter" data-cat="{{ cat.id }}" style="background: var(--bs-secondary); cursor: pointer;">{{ cat.title }}</a>
     {% endfor %}
 </div>
@@ -43,7 +46,7 @@
         {% endif %}
         <div class="itemlink-items itemlink-{{ config.display|default('medium') }}">
             {% for item in favoriteItems %}
-                <div class="itemlink-item itemlink-fav {% if not item.bgcolor %}bg-dark{% endif %}" data-cat="fav" data-origin-cat="{{ item.category.id }}" data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
+                <div class="itemlink-item itemlink-fav {% if not item.bgcolor %}bg-dark{% endif %}" data-cat="fav" {% if item._isBookmark is not defined or not item._isBookmark %}data-origin-cat="{{ item.category.id }}"{% endif %} data-title="{{ item.title|lower }}" data-summary="{{ item.summary|default('')|lower }}"
                      title="{{ item.title }}{% if item.summary %}\n{{ item.summary }}{% endif %}{% if item.description %}\n{{ item.description }}{% endif %}"
                      style="{% if item.bgcolor %}background-color: {{ item.bgcolor }};{% endif %}{% if item.color %} color: {{ item.color }};{% elseif not item.bgcolor %} color: #fff;{% endif %}">
                     {% if item.icon %}
@@ -61,9 +64,11 @@
                     {% if item.url %}
                         <a href="{{ item.url }}" target="{{ item.newTab ? '_blank' : '_self' }}" class="stretched-link" title="{{ item.title }}"></a>
                     {% endif %}
+                    {% if item._isBookmark is not defined or not item._isBookmark %}
                     <button class="itemlink-fav-btn active" data-item-id="{{ item.id }}" title="Retirer des favoris">
                         <i class="fas fa-heart"></i>
                     </button>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Widgets;
 
+use App\Repository\BookmarkRepository;
 use App\Repository\ItemCategoryRepository;
 use App\Repository\ItemRepository;
 use App\Repository\PageWidgetRepository;
@@ -24,6 +25,7 @@ class BureauWidgetController extends AbstractController
         PageWidgetRepository $pageWidgetRepository,
         ItemRepository $itemRepository,
         ItemCategoryRepository $itemCategoryRepository,
+        BookmarkRepository $bookmarkRepository,
         WidgetConfigService $widgetConfigService,
         ?string $_route,
     ): Response {
@@ -100,11 +102,18 @@ class BureauWidgetController extends AbstractController
             return $a->getSortOrder() <=> $b->getSortOrder();
         });
 
-        // Separate favorites for virtual category
+        // Separate favorites for virtual category : items favoris + bookmarks personnels (comme le widget favoris)
         $favoriteItems = [];
         if (!empty($config['showFavorites']) && $user) {
             $favoriteIds = array_map(fn($i) => $i->getId(), $user->getItems()->toArray());
             $favoriteItems = array_filter($items, fn($item) => in_array($item->getId(), $favoriteIds));
+
+            $bookmarks = $bookmarkRepository->findBy(['user' => $user], ['title' => 'ASC']);
+            foreach ($bookmarks as $bookmark) {
+                $bookmark->_isBookmark = true;
+            }
+            $favoriteItems = array_merge($favoriteItems, $bookmarks);
+            usort($favoriteItems, fn($a, $b) => $a->getTitle() <=> $b->getTitle());
         }
 
         // Get categories that have at least one accessible item

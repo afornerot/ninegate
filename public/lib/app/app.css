@@ -619,7 +619,7 @@ body {
 }
 
 .page-widget-bordered {
-    border: var(--bs-card-border-width, 1px) solid var(--bs-card-border-color);
+    border: var(--bs-card-border-width, 1px) solid var(--bs-border-color);
     background-color: var(--bs-card-bg);
     box-shadow: var(--bs-card-box-shadow);
 }
