@@ -77,6 +77,8 @@ class IdentitySyncService
         $this->ldapService->modify($newDn, $attrs);
 
         $mapping->setSyncedAt(new \DateTimeImmutable());
+        // Worker long-vif : l'EntityManager ne flush pas tout seul.
+        $this->em->flush();
     }
 
     /**
@@ -282,6 +284,9 @@ class IdentitySyncService
             ]);
 
         $mapping->setSyncedAt(new \DateTimeImmutable());
+        // Worker long-vif : l'EntityManager ne flush pas tout seul
+        // (sinon le mapping garde l'ancien DN après rename).
+        $this->em->flush();
     }
 
     /**
@@ -328,6 +333,7 @@ class IdentitySyncService
             $this->ldapService->removeAttributes($mapping->getLdapDn(), $toRemove);
         }
         $mapping->setSyncedAt(new \DateTimeImmutable());
+        $this->em->flush();
     }
 
     /**
