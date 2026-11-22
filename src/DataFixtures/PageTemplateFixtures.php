@@ -9,6 +9,33 @@ use Doctrine\Persistence\ObjectManager;
 
 class PageTemplateFixtures extends Fixture
 {
+    /**
+     * Bloc responsive embarqué dans chaque template :
+     * - mode tablette (≤ 992px) : grille forcée en 2 colonnes, placement inline annulé ;
+     * - mode téléphone (≤ 700px) : grille forcée en une colonne.
+     */
+    private const RESPONSIVE_STYLE = '<style>
+@media (max-width: 992px) {
+    .page-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: none !important;
+    }
+    .page-grid > div {
+        grid-column: auto !important;
+        grid-row: auto !important;
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+@media (max-width: 700px) {
+    .page-grid,
+    .page-grid > div {
+        display: block !important;
+    }
+}
+</style>';
+
     public function __construct(
         private PageTemplateRepository $pageTemplateRepository,
     ) {
@@ -16,11 +43,13 @@ class PageTemplateFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        $responsive = self::RESPONSIVE_STYLE;
+
         $data = [
             [
                 'name' => 'Grille Simple 3 Colonnes',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 2fr 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr 2fr 1fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
     <div id="R1C3"></div>
@@ -29,7 +58,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Grille Simple 3 Colonnes (Centre Large)',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 3fr 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr 3fr 1fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
     <div id="R1C3"></div>
@@ -38,7 +67,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Grille 3 Colonnes Centre Large + 2 Colonnes Sous le Centre',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="display: grid; grid-template-columns: 1fr 3fr 1fr; grid-template-rows: auto; align-items: start; row-gap: 0;">
+                'template' => $responsive.'<div class="page-grid" style="display: grid; grid-template-columns: 1fr 3fr 1fr; grid-template-rows: auto; align-items: start; row-gap: 0;">
     <div id="R1C1" style="grid-column: 1; grid-row: 1; align-self: stretch;"></div>
     <div style="grid-column: 2; grid-row: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; align-items: start; gap: 0 0.5rem;">
         <div id="R1C2" style="grid-column: 1 / span 2; grid-row: 1; margin-bottom: 0;"></div>
@@ -51,7 +80,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Deux Colonnes Égales',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr 1fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
 </div>',
@@ -59,7 +88,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Colonne Large + Colonne Petite',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 2fr 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 2fr 1fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
 </div>',
@@ -67,7 +96,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Colonne Petite + Colonne Large',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 2fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr 2fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
 </div>',
@@ -75,7 +104,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Grille 4 Colonnes',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
     <div id="R1C3"></div>
@@ -85,7 +114,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Grille 2 Lignes (2+1)',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr 1fr;">
     <div id="R1C1"></div>
     <div id="R1C2"></div>
 </div>
@@ -96,7 +125,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Grille L Pleine + 3 Sous-colonnes',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr;">
     <div id="R1C1"></div>
 </div>
 <div class="page-grid" style="grid-template-columns: 1fr 1fr 1fr;">
@@ -108,7 +137,7 @@ class PageTemplateFixtures extends Fixture
             [
                 'name' => 'Grille 3 Lignes (1+2+1)',
                 'logo' => 'medias/icon/grid.png',
-                'template' => '<div class="page-grid" style="grid-template-columns: 1fr;">
+                'template' => $responsive.'<div class="page-grid" style="grid-template-columns: 1fr;">
     <div id="R1C1"></div>
 </div>
 <div class="page-grid" style="grid-template-columns: 1fr 1fr;">

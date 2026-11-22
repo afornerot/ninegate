@@ -1260,6 +1260,12 @@ body {
     column-gap: 0.5rem;
 }
 
+@media (max-width: 992px) {
+    .rss-widget .blog-masonry {
+        column-count: 1;
+    }
+}
+
 .rss-widget .blog-masonry-item {
     break-inside: avoid;
     margin-bottom: 0.5rem;
