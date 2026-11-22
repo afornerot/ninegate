@@ -57,10 +57,35 @@ class LdapService
     {
         $this->ensureBound();
         try {
-            return $this->adapter->getEntry($dn);
+            // ExtLdap n'expose pas de get() : lecture par query base-objet
+            // options: scope 'base' = lecture de l'entrée elle-même
+            $results = $this->adapter->createQuery($dn, 'objectClass=*', ['scope' => 'base'])->execute();
+
+            return isset($results[0]) ? $results[0] : null;
         } catch (LdapException $e) {
             return null;
         }
+    }
+
+    /**
+     * Comparaison de DN au sens LDAP (RFC 4514) : insensible à la casse et
+     * aux espaces autour des séparateurs. Permet d'éviter des MODRDN inutiles
+     * quand le DN historique diffère uniquement par la casse (cn=AO vs cn=ao).
+     */
+    public function dnEquals(string $a, string $b): bool
+    {
+        $normalize = static function (string $dn): string {
+            // Découpe sur les virgules non échappées, normalise chaque RDN
+            $rdns = preg_split('/(?<!\\\\),/', $dn) ?: [];
+            $normalized = array_map(static function (string $rdn): string {
+                [$attr, $value] = array_pad(explode('=', $rdn, 2), 2, '');
+                return strtolower(trim($attr)).'='.strtolower(trim($value));
+            }, $rdns);
+
+            return implode(',', $normalized);
+        };
+
+        return $normalize($a) === $normalize($b);
     }
 
     public function exists(string $dn): bool
@@ -83,6 +108,11 @@ class LdapService
     public function modify(string $dn, array $mods): bool
     {
         $this->ensureBound();
+        // Rien à écrire après normalisation (valeurs vides retirées) : no-op,
+        // sinon ldap_modify() rejette une entry vide.
+        if ([] === $this->normalizeAttrs($mods)) {
+            return true;
+        }
         try {
             $this->adapter->getEntryManager()->update(new Entry($dn, $this->normalizeAttrs($mods)));
             return true;
@@ -91,6 +121,39 @@ class LdapService
         } catch (\InvalidArgumentException $e) {
             return false;
         }
+    }
+
+    /**
+     * Supprime des attributs d'une entrée (ldap_mod_del). Nécessaire quand la
+     * dernière valeur disparaît : modify() no-op sur les valeurs vides.
+     */
+    public function removeAttributes(string $dn, array $attrs): bool
+    {
+        $this->ensureBound();
+        // Un attribut par mod_del : "no such attribute" (errno 16) sur l'un
+        // ne doit pas empêcher la suppression des autres (mod atomique).
+        $ok = true;
+        foreach ($attrs as $attr) {
+            $errno = 0;
+            set_error_handler(static function (int $n, string $s) use (&$errno): bool {
+                if (preg_match('/\((\d+)\)/', $s, $m)) {
+                    $errno = (int) $m[1];
+                }
+                return true;
+            }, E_WARNING);
+            try {
+                $done = ldap_mod_del($this->adapter->getConnection()->getResource(), $dn, [$attr => []]);
+            } catch (\Throwable $e) {
+                $done = false;
+            } finally {
+                restore_error_handler();
+            }
+            // 16 = no such attribute : l'attribut est déjà absent, objectif atteint.
+            if (!$done && 16 !== $errno) {
+                $ok = false;
+            }
+        }
+        return $ok;
     }
 
     public function modifyRdn(string $oldDn, string $newRdn): bool
@@ -103,7 +166,7 @@ class LdapService
         [$rdn, $parent] = $parsed;
         $newDn = $newRdn . ($parent ? ',' . $parent : '');
         try {
-            $this->adapter->getEntryManager()->rename($oldDn, $newRdn, $parent);
+            $this->adapter->getEntryManager()->rename(new Entry($oldDn, []), $newRdn, $parent);
             return true;
         } catch (LdapException $e) {
             return false;

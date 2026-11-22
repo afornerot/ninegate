@@ -135,9 +135,11 @@ class IdentitySyncNine2LdapCommand extends Command
 
                 if (!$dryRun) {
                     $memberAttr = (string) $this->parameterBag->get('ldapAttrGroupMemberDn');
+                    // modify() no-op sur valeurs vides : suppression du dernier
+                    // membre via ldap_mod_del.
                     $mods = [
                         'description' => $group->getDescription() ?? '',
-                        'memberuid'   => $members,
+                        'memberuid' => $members,
                     ];
                     if ('' !== $memberAttr) {
                         // objectclass inclus : les entrées préexistantes doivent
@@ -146,6 +148,17 @@ class IdentitySyncNine2LdapCommand extends Command
                         $mods[$memberAttr] = $this->resolveMemberDns($group);
                     }
                     $this->ldapService->modify($newDn, $mods);
+
+                    $toRemove = [];
+                    if ([] === $members) {
+                        $toRemove[] = 'memberuid';
+                    }
+                    if ('' !== $memberAttr && [] === $this->resolveMemberDns($group)) {
+                        $toRemove[] = $memberAttr;
+                    }
+                    if ([] !== $toRemove) {
+                        $this->ldapService->removeAttributes($newDn, $toRemove);
+                    }
                     $mapping->setSyncedAt(new \DateTimeImmutable());
                 }
                 $io->writeln(sprintf('  ✓ Group %s updated', $group->getSlug()));

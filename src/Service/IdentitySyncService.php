@@ -281,10 +281,27 @@ class IdentitySyncService
         }
 
         $members = $this->resolveMemberUids($group);
+        $memberAttr = (string) $this->parameterBag->get('ldapAttrGroupMemberDn');
+        $memberDns = '' !== $memberAttr ? $this->resolveMemberDns($group) : [];
 
-        $this->ldapService->modify($mapping->getLdapDn(), [
-            'memberuid' => $members,
-        ]);
+        // modify() no-op sur valeurs vides : la suppression du dernier
+        // membre passe par une vraie suppression d'attribut (ldap_mod_del).
+        $mods = ['memberuid' => $members];
+        if ('' !== $memberAttr) {
+            $mods[$memberAttr] = $memberDns;
+        }
+        $this->ldapService->modify($mapping->getLdapDn(), $mods);
+
+        $toRemove = [];
+        if ([] === $members) {
+            $toRemove[] = 'memberuid';
+        }
+        if ('' !== $memberAttr && [] === $memberDns) {
+            $toRemove[] = $memberAttr;
+        }
+        if ([] !== $toRemove) {
+            $this->ldapService->removeAttributes($mapping->getLdapDn(), $toRemove);
+        }
         $mapping->setSyncedAt(new \DateTimeImmutable());
     }
 
