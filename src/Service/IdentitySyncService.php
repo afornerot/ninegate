@@ -218,9 +218,11 @@ class IdentitySyncService
                     'description' => $group->getDescription() ?? '',
                     'memberuid'   => $members,
                 ];
-                if ([] !== $memberDns) {
+                if ('' !== $memberAttr) {
+                    // Toujours cadolesGroup si le schéma étendu est configuré :
+                    // un groupe vide doit accepter un cadolesmember posé par une
+                    // appli externe (l'attribut lui-même n'est ajouté qu'avec valeurs).
                     $attrs['objectclass'] = ['top', 'posixGroup', 'cadolesGroup'];
-                    $attrs[$memberAttr] = $memberDns;
                 } else {
                     $attrs['objectclass'] = ['top', 'posixGroup'];
                 }
