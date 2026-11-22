@@ -58,6 +58,11 @@ class IdentitySyncService
             $mapping->setLdapDn($newDn);
         }
 
+        if (null === $mapping) {
+            $this->ensureUserMapping($user, $newDn);
+            return;
+        }
+
         $attrs = [
             'mail'      => $user->getEmail() ?? '',
             'givenname' => $user->getFirstname() ?? '',
@@ -72,6 +77,42 @@ class IdentitySyncService
         $this->ldapService->modify($newDn, $attrs);
 
         $mapping->setSyncedAt(new \DateTimeImmutable());
+    }
+
+    /**
+     * Crée l'entrée LDAP + le mapping d'un user sans mapping (cf. batch).
+     * Idempotence : DN déjà présent -> mapping seul, la sync le traitera
+     * en update au prochain tour.
+     */
+    private function ensureUserMapping(User $user, string $newDn): void
+    {
+        $alreadyThere = $this->ldapService->exists($newDn);
+        if (!$alreadyThere) {
+            if (!$this->ldapService->add($newDn, [
+                'objectclass'   => ['top', 'inetOrgPerson', 'posixAccount'],
+                'uid'           => $this->normalizeForUid($user->getUsername()),
+                'cn'            => trim(($user->getFirstname() ?? '') . ' ' . ($user->getLastname() ?? '')) ?: $this->normalizeForUid($user->getUsername()),
+                'uidnumber'     => (string) ($user->getId() + 1000),
+                'gidnumber'     => '1000',
+                'mail'          => $user->getEmail() ?? '',
+                'sn'            => $user->getLastname() ?? $user->getUsername(),
+                'homedirectory' => '/home/' . $this->normalizeForUid($user->getUsername()),
+                'loginshell'    => '/bin/bash',
+            ] + (null !== $user->getOpenLdapPassword() && '' !== $user->getOpenLdapPassword()
+                ? ['userpassword' => $user->getOpenLdapPassword()]
+                : []))) {
+                return;
+            }
+        }
+
+        $mapping = new LdapMapping();
+        $mapping->setEntityType(LdapMapping::TYPE_USER);
+        $mapping->setEntityId($user->getId());
+        $mapping->setLdapDn($newDn);
+        $mapping->setLdapUid($user->getUsername());
+        $mapping->setSyncedAt(new \DateTimeImmutable());
+        $this->em->persist($mapping);
+        $this->em->flush();
     }
 
     /**
@@ -96,6 +137,37 @@ class IdentitySyncService
         }
 
         $members = $this->resolveMemberUids($group);
+
+        if (null === $mapping) {
+            // Nouveau groupe : création de l'entrée LDAP + mapping (cf. batch).
+            // Idempotence : le DN peut déjà exister (run interrompu ou créé
+            // hors sync) -> on enregistre juste le mapping, la sync le
+            // traitera en update au prochain tour.
+            $gidNumber = $group->getId() + 1000;
+            $alreadyThere = $this->ldapService->exists($newDn);
+            if (!$alreadyThere) {
+                if (!$this->ldapService->add($newDn, [
+                    'objectclass' => ['top', 'posixGroup'],
+                    'cn'          => $this->normalizeForCn($group->getSlug()),
+                    'gidnumber'   => (string) $gidNumber,
+                    'description' => $group->getDescription() ?? '',
+                    'memberuid'   => $members,
+                ])) {
+                    return;
+                }
+            }
+
+            $mapping = new LdapMapping();
+            $mapping->setEntityType(LdapMapping::TYPE_GROUP);
+            $mapping->setEntityId($group->getId());
+            $mapping->setLdapDn($newDn);
+            $mapping->setLdapGidNumber($alreadyThere ? null : $gidNumber);
+            $mapping->setSyncedAt(new \DateTimeImmutable());
+            $this->em->persist($mapping);
+            $this->em->flush();
+            // Entrée créée : memberuid déjà posé par add(), rien d'autre à faire.
+            return;
+        }
 
         $this->ldapService->modify($newDn, [
             'description' => $group->getDescription() ?? '',
