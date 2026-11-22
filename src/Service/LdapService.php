@@ -5,6 +5,7 @@ namespace App\Service;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\NotBoundException;
@@ -38,7 +39,14 @@ class LdapService
         $writerDn = $this->parameterBag->get('ldapWriterDn');
         $writerPwd = $this->parameterBag->get('ldapWriterPassword');
 
-        $this->adapter->getConnection()->bind($writerDn, $writerPwd);
+        // Socket mort (worker long-vif : idle TCP fermé ou slapd redémarré)
+        // -> on recrée l'adaptateur et on réessaie une fois.
+        try {
+            $this->adapter->getConnection()->bind($writerDn, $writerPwd);
+        } catch (ConnectionException $e) {
+            $this->adapter = LdapAdapterFactory::create($this->parameterBag);
+            $this->adapter->getConnection()->bind($writerDn, $writerPwd);
+        }
         $this->bound = true;
     }
 
