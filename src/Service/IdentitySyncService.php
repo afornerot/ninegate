@@ -139,7 +139,8 @@ class IdentitySyncService
             if (null === $dn) {
                 continue;
             }
-            $this->ldapService->modify((string) $dn, ['memberuid' => []]);
+            // modify() est no-op sur valeurs vides : vraie suppression d'attribut.
+            $this->ldapService->removeAttributes((string) $dn, ['memberuid']);
         }
     }
 
