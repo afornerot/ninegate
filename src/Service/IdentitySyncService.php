@@ -199,6 +199,8 @@ class IdentitySyncService
         }
 
         $members = $this->resolveMemberUids($group);
+        $memberAttr = (string) $this->parameterBag->get('ldapAttrGroupMemberDn');
+        $memberDns = '' !== $memberAttr ? $this->resolveMemberDns($group) : [];
 
         if (null === $mapping) {
             // Nouveau groupe : création de l'entrée LDAP + mapping (cf. batch).
@@ -208,13 +210,21 @@ class IdentitySyncService
             $gidNumber = $group->getId() + 1000;
             $alreadyThere = $this->ldapService->exists($newDn);
             if (!$alreadyThere) {
-                if (!$this->ldapService->add($newDn, [
-                    'objectclass' => ['top', 'posixGroup'],
+                // Schéma étendu (ex: cadolesGroup/cadolesmember) uniquement si
+                // LDAP_ATTR_GROUP_MEMBER_DN est configuré ; sinon posixGroup seul.
+                $attrs = [
                     'cn'          => $this->normalizeForCn($group->getSlug()),
                     'gidnumber'   => (string) $gidNumber,
                     'description' => $group->getDescription() ?? '',
                     'memberuid'   => $members,
-                ])) {
+                ];
+                if ([] !== $memberDns) {
+                    $attrs['objectclass'] = ['top', 'posixGroup', 'cadolesGroup'];
+                    $attrs[$memberAttr] = $memberDns;
+                } else {
+                    $attrs['objectclass'] = ['top', 'posixGroup'];
+                }
+                if (!$this->ldapService->add($newDn, $attrs)) {
                     return;
                 }
             }
@@ -231,10 +241,20 @@ class IdentitySyncService
             return;
         }
 
-        $this->ldapService->modify($newDn, [
-            'description' => $group->getDescription() ?? '',
-            'memberuid'   => $members,
-        ]);
+        $this->ldapService->modify($newDn, [] !== $memberDns
+            // objectclass inclus : les entrées préexistantes (créées avant la
+            // refonte du schéma ou importées incomplètes) doivent passer en
+            // cadolesGroup pour accepter l'attribut DN.
+            ? [
+                'objectclass'   => ['top', 'posixGroup', 'cadolesGroup'],
+                'description'   => $group->getDescription() ?? '',
+                'memberuid'     => $members,
+                $memberAttr     => $memberDns,
+            ]
+            : [
+                'description' => $group->getDescription() ?? '',
+                'memberuid'   => $members,
+            ]);
 
         $mapping->setSyncedAt(new \DateTimeImmutable());
     }
@@ -283,6 +303,25 @@ class IdentitySyncService
         $uids = array_values(array_unique($uids));
         sort($uids);
         return $uids;
+    }
+
+    /**
+     * DN complets des membres (attribut cadolesMember), même format que
+     * l'annuaire d'origine : uid=x,<usersDN>.
+     */
+    private function resolveMemberDns(AppGroup $group): array
+    {
+        $usersDn = $this->parameterBag->get('ldapUsersDn');
+        $dns = [];
+        foreach ($group->getUserGroups() as $userGroup) {
+            $user = $userGroup->getUser();
+            if ($user && null !== $user->getUsername()) {
+                $dns[] = 'uid='.$this->normalizeForUid($user->getUsername()).','.$usersDn;
+            }
+        }
+        $dns = array_values(array_unique($dns));
+        sort($dns);
+        return $dns;
     }
 
     private function normalizeForUid(string $value): string

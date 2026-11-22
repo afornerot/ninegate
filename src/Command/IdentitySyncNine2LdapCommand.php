@@ -5,7 +5,6 @@ namespace App\Command;
 use App\Entity\Group as AppGroup;
 use App\Entity\LdapMapping;
 use App\Entity\User;
-use App\Entity\UserGroup;
 use App\Repository\GroupRepository;
 use App\Repository\LdapMappingRepository;
 use App\Repository\UserGroupRepository;
@@ -50,6 +49,7 @@ class IdentitySyncNine2LdapCommand extends Command
         private LdapMappingRepository $mappingRepository,
         private LdapService $ldapService,
         private EntityManagerInterface $em,
+        private \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $parameterBag,
     ) {
         parent::__construct();
     }
@@ -125,7 +125,7 @@ class IdentitySyncNine2LdapCommand extends Command
             $members = $this->resolveMemberUids($group);
 
             if ($mapping) {
-                if ($mapping->getLdapDn() !== $newDn) {
+                if (!$this->ldapService->dnEquals($mapping->getLdapDn(), $newDn)) {
                     if (!$dryRun) {
                         $this->ldapService->modifyRdn($mapping->getLdapDn(), 'cn=' . $this->normalizeForCn($group->getSlug()));
                         $mapping->setLdapDn($newDn);
@@ -134,23 +134,40 @@ class IdentitySyncNine2LdapCommand extends Command
                 }
 
                 if (!$dryRun) {
-                    $this->ldapService->modify($newDn, [
+                    $memberAttr = (string) $this->parameterBag->get('ldapAttrGroupMemberDn');
+                    $mods = [
                         'description' => $group->getDescription() ?? '',
                         'memberuid'   => $members,
-                    ]);
+                    ];
+                    if ('' !== $memberAttr) {
+                        // objectclass inclus : les entrées préexistantes doivent
+                        // passer en cadolesGroup pour accepter l'attribut DN.
+                        $mods['objectclass'] = ['top', 'posixGroup', 'cadolesGroup'];
+                        $mods[$memberAttr] = $this->resolveMemberDns($group);
+                    }
+                    $this->ldapService->modify($newDn, $mods);
                     $mapping->setSyncedAt(new \DateTimeImmutable());
                 }
                 $io->writeln(sprintf('  ✓ Group %s updated', $group->getSlug()));
             } else {
                 $gidNumber = $group->getId() + 1000;
-                if (!$dryRun) {
-                    $ok = $this->ldapService->add($newDn, [
-                        'objectclass' => ['top', 'posixGroup'],
+                // Idempotence : le DN peut déjà exister (run interrompu avant
+                // flush des mappings, ou créé hors sync). On enregistre juste
+                // le mapping et la sync le traitera en update au prochain tour.
+                $alreadyThere = !$dryRun && $this->ldapService->exists($newDn);
+                if (!$dryRun && !$alreadyThere) {
+                    $memberAttr = (string) $this->parameterBag->get('ldapAttrGroupMemberDn');
+                    $attrs = [
+                        'objectclass' => '' !== $memberAttr ? ['top', 'posixGroup', 'cadolesGroup'] : ['top', 'posixGroup'],
                         'cn' => $this->normalizeForCn($group->getSlug()),
                         'gidnumber' => (string) $gidNumber,
                         'description' => $group->getDescription() ?? '',
                         'memberuid' => $members,
-                    ]);
+                    ];
+                    if ('' !== $memberAttr) {
+                        $attrs[$memberAttr] = $this->resolveMemberDns($group);
+                    }
+                    $ok = $this->ldapService->add($newDn, $attrs);
 
                     if ($ok) {
                         $mapping = new LdapMapping();
@@ -162,7 +179,17 @@ class IdentitySyncNine2LdapCommand extends Command
                         $this->em->persist($mapping);
                     }
                 }
-                $io->writeln(sprintf('  + Group %s added', $group->getSlug()));
+                if ($alreadyThere) {
+                    $mapping = new LdapMapping();
+                    $mapping->setEntityType(LdapMapping::TYPE_GROUP);
+                    $mapping->setEntityId($group->getId());
+                    $mapping->setLdapDn($newDn);
+                    $mapping->setSyncedAt(new \DateTimeImmutable());
+                    $this->em->persist($mapping);
+                    $io->writeln(sprintf('  ⚠ Group %s : DN déjà présent, mapping créé', $group->getSlug()));
+                } else {
+                    $io->writeln(sprintf('  + Group %s added', $group->getSlug()));
+                }
             }
         }
     }
@@ -183,7 +210,7 @@ class IdentitySyncNine2LdapCommand extends Command
             $newDn = $this->ldapService->userDnFor($user->getUsername());
 
             if ($mapping) {
-                if ($mapping->getLdapDn() !== $newDn) {
+                if (!$this->ldapService->dnEquals($mapping->getLdapDn(), $newDn)) {
                     if (!$dryRun) {
                         $this->ldapService->modifyRdn($mapping->getLdapDn(), 'uid=' . $this->normalizeForUid($user->getUsername()));
                         $mapping->setLdapDn($newDn);
@@ -202,7 +229,9 @@ class IdentitySyncNine2LdapCommand extends Command
                 $io->writeln(sprintf('  ✓ User %s updated', $user->getUsername()));
             } else {
                 $uidNumber = $user->getId() + 1000;
-                if (!$dryRun) {
+                // Idempotence : cf. syncGroups()
+                $alreadyThere = !$dryRun && $this->ldapService->exists($newDn);
+                if (!$dryRun && !$alreadyThere) {
                     $ok = $this->ldapService->add($newDn, [
                         'objectclass'   => ['top', 'inetOrgPerson', 'posixAccount'],
                         'uid'           => $this->normalizeForUid($user->getUsername()),
@@ -225,7 +254,18 @@ class IdentitySyncNine2LdapCommand extends Command
                         $this->em->persist($mapping);
                     }
                 }
-                $io->writeln(sprintf('  + User %s added', $user->getUsername()));
+                if ($alreadyThere) {
+                    $mapping = new LdapMapping();
+                    $mapping->setEntityType(LdapMapping::TYPE_USER);
+                    $mapping->setEntityId($user->getId());
+                    $mapping->setLdapDn($newDn);
+                    $mapping->setLdapUid($user->getUsername());
+                    $mapping->setSyncedAt(new \DateTimeImmutable());
+                    $this->em->persist($mapping);
+                    $io->writeln(sprintf('  ⚠ User %s : DN déjà présent, mapping créé', $user->getUsername()));
+                } else {
+                    $io->writeln(sprintf('  + User %s added', $user->getUsername()));
+                }
             }
         }
     }
@@ -261,21 +301,40 @@ class IdentitySyncNine2LdapCommand extends Command
 
     /**
      * @return string[] Liste des uid LDAP (normalisés) des membres actifs du groupe.
+     * Tous les membres (comme le service temps réel et l'annuaire historique) ;
+     * le rôle applicatif ROLE_MASTER n'est pas un critère d'appartenance LDAP.
      */
     private function resolveMemberUids(AppGroup $group): array
     {
         $uids = [];
         foreach ($group->getUserGroups() as $userGroup) {
-            if ($userGroup->getRole() === UserGroup::ROLE_MASTER) {
-                $user = $userGroup->getUser();
-                if ($user && null !== $user->getUsername()) {
-                    $uids[] = $this->normalizeForUid($user->getUsername());
-                }
+            $user = $userGroup->getUser();
+            if ($user && null !== $user->getUsername()) {
+                $uids[] = $this->normalizeForUid($user->getUsername());
             }
         }
         $uids = array_values(array_unique($uids));
         sort($uids);
         return $uids;
+    }
+
+    /**
+     * DN complets des membres (attribut configurable, ex: cadolesmember),
+     * même format que l'annuaire d'origine : uid=x,<usersDN>.
+     */
+    private function resolveMemberDns(AppGroup $group): array
+    {
+        $usersDn = $this->parameterBag->get('ldapUsersDn');
+        $dns = [];
+        foreach ($group->getUserGroups() as $userGroup) {
+            $user = $userGroup->getUser();
+            if ($user && null !== $user->getUsername()) {
+                $dns[] = 'uid='.$this->normalizeForUid($user->getUsername()).','.$usersDn;
+            }
+        }
+        $dns = array_values(array_unique($dns));
+        sort($dns);
+        return $dns;
     }
 
     private function normalizeForUid(string $value): string
