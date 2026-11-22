@@ -33,6 +33,9 @@ class Page
     #[ORM\Column(name: 'page_order', type: 'integer', options: ['default' => 0])]
     private int $pageOrder = 0;
 
+    #[ORM\Column(name: 'maxwidth', type: 'integer', options: ['default' => 0])]
+    private int $maxWidth = 0;
+
     #[ORM\ManyToMany(targetEntity: Group::class)]
     #[ORM\JoinTable(name: 'page_group')]
     private Collection $groups;
@@ -101,6 +104,17 @@ class Page
         return $this;
     }
 
+    public function getMaxWidth(): int
+    {
+        return $this->maxWidth;
+    }
+
+    public function setMaxWidth(int $maxWidth): static
+    {
+        $this->maxWidth = $maxWidth;
+
+        return $this;
+    }
     public function getGroups(): Collection
     {
         return $this->groups;

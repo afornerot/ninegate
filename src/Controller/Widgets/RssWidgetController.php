@@ -179,21 +179,22 @@ class RssWidgetController extends AbstractController
                         'title' => $entry->getElementsByTagName('title')->item(0)?->textContent ?? '',
                         'link' => $link,
                         'description' => $entry->getElementsByTagName('summary')->item(0)?->textContent ?? $entry->getElementsByTagName('content')->item(0)?->textContent ?? '',
-                        'pubDate' => $entry->getElementsByTagName('published')->item(0)?->textContent ?? $entry->getElementsByTagName('updated')->item(0)?->textContent ?? '',
+                        'pubDate' => $entry->getElementsByTagName('updated')->item(0)?->textContent ?? $entry->getElementsByTagName('published')->item(0)?->textContent ?? '',
                         'image' => $this->extractImage($entry),
                     ];
                 }
                 return $result;
             }
-
-            return ['title' => '', 'items' => []];
-        } catch (\Exception $e) {
-            return ['title' => '', 'items' => []];
+        } catch (\Throwable) {
+            // Ignore feed parsing errors
         }
+
+        return ['title' => '', 'items' => []];
     }
 
     private function extractImage(\DOMElement $node): ?string
     {
+        // First, try to find image in enclosures (RSS 2.0)
         $enclosures = $node->getElementsByTagName('enclosure');
         foreach ($enclosures as $enclosure) {
             $rel = $enclosure->getAttribute('rel');
@@ -204,9 +205,60 @@ class RssWidgetController extends AbstractController
             }
         }
 
+        // Check for media content tags (RSS 2.0 Media RSS extension)
+        $mediaContentElements = $node->getElementsByTagName('media:content');
+        foreach ($mediaContentElements as $mediaContentElement) {
+            $url = $mediaContentElement->getAttribute('url');
+            if ($url) {
+                return $url;
+            }
+        }
+
+        // Check for media thumbnail tags (RSS 2.0 Media RSS extension)
+        $mediaThumbnailElements = $node->getElementsByTagName('media:thumbnail');
+        foreach ($mediaThumbnailElements as $mediaThumbnailElement) {
+            $url = $mediaThumbnailElement->getAttribute('url');
+            if ($url) {
+                return $url;
+            }
+        }
+
+        // Check for enclosure tags with image types
+        $enclosureElements = $node->getElementsByTagName('enclosure');
+        foreach ($enclosureElements as $enclosureElement) {
+            $url = $enclosureElement->getAttribute('url');
+            $type = $enclosureElement->getAttribute('type');
+            $rel = $enclosureElement->getAttribute('rel');
+            if ($url && (str_starts_with($type, 'image/') || $rel === 'thumb')) {
+                return $url;
+            }
+        }
+
+        // Check description/content for  tags
         $description = $node->getElementsByTagName('description')->item(0)?->textContent ?? '';
         if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/', $description, $m)) {
             return $m[1];
+        }
+
+        // Check content:encoded for  tags (WordPress RSS feeds)
+        $contentEncoded = $node->getElementsByTagName('content:encoded');
+        if ($contentEncoded->length > 0) {
+            $descriptionHtml = $contentEncoded->item(0)?->textContent ?? '';
+            if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/', $descriptionHtml, $m)) {
+                return $m[1];
+            }
+        }
+
+        // Check for any  tags in the entire document
+        $domDocument = $node->ownerDocument;
+        if ($domDocument) {
+            $imageElements = $domDocument->getElementsByTagName('img');
+            foreach ($imageElements as $imageElement) {
+                $url = $imageElement->getAttribute('src');
+                if ($url) {
+                    return $url;
+                }
+            }
         }
 
         return null;

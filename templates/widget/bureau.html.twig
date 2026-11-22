@@ -80,8 +80,8 @@
             </div></div>
         {% endif %}
         <div class="itemlink-category-section" data-cat-section="{{ item.category.id }}" data-bureau-id="{{ pageWidget.id }}">
-            {% if not config.categoryId %}
-                <h6 class="itemlink-category-title mt-2 mb-1" style="opacity: 0.7;">{{ item.category.title }}</h6>
+            {% if not config.categoryId or (config.showFavorites and favoriteItems|length > 0) %}
+                <h6 class="itemlink-category-title mt-4 mb-1" style="opacity: 0.7;">{{ item.category.title }}</h6>
             {% endif %}
             <div class="itemlink-items itemlink-{{ config.display|default('medium') }}">
     {% endif %}

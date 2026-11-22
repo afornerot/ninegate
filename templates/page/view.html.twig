@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block body %}
-<style>.page-grid > div { opacity: 0; }</style>
+<style>.page-grid > div { opacity: 0; } .page-grid { {{ page.maxWidth ? 'max-width:' ~ page.maxWidth ~ 'px;margin: 0 auto;' : '' }} }</style>
 {{ page.pageTemplate.template|raw }}
 
 <div id="page-widgets-data" style="display:none;">

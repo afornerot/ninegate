@@ -11,14 +11,14 @@
 
     <div class="blog-masonry" id="rss-items-{{ pageWidget.id }}">
         {% for item in items %}
-        <div class="blog-masonry-item" data-rss-source="{{ item.source|default('') }}">
+        <div class="blog-masonry-item bg-dark" data-rss-source="{{ item.source|default('') }}">
             <div class="card">
                 {% if item.image %}
                     <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">
                         <img src="{{ item.image }}" class="card-img-top" alt="{{ item.title }}">
                     </a>
                 {% endif %}
-                <div class="card-body">
+                <div class="card-body bg-dark">
                     <div class="card-title mb-1">
                         <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
                             <h6 class="mb-0">{{ item.title }}</h6>

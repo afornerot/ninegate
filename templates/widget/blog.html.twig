@@ -6,7 +6,7 @@
                     <img src="{{ bninefile(article.image) }}" class="card-img-top" alt="{{ article.title }}">
                 </a>
             {% endif %}
-            <div class="card-body">
+            <div class="card-body bg-dark">
                 <div class="card-title mb-1">
                     <a href="{{ path('app_blogarticle_view', {slug: article.slug, pageSlug: pageWidget.page.slug}) }}" class="text-decoration-none">
                         <h6 class="mb-0">{{ article.title }}</h6>

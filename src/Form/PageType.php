@@ -14,6 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,8 +35,13 @@ class PageType extends AbstractType
                 'attr' => ['class' => 'form-control'],
             ])
 
-            ->add('pageOrder', TextType::class, [
+            ->add('pageOrder', NumberType::class, [
                 'label' => 'Ordre',
+                'attr' => ['class' => 'form-control'],
+            ])
+
+            ->add('maxWidth', NumberType::class, [
+                'label' => 'Largeur maximale (px)',
                 'attr' => ['class' => 'form-control'],
             ])
 
