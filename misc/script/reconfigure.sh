@@ -18,8 +18,17 @@ bin/console d:s:u --force
 bin/console app:init
 bin/console assets:install public
 
-# Lancer le worker Messenger en tâche de fond
-nohup bin/console messenger:consume async --time-limit=3600 --memory-limit=128M >> var/log/messenger-worker.log 2>&1 &
+# Lancer le worker Messenger en tâche de fond.
+# --time-limit=3600 recycle le process (fuites mémoire), la boucle le relance :
+# sans elle le worker meurt après 1 h et plus aucune sync temps réel NINE->LDAP.
+(
+  while true; do
+    rc=0
+    bin/console messenger:consume async --time-limit=3600 --memory-limit=128M >> var/log/messenger-worker.log 2>&1 || rc=$?
+    echo "$(date -Iseconds) worker exited (${rc}), restart in 2s" >> var/log/messenger-worker.log
+    sleep 2
+  done
+) &
 disown
 echo "Worker Messenger lancé (PID: $!)"
 
