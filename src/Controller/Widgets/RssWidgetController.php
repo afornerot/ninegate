@@ -30,6 +30,7 @@ class RssWidgetController extends AbstractController
         $feedUrls = $content['feedUrls'] ?? $config['feedUrls']['default'] ?? '';
         $maxItems = $content['maxItems'] ?? $config['maxItems']['default'] ?? 10;
         $showDescription = $content['showDescription'] ?? $config['showDescription']['default'] ?? true;
+        $showNav = $content['showNav'] ?? $config['showNav']['default'] ?? true;
 
         $feedData = $this->fetchAllFeeds($feedUrls, (int) $maxItems, $pageWidget->getId());
         $items = $feedData['items'];
@@ -42,6 +43,7 @@ class RssWidgetController extends AbstractController
             'feedUrls' => $feedUrls,
             'maxItems' => $maxItems,
             'showDescription' => $showDescription,
+            'showNav' => $showNav,
             'items' => $items,
             'feeds' => $feeds,
             'routeSave' => $isAdmin ? 'app_admin_pagewidget_rss_save' : 'app_user_pagewidget_rss_save',
@@ -67,6 +69,7 @@ class RssWidgetController extends AbstractController
         $content['feedUrls'] = $data['feedUrls'] ?? $content['feedUrls'] ?? '';
         $content['maxItems'] = $data['maxItems'] ?? $content['maxItems'] ?? 10;
         $content['showDescription'] = $data['showDescription'] ?? $content['showDescription'] ?? true;
+        $content['showNav'] = $data['showNav'] ?? $content['showNav'] ?? true;
         $pageWidget->setContent($content);
         $em->flush();
 

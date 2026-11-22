@@ -45,7 +45,7 @@ docker exec -i "$TMP_MARIADB" mysql -uroot -proot ninegate -N -e "
 SELECT CONCAT('INSERT INTO app_group (id, name, slug, is_open, is_system, type) VALUES (',
   id, ', ', QUOTE(label), ', ', QUOTE(LOWER(REPLACE(label, ' ', '-'))), ', ',
   IF(fgopen, 'true', 'false'), ', ', IF(fgall, 'true', 'false'), ', ',
-  QUOTE('Groupe de Travail'),
+  QUOTE('Organisation'),
   ') ON CONFLICT (id) DO NOTHING;')
 FROM groupe ORDER BY id;
 " 2>/dev/null >> "$FINAL"

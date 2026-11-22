@@ -1,6 +1,6 @@
 {% if items|length > 0 %}
 <div class="rss-widget">
-    {% if feeds|length > 1 %}
+    {% if showNav and feeds|length > 1 %}
     <div class="rss-feed-nav mb-2 d-flex gap-1 flex-wrap" data-rss-id="{{ pageWidget.id }}">
         <a href="#" class="badge rss-feed-filter active" data-feed="all" style="background: var(--bs-primary); cursor: pointer;">Tous</a>
         {% for feed in feeds %}

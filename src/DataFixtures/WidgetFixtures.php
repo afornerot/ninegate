@@ -138,6 +138,7 @@ class WidgetFixtures extends Fixture implements DependentFixtureInterface
                     'feedUrls' => ['type' => 'textarea', 'label' => 'URLs des flux (une par ligne)', 'default' => ''],
                     'maxItems' => ['type' => 'number', 'label' => 'Nombre max d\'articles', 'default' => 10],
                     'showDescription' => ['type' => 'checkbox', 'label' => 'Afficher la description', 'default' => true],
+                    'showNav' => ['type' => 'checkbox', 'label' => 'Afficher la navbar des flux', 'default' => true],
                 ],
             ],
             [
