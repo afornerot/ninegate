@@ -142,6 +142,36 @@ class IdentitySyncService
     }
 
     /**
+     * ObjectClass d'une entrée groupe : top/posixGroup + LDAP_GROUP_OC si
+     * distinct (ex: cadolesGroup pour l'annuaire Nine historique).
+     */
+    private function groupObjectClasses(): array
+    {
+        $classes = ['top', 'posixGroup'];
+        $extra = (string) $this->parameterBag->get('ldapGroupOc');
+        if ('' !== $extra && !in_array($extra, $classes, true)) {
+            $classes[] = $extra;
+        }
+
+        return $classes;
+    }
+
+    /**
+     * ObjectClass d'une entrée user : top/inetOrgPerson/posixAccount +
+     * LDAP_USER_AUX_OC si configuré (ex: cadolesPerson).
+     */
+    private function userObjectClasses(): array
+    {
+        $classes = ['top', 'inetOrgPerson', 'posixAccount'];
+        $extra = (string) $this->parameterBag->get('ldapUserAuxOc');
+        if ('' !== $extra && !in_array($extra, $classes, true)) {
+            $classes[] = $extra;
+        }
+
+        return $classes;
+    }
+
+    /**
      * Crée l'entrée LDAP + le mapping d'un user sans mapping (cf. batch).
      * Idempotence : DN déjà présent -> mapping seul, la sync le traitera
      * en update au prochain tour.
@@ -151,7 +181,7 @@ class IdentitySyncService
         $alreadyThere = $this->ldapService->exists($newDn);
         if (!$alreadyThere) {
             if (!$this->ldapService->add($newDn, [
-                'objectclass'   => ['top', 'inetOrgPerson', 'posixAccount'],
+                'objectclass'   => $this->userObjectClasses(),
                 'uid'           => $this->normalizeForUid($user->getUsername()),
                 'cn'            => trim(($user->getFirstname() ?? '') . ' ' . ($user->getLastname() ?? '')) ?: $this->normalizeForUid($user->getUsername()),
                 'uidnumber'     => (string) ($user->getId() + 1000),
@@ -218,14 +248,7 @@ class IdentitySyncService
                     'description' => $group->getDescription() ?? '',
                     'memberuid'   => $members,
                 ];
-                if ('' !== $memberAttr) {
-                    // Toujours cadolesGroup si le schéma étendu est configuré :
-                    // un groupe vide doit accepter un cadolesmember posé par une
-                    // appli externe (l'attribut lui-même n'est ajouté qu'avec valeurs).
-                    $attrs['objectclass'] = ['top', 'posixGroup', 'cadolesGroup'];
-                } else {
-                    $attrs['objectclass'] = ['top', 'posixGroup'];
-                }
+                $attrs['objectclass'] = $this->groupObjectClasses();
                 if (!$this->ldapService->add($newDn, $attrs)) {
                     return;
                 }
@@ -245,10 +268,10 @@ class IdentitySyncService
 
         $this->ldapService->modify($newDn, [] !== $memberDns
             // objectclass inclus : les entrées préexistantes (créées avant la
-            // refonte du schéma ou importées incomplètes) doivent passer en
-            // cadolesGroup pour accepter l'attribut DN.
+            // refonte du schéma ou importées incomplètes) doivent porter la
+            // classe étendue pour accepter l'attribut DN.
             ? [
-                'objectclass'   => ['top', 'posixGroup', 'cadolesGroup'],
+                'objectclass'   => $this->groupObjectClasses(),
                 'description'   => $group->getDescription() ?? '',
                 'memberuid'     => $members,
                 $memberAttr     => $memberDns,
